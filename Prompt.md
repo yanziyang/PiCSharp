@@ -60,3 +60,9 @@ Prompt:
 I would transfer implementation task to Codex now. What prompt shall I use for Codex?
 
 Response:
+codex "Complete the task in ÍmplementationKit/packets/T1.2-pi-protocol.md. Read AGENTS.md and docs/translation-patterns.md first. The TypeScript in reference/pi is the specification and is read-only. Write only to the target paths named in the packet; if you need anything outside them, stop and explain in your summary instead of doing it."
+
+--------------------------------------------------
+Prompt:
+
+Proceed until finish. commit and push for each milestone. I will be away for several hours.
