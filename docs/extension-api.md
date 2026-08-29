@@ -79,6 +79,11 @@ public interface IExtensionApi
 {
     void On<TEvent>(EventDescriptor<TEvent> ev, ExtensionHandler<TEvent> handler);
     void On<TEvent, TResult>(EventDescriptor<TEvent, TResult> ev, ExtensionHandler<TEvent, TResult> handler);
+
+    // Amendment A (spike): most handlers are synchronous. Without these overloads every
+    // sync handler ends in `return ValueTask.CompletedTask;` — noise across all 85 ports.
+    void On<TEvent>(EventDescriptor<TEvent> ev, Action<TEvent, IExtensionContext, CancellationToken> handler);
+    void On<TEvent, TResult>(EventDescriptor<TEvent, TResult> ev, Func<TEvent, IExtensionContext, CancellationToken, TResult?> handler);
 }
 
 public delegate ValueTask ExtensionHandler<TEvent>(TEvent e, IExtensionContext ctx, CancellationToken ct);
@@ -123,9 +128,32 @@ Mirror every member. Grouped as upstream groups them:
 | Session meta | `setSessionName`, `getSessionName`, `setLabel` | same |
 | Model | `setModel`, `getThinkingLevel`, `setThinkingLevel` | `SetModelAsync`, others same |
 
-`registerTool` uses typebox schemas upstream. In C#, take a JSON Schema derived from the parameter
-type via source generation, and keep the emitted schema byte-identical to typebox's output for the
-same shape — provider payloads depend on it. See `docs/translation-patterns.md §JSON Schema`.
+### Amendment C (spike) — tool parameter schemas
+
+`registerTool` uses typebox schemas upstream, built as runtime values:
+
+```ts
+const TodoParams = Type.Object({
+  action: StringEnum(["list","add","toggle","clear"] as const),
+  text: Type.Optional(Type.String({ description: "Todo text (for add)" })),
+});
+```
+
+C# needs a declared type plus a source-generated schema:
+
+```csharp
+[PiToolParams]
+public sealed record TodoParams
+{
+    [JsonPropertyName("action")] public required TodoAction Action { get; init; }
+    [JsonPropertyName("text")] [Description("Todo text (for add)")] public string? Text { get; init; }
+}
+```
+
+This is the **only structural** (rather than mechanical) translation found across the three ports in
+`spikes/d1-acceptance-test.md`. The emitted JSON Schema must be byte-identical to typebox's output for
+the same shape — provider payloads depend on it. Golden-test the emitter against typebox before T2.1
+closes. See `translation-patterns.md §7`; this is the project's top schema risk.
 
 ---
 
@@ -197,14 +225,50 @@ rules live in `docs/translation-patterns.md`.
 **Tier 1 — dialogs (portable, low risk).** `Confirm`, `Select`, `Input`, `Editor`, `Notify`.
 Mirror directly as async methods.
 
-**Tier 2 — component ownership (high risk).** Custom components, overlays, widgets with placement,
-`OnTerminalInput`, `AutocompleteProviderFactory`, `EditorFactory`, working-indicator control.
-These hand the extension a region of the render tree.
+**Amendment B (spike):** `ctx.ui.custom<void>(...)` has no C# equivalent — there is no `Task<void>`.
+Provide both forms:
 
-Tier 2 is only mirrorable if `Pi.Tui` preserves upstream's component and layout contracts. This is
-the dependency that drives `docs/tui-strategy.md` to recommend porting `pi-tui` rather than adopting
-Terminal.Gui's widget model. **If that decision is reversed, tier 2 cannot be mirrored and roughly
-41% of extensions become bespoke rewrites — D1's value collapses with it.**
+```csharp
+ValueTask    CustomAsync(Func<ITui, ITheme, IKeybindings, Action, IComponent> factory, CancellationToken ct = default);
+ValueTask<T> CustomAsync<T>(Func<ITui, ITheme, IKeybindings, Action<T>, IComponent> factory, CancellationToken ct = default);
+```
+
+**Tier 2 — components (lower risk than first assessed).** Custom components, overlays, widgets,
+`OnTerminalInput`, `AutocompleteProviderFactory`, `EditorFactory`, working-indicator control.
+
+An earlier draft claimed these "hand the extension a region of the render tree". The spike in
+`spikes/d1-acceptance-test.md` disproved that. The real contract, from `packages/tui/src/tui.ts`, is
+four members:
+
+```ts
+export interface Component {
+  render(width: number): string[];
+  handleInput?(data: string): void;
+  wantsKeyRelease?: boolean;
+  invalidate?(): void;
+}
+```
+
+Extensions emit **arrays of pre-styled strings**. They never touch the diff algorithm, never hold a
+retained widget tree, never do cursor arithmetic. `ctx.ui.setWidget` even accepts a bare `string[]`.
+This mirrors to C# without loss:
+
+```csharp
+public interface IComponent
+{
+    string[] Render(int width);
+    void HandleInput(string data) { }
+    bool WantsKeyRelease => false;
+    void Invalidate() { }
+}
+```
+
+What tier 2 *does* require of `Pi.Tui` is narrower than a compatible widget model: extensions import
+`matchesKey`, `Text` and `truncateToWidth` from `pi-tui` directly, and `Theme.Fg` must emit identical
+ANSI. See `tui-strategy.md`, which reaches the same conclusion on these narrower grounds.
+
+**Still untested:** `EditorFactory`, `AutocompleteProviderFactory` and `onTerminalInput`. See
+`spikes/d1-acceptance-test.md §6` — a second acceptance round is recommended before wave 6.
 
 ---
 
@@ -219,16 +283,31 @@ Terminal.Gui's widget model. **If that decision is reversed, tier 2 cannot be mi
 
 ---
 
-## 7. Acceptance test for this design
+## 7. Acceptance test
 
-Before wave 6 starts, port three extensions by hand against the draft API:
+### Round 1 — run 2026-08-29 · **PASS**
+
+Full working in `spikes/d1-acceptance-test.md`.
+
+| Extension | Exercises | Result |
+|---|---|---|
+| `permission-gate.ts` (34 L) | `tool_call` interception, blocking, `ctx.hasUI`, `ui.select` | clean, no API change |
+| `status-line.ts` (32 L) | `setStatus`, `ui.theme`, closure state | clean, no API change |
+| `todo.ts` (297 L) | tool registration + schema, `renderCall`/`renderResult`, custom `IComponent` with input handling and render caching, `ui.custom` overlay, state reconstruction from the session branch | clean; forced amendments A, B, C |
+
+The spike also disproved this document's original tier-2 risk claim — see §5.
+
+### Round 2 — required before wave 6 opens
+
+Round 1 left the highest-variance surfaces untested. These are cheap to test now and expensive to
+discover later:
 
 | Extension | Exercises |
 |---|---|
-| `permission-gate.ts` | `tool_call` interception, blocking, `ui.confirm` |
-| `todo.ts` | tool registration, `appendEntry`, custom entry rendering |
-| `status-line.ts` | tier-2 UI — widget placement and render ownership |
+| `modal-editor.ts` | `setEditorComponent` / `EditorFactory` — replacing the input editor wholesale |
+| `rainbow-editor.ts` | editor theming plus `onTerminalInput` raw interception |
+| `custom-provider-anthropic/` | `registerProvider`, custom auth, `streamSimple` |
 
-**The design passes if each ports in under a day with no API changes required.** If any of the three
-forces a change, revise this document before wave 6 — not during it. If `status-line.ts` cannot be
-ported at all, escalate: that is the signal that the TUI strategy and D1 are in conflict.
+**Pass condition, both rounds:** each extension ports in under a day with no API change beyond a
+recorded amendment. If one cannot be ported at all, escalate — that is the signal that D1 and the TUI
+strategy are in conflict, and both must be reopened together.

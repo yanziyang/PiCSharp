@@ -37,25 +37,42 @@ reasoning is set out in full.
 Terminal.Gui is a capable, mature full-screen TUI toolkit and it does use double-buffered
 differential rendering. On the surface it looks like it removes most of wave 5.
 
-It does not, for one decisive reason.
+It does not — but for narrower reasons than an earlier draft of this document claimed.
 
-**Pi's extension API hands extensions a region of the render tree.** `registerMessageRenderer`,
-`registerEntryRenderer`, `registerMarkdownTransformer`, custom components, overlays, widget
-placement, `EditorFactory` and `AutocompleteProviderFactory` are all written against *pi-tui's*
-component and layout contracts. Adopting Terminal.Gui's `View` hierarchy means those contracts change
-shape — and then:
+**Correction.** The earlier draft argued that Pi "hands extensions a region of the render tree", so a
+foreign widget model would break the extension mirror and force the 41% of UI-coupled extensions into
+bespoke rewrites. The spike in `spikes/d1-acceptance-test.md` disproved that. The extension-facing
+contract is four members:
 
-- Tier 2 of `extension-api.md` cannot be mirrored.
-- The 41% of extensions that render into the UI become bespoke rewrites rather than mechanical ports.
-- **D1's central justification collapses**, and with it the case for wave 7.
+```ts
+export interface Component {
+  render(width: number): string[];
+  handleInput?(data: string): void;
+  wantsKeyRelease?: boolean;
+  invalidate?(): void;
+}
+```
 
-The saving on wave 5 is paid for several times over in wave 7, in the currency of work that does not
-delegate. If the TUI strategy changes, D1 must be revisited in the same decision — they are one
-decision wearing two hats.
+Extensions emit arrays of pre-styled strings. That contract could be implemented on top of almost any
+renderer, Terminal.Gui included. **The extension mirror does not, by itself, decide this question.**
 
-Secondary concerns, less decisive but real: Terminal.Gui's rendering model would have to reproduce
-upstream's exact output bytes to satisfy the golden-buffer oracle, which is harder through a foreign
-abstraction than in a direct port; and Terminal.Gui carries environment assumptions Pi does not.
+The reasons that do stand, in descending weight:
+
+1. **Upstream's own 43 interactive components** (`modes/interactive/`, 18,302 LOC in T6.8) are written
+   against pi-tui's *internals*, not the four-member public contract. Those are ours to port either
+   way, and porting them onto a foreign layout and focus model is materially harder than onto a direct
+   port of the engine they were written for.
+2. **Extensions import pi-tui helpers directly** — `matchesKey`, `Text`, `truncateToWidth` — and
+   `Theme.Fg` must emit byte-identical ANSI. We owe faithful versions of these regardless of what sits
+   underneath, and they are entangled with the renderer's width and styling model.
+3. **Golden-buffer byte-identity** (`differential-testing.md §Oracle 5`) is the wave's gate. Producing
+   an exact byte match through a foreign abstraction that has its own opinions about clearing,
+   cursor movement and repaint is harder than in a direct port.
+4. Terminal.Gui carries environment assumptions Pi does not.
+
+This is now a **cost-and-risk argument, not an impossibility argument.** If someone produces a
+credible plan to satisfy (1)–(3) on top of Terminal.Gui, it deserves a hearing — the earlier draft
+foreclosed that debate on a false premise.
 
 ## Why not Spectre.Console as the engine
 
@@ -119,8 +136,12 @@ users notice immediately.
 
 ## Reconsider this decision if
 
-- The acceptance test in `extension-api.md §7` shows `status-line.ts` cannot be ported — the tier-2
-  mirror is already failing and the main argument for a faithful port is void.
+- **Round 2 of the acceptance test fails** (`extension-api.md §7`). `modal-editor.ts` and
+  `rainbow-editor.ts` exercise `EditorFactory` and `onTerminalInput` — the surfaces round 1 did not
+  reach. If those cannot be mirrored, the editor is more entangled with the renderer than the
+  four-member `Component` contract suggests, and reasons (1) and (2) above get stronger, not weaker.
+- Someone produces a costed plan satisfying reasons (1)–(3) on top of Terminal.Gui. Since the
+  impossibility argument is withdrawn, this is now a legitimate proposal rather than a non-starter.
 - Product scope drops the interactive TUI entirely (headless service only). Then wave 5 is not
   needed at all, wave 6's T6.8 shrinks by 18,302 LOC, and this document is moot — which would be a
   far larger scope change than a TUI library choice, and should be taken deliberately.
