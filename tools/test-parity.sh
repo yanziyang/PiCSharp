@@ -1,0 +1,97 @@
+#!/usr/bin/env bash
+#
+# Test-parity audit.
+#
+# docs/differential-testing.md makes the upstream suite the specification: "Ported
+# with the implementation, in the same PR. Never deferred." The skip audit catches
+# tests that were ported and then skipped. It cannot catch tests that were never
+# ported at all — a package can land at 2% coverage and stay green.
+#
+# This closes that hole. For each ported package it compares the number of C# test
+# cases against the upstream TypeScript cases, and fails if the count drops below
+# the floor recorded in .test-parity. Floors ratchet upward only: raising one is a
+# normal part of adding tests; lowering one requires deleting the line deliberately.
+#
+# Usage:  tools/test-parity.sh          audit against .test-parity
+#         tools/test-parity.sh --update rewrite floors to current counts
+set -uo pipefail
+
+cd "$(dirname "$0")/.."
+
+REF="reference/pi/packages"
+BUDGET=".test-parity"
+UPDATE=0
+[ "${1:-}" = "--update" ] && UPDATE=1
+
+# upstream package -> C# test project
+PAIRS="
+protocol:Pi.Protocol
+telemetry:Pi.Telemetry
+ai:Pi.Ai
+agent:Pi.AgentCore
+client:Pi.Client
+server:Pi.Server
+tui:Pi.Tui
+"
+
+count_upstream() {
+  local pkg="$1"
+  [ -d "$REF/$pkg" ] || { echo 0; return; }
+  find "$REF/$pkg" -name '*.test.ts' -not -path '*/node_modules/*' -exec grep -hoE '^[[:space:]]*(it|test)\(' {} + 2>/dev/null | wc -l | tr -d ' '
+}
+
+count_ported() {
+  local proj="$1"
+  local dir="tests/${proj}.Tests"
+  [ -d "$dir" ] || { echo 0; return; }
+  # ProjectReferenceTests.cs is scaffold wiring, not a ported upstream test.
+  find "$dir" -name '*.cs' ! -name 'ProjectReferenceTests.cs' \
+    -exec grep -hoE '\[(Fact|Theory)[]( ]' {} + 2>/dev/null | wc -l | tr -d ' '
+}
+
+if [ "$UPDATE" = "1" ]; then
+  {
+    echo "# Test-parity floors. Ported C# test cases may not fall below these."
+    echo "# Regenerate with: tools/test-parity.sh --update"
+    echo "# Format: <upstream-package> <csharp-project> <floor> <upstream-cases-at-record-time>"
+    for pair in $PAIRS; do
+      pkg="${pair%%:*}"; proj="${pair##*:}"
+      echo "$pkg $proj $(count_ported "$proj") $(count_upstream "$pkg")"
+    done
+  } > "$BUDGET"
+  echo "wrote $BUDGET"
+  exit 0
+fi
+
+fail=0
+printf '%-12s %-16s %8s %8s %8s   %s\n' PACKAGE PROJECT UPSTREAM PORTED FLOOR STATUS
+printf '%s\n' "----------------------------------------------------------------------------"
+
+while read -r pkg proj floor _recorded; do
+  case "$pkg" in ""|\#*) continue;; esac
+  up=$(count_upstream "$pkg")
+  got=$(count_ported "$proj")
+  pct=0
+  [ "$up" -gt 0 ] && pct=$(( got * 100 / up ))
+
+  if [ "$got" -lt "$floor" ]; then
+    status="FAIL (below floor $floor)"
+    fail=1
+  else
+    status="ok  ${pct}% of upstream"
+  fi
+  printf '%-12s %-16s %8s %8s %8s   %s\n' "$pkg" "$proj" "$up" "$got" "$floor" "$status"
+done < "$BUDGET"
+
+if [ "$fail" = "1" ]; then
+  echo ""
+  echo "::error::Ported test count fell below a recorded floor in $BUDGET."
+  echo "Tests may not be removed to make a change pass. If a floor is genuinely wrong,"
+  echo "change it in the same commit with a justification in the PR description."
+  exit 1
+fi
+
+echo ""
+echo "All packages at or above their recorded floors."
+echo "Percentages are coverage against the upstream suite, which docs/differential-testing.md"
+echo "treats as the specification. Low percentages are technical debt, not passing grades."

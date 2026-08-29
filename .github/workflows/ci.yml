@@ -62,6 +62,21 @@ jobs:
       - name: Test
         run: dotnet test PiCSharp.slnx --no-build -c Release -- --filter-not-trait "Category=E2E"
 
+  test-parity:
+    name: Test-parity audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      # The skip audit catches tests that were ported then skipped. It cannot catch
+      # tests that were never ported, so a package can land at 2% coverage and stay
+      # green. This compares ported counts against the upstream suite and enforces
+      # a ratchet. See tools/test-parity.sh.
+      - name: Compare ported tests against upstream
+        run: bash tools/test-parity.sh
+
   skip-audit:
     name: Skipped-test audit
     runs-on: ubuntu-latest

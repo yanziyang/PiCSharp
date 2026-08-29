@@ -66,3 +66,11 @@ codex "Complete the task in ÍmplementationKit/packets/T1.2-pi-protocol.md. Read
 Prompt:
 
 Proceed until finish. commit and push for each milestone. I will be away for several hours.
+
+==================================================
+--------------------------------------------------
+Code Review
+--------------------------------------------------
+Prompt:
+
+Codex has made many progress. Please do a through code review, identify area for improve, and refactor the code when necessary.

@@ -62,8 +62,28 @@ public abstract record ToolCallEvent { ... }
 
 Rules:
 - Discriminator strings match the TS literal **exactly**, including underscores.
-- Always source-generated (`JsonSerializerContext`). Reflection-based polymorphism is not AOT-safe
-  and `IsAotCompatible` is on everywhere.
+- Never reflection-based. `IsAotCompatible` is on everywhere, so reflection-driven polymorphic
+  serialisation is out. Use source generation where a fixed shape is being serialised, and the
+  document model (§2.1) where the shape is dynamic.
+
+### 2.1 Which JSON model — recorded after review of the wave 1-5 port
+
+The port settled on a split that this document originally did not describe. It is the right split,
+so it is recorded here rather than corrected in the code.
+
+| Layer | Model | Why |
+|---|---|---|
+| `Pi.Protocol` wire types | Hand-rolled strict value model (`IReadOnlyDictionary<string, object?>`) with explicit `EnsureKeys` validation | `StrictObject` means unknown fields are *rejected*. `System.Text.Json` ignores them by default, which is a wire-compatibility bug. The explicit model makes rejection the default. |
+| Provider request/response payloads (`Pi.Ai`) | `JsonNode` / `JsonObject` | Provider payloads are dynamic and differ per provider. `JsonNode` mirrors the TypeScript object model structurally, preserves `undefined` versus `null` naturally, and avoids schema drift between C# records and upstream shapes. |
+| Fixed internal DTOs | Source-generated `JsonSerializerContext` | Where a shape is genuinely fixed and ours. |
+
+**Known cost, accepted.** `JsonNode` sits on the streaming hot path: one object tree is allocated per
+SSE delta. That matches upstream, which calls `JSON.parse` per delta, so the cost model is faithful
+rather than a regression. Do not "optimise" it into a typed parser without a benchmark showing a real
+problem — the fidelity is worth more than the allocations.
+
+**What this rules out.** Do not model provider payloads as C# records. Provider shapes change upstream
+without notice, and a record set would silently drop fields that `JsonNode` carries through.
 - Unions of primitives (`string | (TextContent | ImageContent)[]`) get a custom converter, not
   `object`. Model as a small struct with an explicit discriminator.
 - Closed string unions (`StopReason = "pending" | "stop" | ...`) become an `enum` with
