@@ -1,0 +1,28 @@
+<Project>
+
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
+  </PropertyGroup>
+
+  <!-- Exact versions only. A package may not be added here without an approved
+       entry in docs/dependencies.md. See that document §6 for the process. -->
+
+  <ItemGroup Label="Testing">
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.9.0" />
+    <PackageVersion Include="xunit.v3" Version="4.0.0" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="4.0.0" />
+  </ItemGroup>
+
+  <!-- Approved in docs/dependencies.md §3 but not yet referenced. Add the
+       PackageVersion when the consuming wave starts, not before:
+         AWSSDK.BedrockRuntime   (T2.7)
+         YamlDotNet              (wave 3 / 6)
+         DiffPlex                (wave 3 / 6)
+         Markdig                 (wave 5 / 6)
+         NuGet.Versioning        (wave 6)
+         SkiaSharp               (T5.5 - confirm actual need first)
+         TextMateSharp           (wave 6)
+         Verify.Xunit            (when golden tests land) -->
+
+</Project>

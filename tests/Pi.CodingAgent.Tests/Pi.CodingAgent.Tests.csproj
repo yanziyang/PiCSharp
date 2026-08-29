@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Pi.CodingAgent\Pi.CodingAgent.csproj" />
+    <ProjectReference Include="..\..\src\Pi.Ai.Testing\Pi.Ai.Testing.csproj" />
+  </ItemGroup>
+
+</Project>

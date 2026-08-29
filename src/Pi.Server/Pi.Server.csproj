@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\Pi.Protocol\Pi.Protocol.csproj" />
+    <ProjectReference Include="..\Pi.Ai\Pi.Ai.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -48,7 +48,7 @@
 | `NuGet.Versioning` | `semver` | `Pi.CodingAgent` (package manager) | Apache-2.0 | npm and SemVer 2.0 range syntax differ. Verify against upstream's range tests, or port `semver`. |
 | `SkiaSharp` | `@silvia-odwyer/photon-node` | `Pi.CodingAgent` (image handling) | MIT | See §5 — deliberately chosen over ImageSharp. |
 | `TextMateSharp` | `highlight.js` | `Pi.CodingAgent` (code rendering) | MIT | Grammar-based; output will not match `highlight.js` token-for-token. Golden tests must be regenerated, not ported. |
-| `xunit`, `xunit.runner.visualstudio` | `vitest` | all test projects | Apache-2.0 | |
+| `xunit.v3` | `vitest` | all test projects | Apache-2.0 | Runs on Microsoft.Testing.Platform, which carries its own runner: `Microsoft.NET.Test.Sdk` and `xunit.runner.visualstudio` are **not** required. See `solution-layout.md §7`. |
 | `Verify.Xunit` | snapshot assertions | test projects | MIT | For golden buffers and normalised event sequences. |
 
 ---

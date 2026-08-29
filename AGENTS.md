@@ -2,10 +2,6 @@
 
 PiCSharp is a C# / .NET 10 port of the Pi coding agent (`earendil-works/pi`), pinned to upstream **v0.84.4**.
 
-> Copy this file to the repository root as `AGENTS.md` when you scaffold. Codex reads it from the root
-> and from any directory it is working in. Add per-directory `AGENTS.md` files for subsystem rules
-> (for example `src/Pi.Tui/AGENTS.md`) rather than growing this one indefinitely.
-
 ## The prime rule
 
 **The TypeScript source in `reference/pi/` is the specification.** It is read-only.

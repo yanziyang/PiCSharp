@@ -21,7 +21,8 @@ be able to derive the C# path without asking, and vice versa.
 ```
 PiCSharp/
 ├── AGENTS.md                      # copied from codex/AGENTS.md at scaffold
-├── PiCSharp.sln
+├── PiCSharp.slnx                   # .NET 10 defaults to the XML solution format
+├── global.json                     # pins the SDK and opts into the MTP test runner
 ├── Directory.Build.props          # shared compiler settings — see §4
 ├── Directory.Packages.props       # central package management
 ├── .editorconfig                  # analyser + formatting rules
@@ -139,7 +140,7 @@ Non-negotiable settings. These are what make "zero warnings" in `AGENTS.md` mean
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningsNotAsErrors></WarningsNotAsErrors>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-    <AnalysisLevel>latest-all</AnalysisLevel>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
     <IsAotCompatible>true</IsAotCompatible>
     <IsTrimmable>true</IsTrimmable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -149,7 +150,16 @@ Non-negotiable settings. These are what make "zero warnings" in `AGENTS.md` mean
 ```
 
 `IsAotCompatible` on every library from day one. Retrofitting AOT compatibility after 120k LOC of
-reflection-based JSON has been generated is far more expensive than the analyser noise now.
+reflection-based JSON has been generated is far more expensive than the analyser noise now. It is set
+in `src/Directory.Build.props`, alongside the trim, AOT and single-file analysers; `tests/` opts out.
+
+**`latest-recommended`, not `latest-all`.** An earlier draft specified `latest-all`. That was wrong
+for this project: it enables rules that actively fight a faithful port (CA1002 on exposed lists,
+CA1707 on underscored test names, CA2007 on `ConfigureAwait`, CA1848 on logging delegates), and with
+`TreatWarningsAsErrors` every one becomes a build break on style rather than substance — which in a
+delegated port means Codex packets failing for the wrong reasons. The rules deliberately relaxed on
+top of `latest-recommended` are listed in `.editorconfig` with a justification each; do not silence
+others without adding a line there.
 
 `InvariantGlobalization` stays **false**: `Pi.Tui` needs real grapheme and East-Asian-width data.
 
@@ -164,6 +174,19 @@ wire protocol:
 - TypeScript `pi-client` ⇄ `Pi.Server`
 
 It needs Node on the CI runner (never in the shipping product). See `docs/differential-testing.md §4`.
+
+## 7. Test platform
+
+`xunit.v3` runs on **Microsoft.Testing.Platform**, not VSTest. Three consequences the scaffold had to
+solve, recorded so nobody re-solves them:
+
+- `global.json` must contain `"test": { "runner": "Microsoft.Testing.Platform" }`. Without it the
+  .NET 10 SDK refuses to run the tests at all. An MSBuild property does not work.
+- Test projects must set `<OutputType>Exe</OutputType>` — they host the runner.
+- Trait filtering is `-- --filter-not-trait "Category=E2E"`, not VSTest's `--filter`.
+
+`Microsoft.NET.Test.Sdk` and `xunit.runner.visualstudio` are **not** needed; `xunit.v3` carries its
+own runner.
 
 ---
 

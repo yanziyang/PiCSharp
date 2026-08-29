@@ -1,0 +1,17 @@
+<Project>
+
+  <!-- Shared by every project. See docs/solution-layout.md §4. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>14.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <!-- pi-tui needs real grapheme and East-Asian-width data. Do not set this true. -->
+    <InvariantGlobalization>false</InvariantGlobalization>
+    <NeutralLanguage>en</NeutralLanguage>
+  </PropertyGroup>
+
+</Project>

@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  build:
+    name: Build, format, test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      # Node is required by Pi.Conformance.Tests, which runs the C# client
+      # against the unmodified TypeScript pi-server. It is never shipped.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.19'
+
+      - name: Verify reference is pinned
+        run: |
+          cd reference/pi
+          tag=$(git describe --tags --exact-match 2>/dev/null || echo "UNPINNED")
+          echo "reference/pi is at: $tag"
+          if [ "$tag" != "v0.84.4" ]; then
+            echo "::error::reference/pi must stay pinned at v0.84.4 (found: $tag)."
+            echo "Bumping the upstream reference is a deliberate, separate decision - see AGENTS.md."
+            exit 1
+          fi
+
+      - run: dotnet restore PiCSharp.slnx
+
+      - name: Build (warnings are errors)
+        run: dotnet build PiCSharp.slnx --no-restore -c Release
+
+      - name: Format
+        run: dotnet format PiCSharp.slnx --verify-no-changes --no-restore
+
+      # xunit.v3 runs on Microsoft.Testing.Platform (opted in via global.json).
+      # Trait filtering uses --filter-not-trait, not VSTest's --filter syntax.
+      - name: Test
+        run: dotnet test PiCSharp.slnx --no-build -c Release -- --filter-not-trait "Category=E2E"
+
+  skip-audit:
+    name: Skipped-test audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # docs/differential-testing.md: a rising skip count is the earliest signal
+      # that packets are being marked done while the hard half is dropped.
+      - name: Count skipped tests
+        run: |
+          count=$(grep -rEo '\[(Fact|Theory)\(\s*Skip\s*=' tests --include='*.cs' | wc -l | tr -d ' ')
+          echo "Skipped tests: $count"
+          echo "$count" > .skip-count
+          budget=0
+          if [ -f .skip-budget ]; then budget=$(tr -d ' \n' < .skip-budget); fi
+          echo "Budget: $budget"
+          if [ "$count" -gt "$budget" ]; then
+            echo "::error::Skipped-test count ($count) exceeds the budget ($budget)."
+            echo "Either un-skip the tests, or raise .skip-budget in the same PR with a written justification."
+            grep -rEn '\[(Fact|Theory)\(\s*Skip\s*=' tests --include='*.cs' || true
+            exit 1
+          fi

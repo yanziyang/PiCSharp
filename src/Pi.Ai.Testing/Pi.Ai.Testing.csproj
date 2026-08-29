@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\Pi.Ai.Abstractions\Pi.Ai.Abstractions.csproj" />
+  </ItemGroup>
+
+</Project>

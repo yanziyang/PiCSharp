@@ -1,0 +1,27 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Pi.AgentCore/Pi.AgentCore.csproj" />
+    <Project Path="src/Pi.Ai.Abstractions/Pi.Ai.Abstractions.csproj" />
+    <Project Path="src/Pi.Ai.Testing/Pi.Ai.Testing.csproj" />
+    <Project Path="src/Pi.Ai/Pi.Ai.csproj" />
+    <Project Path="src/Pi.Cli/Pi.Cli.csproj" />
+    <Project Path="src/Pi.Client/Pi.Client.csproj" />
+    <Project Path="src/Pi.CodingAgent/Pi.CodingAgent.csproj" />
+    <Project Path="src/Pi.Protocol/Pi.Protocol.csproj" />
+    <Project Path="src/Pi.Server/Pi.Server.csproj" />
+    <Project Path="src/Pi.SessionBackends.Sqlite/Pi.SessionBackends.Sqlite.csproj" />
+    <Project Path="src/Pi.Telemetry/Pi.Telemetry.csproj" />
+    <Project Path="src/Pi.Tui/Pi.Tui.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Pi.AgentCore.Tests/Pi.AgentCore.Tests.csproj" />
+    <Project Path="tests/Pi.Ai.Tests/Pi.Ai.Tests.csproj" />
+    <Project Path="tests/Pi.Client.Tests/Pi.Client.Tests.csproj" />
+    <Project Path="tests/Pi.CodingAgent.Tests/Pi.CodingAgent.Tests.csproj" />
+    <Project Path="tests/Pi.Conformance.Tests/Pi.Conformance.Tests.csproj" />
+    <Project Path="tests/Pi.Protocol.Tests/Pi.Protocol.Tests.csproj" />
+    <Project Path="tests/Pi.Server.Tests/Pi.Server.Tests.csproj" />
+    <Project Path="tests/Pi.Telemetry.Tests/Pi.Telemetry.Tests.csproj" />
+    <Project Path="tests/Pi.Tui.Tests/Pi.Tui.Tests.csproj" />
+  </Folder>
+</Solution>

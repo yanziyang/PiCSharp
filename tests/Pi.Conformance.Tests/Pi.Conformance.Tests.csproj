@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Pi.Client\Pi.Client.csproj" />
+    <ProjectReference Include="..\..\src\Pi.Server\Pi.Server.csproj" />
+    <ProjectReference Include="..\..\src\Pi.Protocol\Pi.Protocol.csproj" />
+  </ItemGroup>
+
+</Project>

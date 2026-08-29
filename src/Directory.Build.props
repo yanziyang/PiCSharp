@@ -1,0 +1,18 @@
+<Project>
+
+  <Import Project="$([MSBuild]::GetPathOfFileAbove($(MSBuildThisFile), $(MSBuildThisFileDirectory)..))" />
+
+  <!-- Shipping libraries. Native AOT is a target from day one: retrofitting AOT
+       compatibility after 120k LOC of reflection-based JSON is far more expensive
+       than the analyser noise now. See docs/solution-layout.md §4. -->
+  <PropertyGroup>
+    <IsAotCompatible>true</IsAotCompatible>
+    <IsTrimmable>true</IsTrimmable>
+    <EnableAotAnalyzer>true</EnableAotAnalyzer>
+    <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+    <EnableSingleFileAnalyzer>true</EnableSingleFileAnalyzer>
+    <!-- AGENTS.md: public API carries XML doc comments. CS1591 enforces it. -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+</Project>

@@ -1,0 +1,25 @@
+<Project>
+
+  <Import Project="$([MSBuild]::GetPathOfFileAbove($(MSBuildThisFile), $(MSBuildThisFileDirectory)..))" />
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <!-- xunit.v3 test projects are executables that host the MTP runner. -->
+    <OutputType>Exe</OutputType>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <IsAotCompatible>false</IsAotCompatible>
+    <IsTrimmable>false</IsTrimmable>
+    <!-- xunit.v3 runs on Microsoft.Testing.Platform. The .NET 10 SDK requires
+         opting in explicitly; VSTest is no longer supported for MTP projects. -->
+    <TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
+    <UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- xunit.v3 carries its own MTP runner: neither Microsoft.NET.Test.Sdk
+         nor xunit.runner.visualstudio is needed. -->
+    <PackageReference Include="xunit.v3" />
+  </ItemGroup>
+
+</Project>
