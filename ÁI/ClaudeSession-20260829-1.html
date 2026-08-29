@@ -56,8 +56,8 @@ footer{border-top:1px solid var(--line);background:var(--panel);padding:26px 0 4
 <div class="meta">
 <div>Dates<b>29–30 August 2026</b></div>
 <div>Project<b>C:\MyProjects\PiCSharp</b></div>
-<div>Exchanges<b>20</b></div>
-<div>Responses<b>201</b></div>
+<div>Exchanges<b>22</b></div>
+<div>Responses<b>211</b></div>
 <div>Model<b>Claude Opus 5</b></div>
 </div></div></header>
 <div class="shell">
@@ -82,6 +82,8 @@ footer{border-top:1px solid var(--line);background:var(--panel);padding:26px 0 4
 <a href="#p18"><span class="n">18</span>Back to implementation, just now you said "Pause feature waves and run R…</a>
 <a href="#p19"><span class="n">19</span>proceed.</a>
 <a href="#p20"><span class="n">20</span>Now what is your view of the code quality of Codex code?</a>
+<a href="#p21"><span class="n">21</span>add to ClaudeSession-20260829-1.html. Also only keep important prompt an…</a>
+<a href="#p22"><span class="n">22</span>I will transfer implement back to codex. What shall be the prompt?</a>
 </nav>
 <main>
 <section class="turn user" id="p1">
@@ -1277,11 +1279,80 @@ ai           7%   tui 2%</code></pre>
 <p>If I were assessing a contractor: <strong>I'd keep them, and I'd change how I brief them.</strong> The code is better than most human-written port work I'd expect at this scale. What's missing is exactly what an unguarded agent stops doing when the gate goes green — and that's a management problem, not a capability one.</p>
 <p>The concrete fix is already in: <code>tools/test-parity.sh</code> now ratchets test counts <em>and</em> reports implementation completeness. The next real test is whether coverage rises when the gate finally points at the right thing.</p></div>
 </section>
+<section class="turn user" id="p21">
+  <div class="who"><span class="badge u">Exchange 21</span><time>2026-08-29 16:03:38</time></div>
+  <div class="bubble"><p>add to ClaudeSession-20260829-1.html. Also only keep important prompt and response in the html report, remove those trivial..</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Filtering needs a defensible rule — several one-word prompts like "proceed" produced the most substantial work, so I'll judge the <em>exchange</em>, not the prompt.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>The <code>newline="\\n"</code> argument mangled the file. Let me rewrite it cleanly rather than repair it.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Filter judgement looks sound — all five dropped are genuinely routine. Let me verify rendering.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Verified: 20 exchanges, 201 responses, zero tool blocks, zero relative refs, zero broken anchors. Spans the original brief through the code-quality assessment.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Updated and pushed as <code>837ea31</code>.</p>
+<div class="tw"><table><thead><tr><th></th><th></th></tr></thead><tbody><tr><td>Exchanges kept</td><td><strong>20</strong></td></tr><tr><td>Omitted as routine</td><td><strong>5</strong></td></tr><tr><td>Responses</td><td>201</td></tr><tr><td>Size</td><td>128 KB</td></tr></tbody></table></div>
+<p>Now runs from the original feasibility brief through the wave 1–5 review, the R1 backfill, and the code-quality assessment.</p>
+<h4>How I decided what's trivial</h4>
+<p>The filter judges the <strong>exchange</strong>, not the prompt — because several of the most productive turns here were a single word. "proceed" produced the entire R1 test backfill. "YOu still have some tokens. But are steps forward?" produced the D1 validation spike. Filtering on prompt text alone would have thrown away the best content in the session.</p>
+<p>So an exchange is kept when its <em>response</em> carries structure (headings or tables) or runs past ~900 characters. Housekeeping prompts are dropped only when their answer is also thin.</p>
+<p>The five dropped, with response sizes:</p>
+<ul><li><code>dirrect commit and push to main branch</code> — 919 ch</li><li><code>There are two duplicated commit at gitHub</code> — 1,817 ch</li><li><code>Continue from where you left off.</code> — 22 ch</li><li><code>commit and push</code> — 1,398 ch</li><li><code>add to ClaudeSession… keep important</code> — 253 ch (this request)</li></ul>
+<p>One case worth flagging: the follow-up where you sent the two SHAs <strong>was kept</strong>, because my answer contained a comparison table showing the commits added different files. That's substantive content inside an otherwise routine thread, and the rule caught it correctly rather than dropping the thread wholesale.</p>
+<p>The footer states the rule and the omission count, so a reader knows the document is curated rather than complete — that seemed important for something that reads as a record.</p></div>
+</section>
+<section class="turn user" id="p22">
+  <div class="who"><span class="badge u">Exchange 22</span><time>2026-08-29 16:11:23</time></div>
+  <div class="bubble"><p>I will transfer implement back to codex. What shall be the prompt?</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Let me size the next task properly before writing the packet.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>The session subsystem is the right next packet — it's the harness foundation, and upstream ships a <strong>1,016-line conformance suite</strong> as a ready-made oracle. Let me confirm target placement.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>One thing to verify — <code>JsonlV4Header</code> suggests this may be a different format from the one <code>docs/session-format.md</code> documents.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Confirmed, and this is a trap worth flagging: there are <strong>two different session formats</strong>. The harness uses <code>JsonlV4Header</code> (<code>kind:"header"</code>, <code>version: 4</code>, numeric <code>createdAt</code>); <code>docs/session-format.md</code> documents the <em>coding-agent</em> format (<code>type:"session"</code>, absent version = v1, string <code>timestamp</code>). Let me scope that doc, then write the packet.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Packet committed at <code>ÍmplementationKit/packets/H1-harness-session.md</code>, pushed as <code>f3aad1a</code>.</p>
+<h4>The prompt</h4>
+<pre class="code" data-lang="bash"><code>codex "Complete the task in ÍmplementationKit/packets/H1-harness-session.md. Read AGENTS.md and docs/translation-patterns.md first. The TypeScript in reference/pi is the specification and is read-only. Write only to the target paths in the packet; if you need anything outside them, stop and explain rather than doing it. The upstream tests ship in the same PR as the implementation — a packet that lands code without its test suite is not complete."</code></pre>
+<p>That last sentence is deliberate. It's the one instruction waves 2–5 didn't have.</p>
+<h4>Why the harness session subsystem</h4>
+<p>Not more test backfill — <strong>the harness</strong>. <code>pi-agent-core</code> is 18% implemented, and <code>Pi.CodingAgent</code> (wave 6, ~61k LOC of actual product) cannot start without a session store. That's the critical path.</p>
+<p>Session goes first within the harness because <code>agent-harness.ts</code> and <code>reducer.ts</code> both depend on it, and because upstream ships a <strong>1,016-line conformance suite</strong> for it. That's the strongest oracle on this project — and it's the same pattern behind <code>pi-telemetry</code>, which Codex ported to 157% parity. Giving it a suite it can run against plays to what it already did well.</p>
+<h4>The trap I found while writing it</h4>
+<p>There are <strong>two unrelated session formats</strong>:</p>
+<div class="tw"><table><thead><tr><th></th><th>harness</th><th>coding-agent</th></tr></thead><tbody><tr><td>header</td><td><code>kind: "header"</code></td><td><code>type: "session"</code></td></tr><tr><td>version</td><td><code>version: 4</code></td><td>absent means v1</td></tr><tr><td>time</td><td><code>createdAt: number</code></td><td><code>timestamp: string</code></td></tr></tbody></table></div>
+<p>My <code>docs/session-format.md</code> documents the <em>coding-agent</em> one. A porter reading it while implementing the harness would produce a confidently wrong format. I've added a scope note to that doc and a comparison table to the packet.</p>
+<h4>After H1</h4>
+<p>The remaining harness packets, roughly in dependency order: <code>compaction/</code> (1,260 LOC), <code>reducer.ts</code> (667), <code>skills.ts</code> (386), <code>agent-harness.ts</code> (508), then <code>env/</code> and <code>tools/</code>. I'd write each one only when its predecessor lands — the H1 result will tell you whether the parity gate actually changed behaviour, and that should inform how much specification the next packet needs.</p></div>
+</section>
 
 </main></div>
 <footer><div class="wrap">
 <p style="margin:0 0 6px"><b>Session transcript exported from Claude Code.</b> Prompts and responses only — tool calls, tool results and internal reasoning are excluded as intermediate working detail.</p>
-<p style="margin:0 0 6px">A further 5 exchanges were omitted as routine: commit-and-push confirmations, file renames, a commit-history question, and requests about this transcript itself. Selection is by exchange rather than by prompt, so a one-word instruction answered with substantial work is kept.</p>
-<p style="margin:0">Generated 2026-08-29 · 221 entries from 2,103 transcript records.</p>
+<p style="margin:0 0 6px">A further 6 exchanges were omitted as routine: commit-and-push confirmations, file renames, a commit-history question, and requests about this transcript itself. Selection is by exchange rather than by prompt, so a one-word instruction answered with substantial work is kept.</p>
+<p style="margin:0">Generated 2026-08-29 · 233 entries from 2,184 transcript records.</p>
 </div></footer>
 </body></html>
