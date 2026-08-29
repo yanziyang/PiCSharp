@@ -6,8 +6,10 @@ without forcing an API change.
 
 ## Verdict
 
-**PASS, with three small amendments to the draft API** (§4) and **two documents requiring correction**
-(§5). D1 is safer than the draft claimed. Proceed to sign-off once the amendments are folded in.
+**PASS — both rounds.** Round 1 (§2–§4) and round 2 (§6) together forced five amendments (A–E) and
+no redesign. Two documents required correction (§5). D1 is safer than the draft claimed; the one
+contract materially larger than expected is the editor base class (amendment D). **Proceed to
+sign-off once A–E are folded in.**
 
 ---
 
@@ -269,16 +271,150 @@ Both are corrected in the same change as this spike.
 
 ---
 
-## 6. Residual risk not covered by this test
+## 6. Round 2 — run 2026-08-29 · **PASS, with amendments D and E**
 
-These three extensions do **not** exercise:
+Round 1 left the high-variance surfaces untested. Round 2 covers editor replacement and custom
+providers.
 
-- `setEditorComponent` / `EditorFactory` — replacing the input editor wholesale
-- `AutocompleteProviderFactory`
-- `onTerminalInput` raw input interception
-- `registerProvider` — custom model providers
-- `registerMarkdownTransformer`
+| Extension | LOC | Exercises | Result |
+|---|---|---|---|
+| `rainbow-editor.ts` | 88 | `setEditorComponent`, `CustomEditor` subclassing, `tui.requestRender()`, timer-driven animation | ports; forces **D** |
+| `modal-editor.ts` | 85 | `CustomEditor` subclassing, `super.handleInput`, pi-tui helpers | ports; forces **D** |
+| `custom-provider-anthropic/` | 611 | `registerProvider`, OAuth delegates, `streamSimple` | ports; forces **E** |
 
-`modal-editor.ts`, `rainbow-editor.ts` and `custom-provider-anthropic/` cover these. **Recommend a
-second acceptance round against those three before wave 6 opens** — they are the remaining places
-where the mirror could still fail, and they are cheap to test now.
+### 6.1 The finding — editors are subclassed, not implemented
+
+Both editor extensions do this:
+
+```ts
+class ModalEditor extends CustomEditor {
+  handleInput(data: string): void {
+    if (matchesKey(data, "escape")) { /* … */ return; }
+    super.handleInput(data);
+  }
+  render(width: number): string[] {
+    const lines = super.render(width);
+    /* decorate */
+    return lines;
+  }
+}
+pi.on("session_start", (_e, ctx) =>
+  ctx.ui.setEditorComponent((tui, theme, kb) => new ModalEditor(tui, theme, kb)));
+```
+
+And `CustomEditor` is itself `class CustomEditor extends Editor`, where `Editor` comes from pi-tui.
+
+**This is a materially larger contract than `IComponent`.** The extension inherits, transitively, the
+whole of pi-tui's `Editor`: text buffer, cursor, autocomplete, undo stack, kill-ring, word navigation.
+Members reached by these two extensions alone: `super.handleInput`, `super.render`, `this.getText()`,
+`this.tui.requestRender()`, plus `onAction`, `actionHandlers` and `onExtensionShortcut` on
+`CustomEditor`.
+
+**Still mirrorable.** C# has inheritance, `virtual` dispatch and `protected` visibility, and both
+ports are mechanical:
+
+```csharp
+internal sealed class ModalEditor(ITui tui, IEditorTheme theme, IKeybindings kb)
+    : CustomEditor(tui, theme, kb)
+{
+    private EditMode _mode = EditMode.Insert;
+
+    public override void HandleInput(string data)
+    {
+        if (Keys.Matches(data, "escape"))
+        {
+            if (_mode == EditMode.Insert) _mode = EditMode.Normal;
+            else base.HandleInput(data);
+            return;
+        }
+        if (_mode == EditMode.Insert) { base.HandleInput(data); return; }
+        // … normal-mode mapping
+    }
+
+    public override string[] Render(int width)
+    {
+        var lines = base.Render(width);
+        if (lines.Length == 0) return lines;
+        var label = _mode == EditMode.Normal ? " NORMAL " : " INSERT ";
+        var last = lines.Length - 1;
+        if (Text.VisibleWidth(lines[last]) >= label.Length)
+            lines[last] = Text.TruncateToWidth(lines[last], width - label.Length, "") + label;
+        return lines;
+    }
+}
+```
+
+### Amendment D — `Editor` and `CustomEditor` are public contract
+
+`Pi.Tui.Editor` and `Pi.CodingAgent.CustomEditor` must be **public, non-sealed**, with `virtual`
+`HandleInput` / `Render` and their protected surface treated as part of the extension API — versioned
+and change-controlled like any other public contract. A porter cannot decide `Editor`'s member
+visibility on convenience grounds; the visibility *is* the contract.
+
+Consequence for `tui-strategy.md`: this is the concrete form of reason (1). Extensions do not merely
+consume pi-tui, three of them **inherit from it**.
+
+### 6.2 Custom providers port cleanly
+
+`registerProvider` is a declarative object plus four delegates — nothing structural:
+
+```csharp
+pi.RegisterProvider("custom-anthropic", new ProviderOptions
+{
+    BaseUrl = "https://api.anthropic.com",
+    ApiKey  = "$CUSTOM_ANTHROPIC_API_KEY",
+    Api     = "custom-anthropic-api",
+    Models  = [ /* declarative model metadata */ ],
+    OAuth   = new OAuthOptions
+    {
+        Name = "Custom Anthropic (Claude Pro/Max)",
+        Login = LoginAnthropicAsync,
+        RefreshToken = RefreshAnthropicTokenAsync,
+        GetApiKey = cred => cred.Access,
+    },
+    StreamSimple = StreamCustomAnthropic,
+});
+```
+
+### Amendment E — push-style event streams
+
+`streamSimple` returns an `AssistantMessageEventStream` built by `createAssistantMessageEventStream()`
+— a *push* stream written from a detached async task. C# needs the equivalent:
+
+```csharp
+public static AssistantMessageEventStream Create();   // Channel<T>-backed
+// exposes: ValueTask WriteAsync(AssistantMessageEvent e); void Complete(Exception? error = null);
+// consumed as: IAsyncEnumerable<AssistantMessageEvent>
+```
+
+Use `System.Threading.Channels`, per `translation-patterns.md §5`. Do not model this as
+`async IAsyncEnumerable` with `yield` — the upstream shape writes from a task that outlives the
+factory call, and rewriting it to a pull model changes provider error and cancellation timing.
+
+### 6.3 Population check
+
+Only **3 of 85** bundled extensions replace the editor (`modal-editor.ts`, `rainbow-editor.ts`,
+`border-status-editor.ts`) — **3.5%**, not the 41% that touch UI generally. Amendment D is
+structurally significant but narrow in blast radius.
+
+---
+
+## 7. Combined verdict
+
+**D1 passes both rounds.** Five amendments (A–E), no redesign. Every extension tested ported
+mechanically once the amendment was in place.
+
+Still untested, and low-risk enough to defer to implementation: `AutocompleteProviderFactory`,
+`registerMarkdownTransformer`, `onTerminalInput` standalone (round 2 reached it only via the editor).
+
+### Consequence for Option B in the feasibility report
+
+Report rev 2 says editors "degrade over IPC". For editor-replacing extensions that is **too
+generous**: `super.HandleInput()` and `super.Render()` are base-class calls into the host, so they do
+not degrade across a process boundary — they do not work at all without proxying every base method
+per keystroke. `rainbow-editor.ts` compounds this with a 60 ms animation timer calling
+`requestRender()`, roughly 17 IPC round trips per second.
+
+The report's ~90% figure survives (the affected population is 3.5%), but the word "degrade" should be
+"break" for this subset. Recorded here; a rev 3 is not warranted for a 3.5% nuance unless the report
+is being revised for another reason.

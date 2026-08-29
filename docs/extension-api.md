@@ -267,8 +267,42 @@ What tier 2 *does* require of `Pi.Tui` is narrower than a compatible widget mode
 `matchesKey`, `Text` and `truncateToWidth` from `pi-tui` directly, and `Theme.Fg` must emit identical
 ANSI. See `tui-strategy.md`, which reaches the same conclusion on these narrower grounds.
 
-**Still untested:** `EditorFactory`, `AutocompleteProviderFactory` and `onTerminalInput`. See
-`spikes/d1-acceptance-test.md §6` — a second acceptance round is recommended before wave 6.
+### Amendment D (round 2) — the editor is a base class, not an interface
+
+Editor-replacing extensions **subclass** rather than implement:
+
+```ts
+class ModalEditor extends CustomEditor {
+  handleInput(data: string) { /* … */ super.handleInput(data); }
+  render(width: number)     { const lines = super.render(width); /* decorate */ return lines; }
+}
+ctx.ui.setEditorComponent((tui, theme, kb) => new ModalEditor(tui, theme, kb));
+```
+
+`CustomEditor` is itself `class CustomEditor extends Editor`, where `Editor` is pi-tui's. Extensions
+therefore inherit, transitively, pi-tui's whole editor: text buffer, cursor, autocomplete, undo stack,
+kill-ring, word navigation.
+
+**Consequence.** `Pi.Tui.Editor` and `Pi.CodingAgent.CustomEditor` must be **public and non-sealed**,
+with `virtual` `HandleInput` / `Render`, and their protected surface is **part of the extension
+contract** — versioned and change-controlled like any other public API. A porter cannot choose member
+visibility on convenience grounds; the visibility is the contract.
+
+This is mirrorable and both ports were mechanical, but it is by far the largest contract surface D1
+commits to. Blast radius is narrow: 3 of 85 bundled extensions (3.5%) replace the editor.
+
+### Amendment E (round 2) — push-style event streams
+
+`streamSimple` returns an `AssistantMessageEventStream` created by
+`createAssistantMessageEventStream()` and written from a detached async task. Provide a
+`Channel<T>`-backed equivalent exposing `WriteAsync` / `Complete` and consumed as
+`IAsyncEnumerable<AssistantMessageEvent>`. Do not rewrite it as `async IAsyncEnumerable` with
+`yield` — the upstream writer outlives the factory call, and a pull model changes provider error and
+cancellation timing. See `translation-patterns.md §5`.
+
+**Round 2 confirmed** `EditorFactory` (amendment D) and `registerProvider` (amendment E). Still
+untested and deferred as low-risk: `AutocompleteProviderFactory`, `registerMarkdownTransformer`, and
+`onTerminalInput` standalone. See `spikes/d1-acceptance-test.md §6`.
 
 ---
 
@@ -297,17 +331,15 @@ Full working in `spikes/d1-acceptance-test.md`.
 
 The spike also disproved this document's original tier-2 risk claim — see §5.
 
-### Round 2 — required before wave 6 opens
+### Round 2 — run 2026-08-29 · **PASS**
 
-Round 1 left the highest-variance surfaces untested. These are cheap to test now and expensive to
-discover later:
+| Extension | Exercises | Result |
+|---|---|---|
+| `rainbow-editor.ts` (88 L) | `setEditorComponent`, `CustomEditor` subclassing, `tui.requestRender()`, timer animation | ports; forces **D** |
+| `modal-editor.ts` (85 L) | `CustomEditor` subclassing, `super.handleInput`, pi-tui helpers | ports; forces **D** |
+| `custom-provider-anthropic/` (611 L) | `registerProvider`, OAuth delegates, `streamSimple` | ports; forces **E** |
 
-| Extension | Exercises |
-|---|---|
-| `modal-editor.ts` | `setEditorComponent` / `EditorFactory` — replacing the input editor wholesale |
-| `rainbow-editor.ts` | editor theming plus `onTerminalInput` raw interception |
-| `custom-provider-anthropic/` | `registerProvider`, custom auth, `streamSimple` |
+**D1 passes both rounds.** Five amendments, no redesign.
 
-**Pass condition, both rounds:** each extension ports in under a day with no API change beyond a
-recorded amendment. If one cannot be ported at all, escalate — that is the signal that D1 and the TUI
-strategy are in conflict, and both must be reopened together.
+Still untested and deferred to implementation as low-risk: `AutocompleteProviderFactory`,
+`registerMarkdownTransformer`, and `onTerminalInput` standalone.

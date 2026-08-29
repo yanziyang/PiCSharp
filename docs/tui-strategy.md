@@ -58,20 +58,27 @@ renderer, Terminal.Gui included. **The extension mirror does not, by itself, dec
 
 The reasons that do stand, in descending weight:
 
-1. **Upstream's own 43 interactive components** (`modes/interactive/`, 18,302 LOC in T6.8) are written
+1. **Extensions inherit from pi-tui's `Editor`.** Round 2 of the acceptance spike found that
+   editor-replacing extensions do `class ModalEditor extends CustomEditor`, and `CustomEditor` is
+   itself `extends Editor` — pi-tui's. They call `super.handleInput()` and `super.render()`. So
+   pi-tui's editor is not an implementation detail we may swap: its protected surface is part of the
+   public extension contract (`extension-api.md`, amendment D). A foreign editor with a different
+   inheritance surface breaks those extensions outright. Narrow blast radius — 3 of 85 bundled
+   extensions — but it is a hard break, not a degradation.
+2. **Upstream's own 43 interactive components** (`modes/interactive/`, 18,302 LOC in T6.8) are written
    against pi-tui's *internals*, not the four-member public contract. Those are ours to port either
    way, and porting them onto a foreign layout and focus model is materially harder than onto a direct
    port of the engine they were written for.
-2. **Extensions import pi-tui helpers directly** — `matchesKey`, `Text`, `truncateToWidth` — and
+3. **Extensions import pi-tui helpers directly** — `matchesKey`, `Text`, `truncateToWidth` — and
    `Theme.Fg` must emit byte-identical ANSI. We owe faithful versions of these regardless of what sits
    underneath, and they are entangled with the renderer's width and styling model.
-3. **Golden-buffer byte-identity** (`differential-testing.md §Oracle 5`) is the wave's gate. Producing
+4. **Golden-buffer byte-identity** (`differential-testing.md §Oracle 5`) is the wave's gate. Producing
    an exact byte match through a foreign abstraction that has its own opinions about clearing,
    cursor movement and repaint is harder than in a direct port.
-4. Terminal.Gui carries environment assumptions Pi does not.
+5. Terminal.Gui carries environment assumptions Pi does not.
 
 This is now a **cost-and-risk argument, not an impossibility argument.** If someone produces a
-credible plan to satisfy (1)–(3) on top of Terminal.Gui, it deserves a hearing — the earlier draft
+credible plan to satisfy (1)–(4) on top of Terminal.Gui, it deserves a hearing — the earlier draft
 foreclosed that debate on a false premise.
 
 ## Why not Spectre.Console as the engine
@@ -136,12 +143,13 @@ users notice immediately.
 
 ## Reconsider this decision if
 
-- **Round 2 of the acceptance test fails** (`extension-api.md §7`). `modal-editor.ts` and
-  `rainbow-editor.ts` exercise `EditorFactory` and `onTerminalInput` — the surfaces round 1 did not
-  reach. If those cannot be mirrored, the editor is more entangled with the renderer than the
-  four-member `Component` contract suggests, and reasons (1) and (2) above get stronger, not weaker.
-- Someone produces a costed plan satisfying reasons (1)–(3) on top of Terminal.Gui. Since the
-  impossibility argument is withdrawn, this is now a legitimate proposal rather than a non-starter.
+- Someone produces a costed plan satisfying reasons (1)–(4) on top of Terminal.Gui, including a
+  credible answer for the inherited `Editor` surface in reason (1). Since the impossibility argument
+  is withdrawn, this is a legitimate proposal rather than a non-starter — but reason (1) is the one
+  that must be answered first, and it got harder after round 2, not easier.
+- Product scope drops editor replacement from the supported extension surface. That would retire
+  reason (1) at the cost of 3 bundled extensions, and should be taken as an explicit product
+  decision recorded in `extension-api.md`, not assumed.
 - Product scope drops the interactive TUI entirely (headless service only). Then wave 5 is not
   needed at all, wave 6's T6.8 shrinks by 18,302 LOC, and this document is moot — which would be a
   far larger scope change than a TUI library choice, and should be taken deliberately.
