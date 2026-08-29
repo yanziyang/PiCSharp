@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Claude Code Session — PiCSharp — 29 Aug 2026</title>
+<title>Claude Code Session — PiCSharp — Aug 2026</title>
 <style>
 :root{--ink:#0f172a;--body:#334155;--muted:#64748b;--faint:#94a3b8;--line:#e2e8f0;--line2:#cbd5e1;
 --bg:#fff;--panel:#f8fafc;--panel2:#f1f5f9;--indigo:#4f46e5;
@@ -30,13 +30,13 @@ main{padding:28px 0 80px;min-width:0}
 time{font-size:11px;color:var(--faint);font-variant-numeric:tabular-nums}
 .user .bubble{background:#eef2ff;border:1px solid #c7d2fe;padding:14px 18px;border-radius:11px}
 .asst .bubble{padding:0 2px}
+.bubble{min-width:0}
 .bubble>:first-child{margin-top:0}.bubble>:last-child{margin-bottom:0}
 h3,h4,h5,h6{color:var(--ink);margin:22px 0 8px;line-height:1.3}
 h3{font-size:19px}h4{font-size:16.5px}h5{font-size:14.5px}h6{font-size:13.5px}
 p{margin:0 0 12px}ul,ol{margin:0 0 12px;padding-left:22px}li{margin-bottom:5px}
 a{color:var(--indigo)}strong{color:var(--ink);font-weight:650}hr{border:0;border-top:1px solid var(--line);margin:24px 0}
 code{font-family:var(--mono);font-size:.87em;background:var(--panel2);border:1px solid var(--line);border-radius:4px;padding:1px 5px;color:#be185d;overflow-wrap:anywhere}
-.bubble{min-width:0}
 pre.code{background:#0f172a;color:#e2e8f0;border-radius:9px;padding:14px 16px;overflow-x:auto;margin:12px 0;
 font-family:var(--mono);font-size:12.4px;line-height:1.6;white-space:pre}
 pre.code code{background:none;border:0;padding:0;color:inherit;font-size:inherit;overflow-wrap:normal}
@@ -52,41 +52,40 @@ footer{border-top:1px solid var(--line);background:var(--panel);padding:26px 0 4
 <header class="mast"><div class="wrap">
 <p class="eyebrow">Claude Code · Session Transcript</p>
 <h1>PiCSharp — Pi to .NET 10 feasibility, port scaffold and review</h1>
-<p>Feasibility assessment, delegation kit, design specifications, D1 acceptance spikes, the .NET 10 solution scaffold, and the wave 1–5 code review.</p>
+<p>Feasibility assessment, delegation kit, design specifications, D1 acceptance spikes, the .NET 10 solution scaffold, the wave 1–5 code review, and the R1 test backfill.</p>
 <div class="meta">
-<div>Date<b>29 August 2026</b></div>
+<div>Dates<b>29–30 August 2026</b></div>
 <div>Project<b>C:\MyProjects\PiCSharp</b></div>
-<div>Prompts<b>21</b></div>
-<div>Responses<b>168</b></div>
+<div>Exchanges<b>20</b></div>
+<div>Responses<b>201</b></div>
 <div>Model<b>Claude Opus 5</b></div>
 </div></div></header>
 <div class="shell">
-<nav><div class="t">Prompts</div>
+<nav><div class="t">Exchanges</div>
 <a href="#p1"><span class="n">1</span>Evaluate feasibility of migrating Pi Coding Agent to .NET 10. Need nearl…</a>
 <a href="#p2"><span class="n">2</span>I would choose option 1 Full C# Rewrite. </a>
 <a href="#p3"><span class="n">3</span>Do i need create traditional function spec, design spec, implementation …</a>
 <a href="#p4"><span class="n">4</span>I did not find the doc you mentioned:</a>
 <a href="#p5"><span class="n">5</span>commit and push</a>
-<a href="#p6"><span class="n">6</span>dirrect commit and push to main branch, no need Pull Request.</a>
-<a href="#p7"><span class="n">7</span>There are two duplicated commit at gitHub: Add design specifications for…</a>
-<a href="#p8"><span class="n">8</span>THe SHA:</a>
-<a href="#p9"><span class="n">9</span>YOu still have some tokens. But are steps forward?</a>
-<a href="#p10"><span class="n">10</span>Continue from where you left off.</a>
-<a href="#p11"><span class="n">11</span>continue</a>
-<a href="#p12"><span class="n">12</span>Update feasibility report as you recommended. Also change folder name 'd…</a>
-<a href="#p13"><span class="n">13</span>proceed</a>
-<a href="#p14"><span class="n">14</span>proceed</a>
-<a href="#p15"><span class="n">15</span>commit and push</a>
-<a href="#p16"><span class="n">16</span>There is github error</a>
-<a href="#p17"><span class="n">17</span>"Move 'AGENTS.md' from 'codex' folder to root folder.  Rename 'codex' to…</a>
-<a href="#p18"><span class="n">18</span>I would transfer implementation task to Codex now. What prompt shall I u…</a>
-<a href="#p19"><span class="n">19</span>commit and git push. After taht export this session as 'standalone hTML …</a>
-<a href="#p20"><span class="n">20</span>Codex has made many progress. Please do a through code review, identify …</a>
-<a href="#p21"><span class="n">21</span>Add to ClaudeSession-20260829-1.html. Also simplify this file , to only …</a>
+<a href="#p6"><span class="n">6</span>THe SHA:</a>
+<a href="#p7"><span class="n">7</span>YOu still have some tokens. But are steps forward?</a>
+<a href="#p8"><span class="n">8</span>continue</a>
+<a href="#p9"><span class="n">9</span>Update feasibility report as you recommended. Also change folder name 'd…</a>
+<a href="#p10"><span class="n">10</span>proceed</a>
+<a href="#p11"><span class="n">11</span>proceed</a>
+<a href="#p12"><span class="n">12</span>There is github error</a>
+<a href="#p13"><span class="n">13</span>"Move 'AGENTS.md' from 'codex' folder to root folder.  Rename 'codex' to…</a>
+<a href="#p14"><span class="n">14</span>I would transfer implementation task to Codex now. What prompt shall I u…</a>
+<a href="#p15"><span class="n">15</span>commit and git push. After taht export this session as 'standalone hTML …</a>
+<a href="#p16"><span class="n">16</span>Codex has made many progress. Please do a through code review, identify …</a>
+<a href="#p17"><span class="n">17</span>Add to ClaudeSession-20260829-1.html. Also simplify this file , to only …</a>
+<a href="#p18"><span class="n">18</span>Back to implementation, just now you said "Pause feature waves and run R…</a>
+<a href="#p19"><span class="n">19</span>proceed.</a>
+<a href="#p20"><span class="n">20</span>Now what is your view of the code quality of Codex code?</a>
 </nav>
 <main>
 <section class="turn user" id="p1">
-  <div class="who"><span class="badge u">Prompt 1</span><time>2026-08-29 06:52:19</time></div>
+  <div class="who"><span class="badge u">Exchange 1</span><time>2026-08-29 06:52:19</time></div>
   <div class="bubble"><p>Evaluate feasibility of migrating Pi Coding Agent to .NET 10. Need nearly full compatibility with Pi ecosystem such as plugins etc.</p>
 <p>Pi Coding Agent Home Page: https://pi.dev/</p>
 <p>Pi Agent GitHub Repository: https://github.com/earendil-works/pi</p>
@@ -228,7 +227,7 @@ footer{border-top:1px solid var(--line);background:var(--panel);padding:26px 0 4
 <p>One caveat on the numbers: the effort figures are model-derived from measured line counts using a stated throughput assumption, and §7 shows the arithmetic so you can challenge it. They're planning ranges, not bottom-up estimates from a named team.</p></div>
 </section>
 <section class="turn user" id="p2">
-  <div class="who"><span class="badge u">Prompt 2</span><time>2026-08-29 07:20:08</time></div>
+  <div class="who"><span class="badge u">Exchange 2</span><time>2026-08-29 07:20:08</time></div>
   <div class="bubble"><p>I would choose option 1 Full C# Rewrite. </p>
 <p>If I want to delegate the implementation to Codex, how shall I proceed?</p></div>
 </section>
@@ -285,7 +284,7 @@ footer{border-top:1px solid var(--line);background:var(--panel);padding:26px 0 4
 <p>The work breakdown reflects the provider correction: <code>Pi.Ai</code> slices into ~11 protocol ports plus one trivial task for all 47 provider declarations, not 47 separate integrations.</p></div>
 </section>
 <section class="turn user" id="p3">
-  <div class="who"><span class="badge u">Prompt 3</span><time>2026-08-29 07:29:28</time></div>
+  <div class="who"><span class="badge u">Exchange 3</span><time>2026-08-29 07:29:28</time></div>
   <div class="bubble"><p>Do i need create traditional function spec, design spec, implementation plan? Or the delegation kit is enough?</p></div>
 </section>
 <section class="turn asst">
@@ -313,7 +312,7 @@ footer{border-top:1px solid var(--line);background:var(--panel);padding:26px 0 4
 <p>Two of these are on the critical path and I can draft them properly: <code>docs/extension-api.md</code> as a decision-ready proposal with concrete C# signatures mirrored against the real <code>ExtensionAPI</code> surface, and <code>docs/translation-patterns.md</code> with worked TS→C# examples pulled from the actual source. The other four are mostly your decisions to record rather than mine to propose. Want me to draft those two?</p></div>
 </section>
 <section class="turn user" id="p4">
-  <div class="who"><span class="badge u">Prompt 4</span><time>2026-08-29 07:32:50</time></div>
+  <div class="who"><span class="badge u">Exchange 4</span><time>2026-08-29 07:32:50</time></div>
   <div class="bubble"><p>I did not find the doc you mentioned:</p>
 <ul><li>docs/extension-api.md</li></ul>
 <ul><li>docs/solution-layout.md</li><li>docs/differential-testing.md</li><li>docs/session-format.md</li><li>docs/tui-strategy.md</li><li>docs/dependencies.md</li></ul></div>
@@ -359,7 +358,7 @@ footer{border-top:1px solid var(--line);background:var(--panel);padding:26px 0 4
 <p>Still outstanding before dispatch: sign-off on D1 and D5 (they're coupled), and T0.1/T0.2 by hand. The acceptance test in <code>extension-api.md §7</code> — hand-port <code>permission-gate.ts</code>, <code>todo.ts</code> and <code>status-line.ts</code> against the draft API — is the cheapest way to find out whether D1 holds, and I'd run it before committing to wave 6.</p></div>
 </section>
 <section class="turn user" id="p5">
-  <div class="who"><span class="badge u">Prompt 5</span><time>2026-08-29 07:40:25</time></div>
+  <div class="who"><span class="badge u">Exchange 5</span><time>2026-08-29 07:40:25</time></div>
   <div class="bubble"><p>commit and push</p></div>
 </section>
 <section class="turn asst">
@@ -389,58 +388,7 @@ footer{border-top:1px solid var(--line);background:var(--panel);padding:26px 0 4
 <p>One loose end worth deciding before the port begins: you now have both <code>doc/</code> (the report, per your original brief) and <code>docs/</code> (the specs, because <code>AGENTS.md</code> references <code>docs/</code>). That's a confusing pair to live with long-term. I'd fold the report into <code>docs/</code> and drop <code>doc/</code>, but it's a one-line rename either way and I didn't want to move your deliverable without asking.</p></div>
 </section>
 <section class="turn user" id="p6">
-  <div class="who"><span class="badge u">Prompt 6</span><time>2026-08-29 07:43:08</time></div>
-  <div class="bubble"><p>dirrect commit and push to main branch, no need Pull Request.</p></div>
-</section>
-<section class="turn asst">
-  <div class="who"><span class="badge a">Claude</span></div>
-  <div class="bubble"><p>Your call — merging to <code>main</code> directly.</p></div>
-</section>
-<section class="turn asst">
-  <div class="who"><span class="badge a">Claude</span></div>
-  <div class="bubble"><p><code>main</code> is pushed and in sync. Cleaning up the now-redundant branch — it's fully merged, so nothing is lost.</p></div>
-</section>
-<section class="turn asst">
-  <div class="who"><span class="badge a">Claude</span></div>
-  <div class="bubble"><p>Done. Everything is on <code>main</code> at <a href="https://github.com/yanziyang/PiCSharp" target="_blank" rel="noopener">yanziyang/PiCSharp</a>, no PR:</p>
-<pre class="code"><code>2c8140b  Add design specifications for the C# port
-ed4f5ce  Add Codex delegation kit for the C# port
-61d7177  Add .NET 10 feasibility assessment for Pi coding agent
-91e8518  Initial commit</code></pre>
-<p><code>main</code> is in sync with <code>origin/main</code>, working tree clean. I deleted the temporary branch on both sides since it was fully merged — the commits live on <code>main</code>.</p>
-<p>Kept the three commits separate rather than squashing, so the feasibility analysis, the delegation kit, and the design specs each have their own message and can be reverted independently.</p>
-<p>Noting for next time: you want work committed straight to <code>main</code> in this repo, so I'll skip the branch step going forward.</p></div>
-</section>
-<section class="turn user" id="p7">
-  <div class="who"><span class="badge u">Prompt 7</span><time>2026-08-29 07:44:48</time></div>
-  <div class="bubble"><p>There are two duplicated commit at gitHub: Add design specifications for the C# port Delete one.</p></div>
-</section>
-<section class="turn asst">
-  <div class="who"><span class="badge a">Claude</span></div>
-  <div class="bubble"><p>Before touching history on <code>main</code>, let me verify what's actually on GitHub — rewriting a pushed branch isn't something to do on an unconfirmed premise.</p></div>
-</section>
-<section class="turn asst">
-  <div class="who"><span class="badge a">Claude</span></div>
-  <div class="bubble"><p>Only one such commit exists locally. Let me confirm against GitHub's API directly rather than trusting my local view.</p></div>
-</section>
-<section class="turn asst">
-  <div class="who"><span class="badge a">Claude</span></div>
-  <div class="bubble"><p>I checked, and I'm not going to delete anything — there's only one such commit, and removing it would delete the seven design docs.</p>
-<p>The remote has exactly one ref and four linear commits:</p>
-<pre class="code"><code>2c8140b  Add design specifications for the C# port     ← only one
-ed4f5ce  Add Codex delegation kit for the C# port
-61d7177  Add .NET 10 feasibility assessment for Pi coding agent
-91e8518  Initial commit</code></pre>
-<p><code>git ls-remote origin</code> returns a single branch, <code>refs/heads/main</code> → <code>2c8140b</code>, and a message search across <em>all</em> refs returns exactly one match (<code>2c8140ba413…</code>, 15:41:44 +0800). There is no second commit to delete.</p>
-<p>What you're most likely looking at is the repo's <strong>Activity</strong> tab rather than the commit history. That feed logs push <em>events</em>, not commits — and I pushed <code>2c8140b</code> twice: once to the <code>feasibility-study-and-delegation-kit</code> branch, then again to <code>main</code> when I fast-forwarded. Same single commit, two push events, so it reads as a duplicate. The other possibility is a page cached from before I deleted that branch, when the commit was genuinely reachable from two refs.</p>
-<p>Either way the underlying history is clean. Confirm with a hard refresh here:</p>
-<p>https://github.com/yanziyang/PiCSharp/commits/main</p>
-<p>Or locally:</p>
-<pre class="code" data-lang="bash"><code>git log --oneline origin/main</code></pre>
-<p>If after refreshing you still see two entries on the <strong>commits</strong> page, send me both SHAs — if they differ, something real happened that I can't see from here and I'll fix it properly. Rewriting <code>main</code> is cheap to do and awkward to undo, so I'd rather have the SHAs first.</p></div>
-</section>
-<section class="turn user" id="p8">
-  <div class="who"><span class="badge u">Prompt 8</span><time>2026-08-29 07:46:05</time></div>
+  <div class="who"><span class="badge u">Exchange 6</span><time>2026-08-29 07:46:05</time></div>
   <div class="bubble"><p>THe SHA: 2c8140ba41323ead7d973ded916d6ae9db506249 ed4f5ce29fd4b90668f464f75045eb2395057011</p></div>
 </section>
 <section class="turn asst">
@@ -457,8 +405,8 @@ ed4f5ce  Add Codex delegation kit for the C# port
 <ol><li><strong>Reword</strong> them to be visually distinct — e.g. <code>Add Codex delegation kit (codex/)</code> and <code>Add port design specifications (docs/)</code>.</li><li><strong>Squash</strong> into one commit, <code>Add C# port delegation kit and design specifications</code>, keeping all 10 files.</li></ol>
 <p>Both rewrite the two commits and need a force-push to <code>main</code>. Content is preserved either way — say which you'd prefer and I'll do it. If you'd rather leave history alone, that's fine too; the log is accurate as it stands.</p></div>
 </section>
-<section class="turn user" id="p9">
-  <div class="who"><span class="badge u">Prompt 9</span><time>2026-08-29 07:47:05</time></div>
+<section class="turn user" id="p7">
+  <div class="who"><span class="badge u">Exchange 7</span><time>2026-08-29 07:47:05</time></div>
   <div class="bubble"><p>YOu still have some tokens. But are steps forward?</p></div>
 </section>
 <section class="turn asst">
@@ -486,16 +434,8 @@ ed4f5ce  Add Codex delegation kit for the C# port
   <div class="who"><span class="badge a">Claude</span></div>
   <div class="bubble"><p>Now correcting the two documents the spike falsified.</p></div>
 </section>
-<section class="turn user" id="p10">
-  <div class="who"><span class="badge u">Prompt 10</span><time>2026-08-29 07:52:42</time></div>
-  <div class="bubble"><p>Continue from where you left off.</p></div>
-</section>
-<section class="turn asst">
-  <div class="who"><span class="badge a">Claude</span></div>
-  <div class="bubble"><p>No response requested.</p></div>
-</section>
-<section class="turn user" id="p11">
-  <div class="who"><span class="badge u">Prompt 11</span><time>2026-08-29 07:52:45</time></div>
+<section class="turn user" id="p8">
+  <div class="who"><span class="badge u">Exchange 8</span><time>2026-08-29 07:52:45</time></div>
   <div class="bubble"><p>continue</p></div>
 </section>
 <section class="turn asst">
@@ -537,8 +477,8 @@ ed4f5ce  Add Codex delegation kit for the C# port
 <ul><li><strong>Round 2 acceptance test</strong> — <code>modal-editor.ts</code>, <code>rainbow-editor.ts</code>, <code>custom-provider-anthropic/</code>. These cover <code>EditorFactory</code>, <code>onTerminalInput</code> and <code>registerProvider</code>, the highest-variance surfaces round 1 never reached. Cheap now, expensive in month nine.</li><li>Then D1/D5 sign-off, T0.1 scaffold, T0.2 harness.</li></ul>
 <p>I'd run round 2 next unless you'd rather I fix the report first.</p></div>
 </section>
-<section class="turn user" id="p12">
-  <div class="who"><span class="badge u">Prompt 12</span><time>2026-08-29 07:56:13</time></div>
+<section class="turn user" id="p9">
+  <div class="who"><span class="badge u">Exchange 9</span><time>2026-08-29 07:56:13</time></div>
   <div class="bubble"><p>Update feasibility report as you recommended. Also change folder name 'doc' to be 'ÁI'</p></div>
 </section>
 <section class="turn asst">
@@ -593,8 +533,8 @@ ed4f5ce  Add Codex delegation kit for the C# port
 <p>You now have <code>ÁI/</code> and <code>docs/</code> side by side — the report versus the port specs. That's the split I flagged earlier; still a one-line fix if you'd rather consolidate.</p>
 <p>Next up is round 2 of the acceptance test (<code>modal-editor.ts</code>, <code>rainbow-editor.ts</code>, <code>custom-provider-anthropic/</code>) unless you want something else first.</p></div>
 </section>
-<section class="turn user" id="p13">
-  <div class="who"><span class="badge u">Prompt 13</span><time>2026-08-29 08:00:46</time></div>
+<section class="turn user" id="p10">
+  <div class="who"><span class="badge u">Exchange 10</span><time>2026-08-29 08:00:46</time></div>
   <div class="bubble"><p>proceed</p></div>
 </section>
 <section class="turn asst">
@@ -652,8 +592,8 @@ ed4f5ce  Add Codex delegation kit for the C# port
 <h4>Where the critical path stands</h4>
 <p>D1 and D5 are now evidence-backed and ready for your sign-off. After that: <strong>T0.1</strong> (solution scaffold, CI, <code>reference/</code> submodule pinned to v0.84.4) and <strong>T0.2</strong> (differential harness) — both human-led, then wave 1's three calibration packets.</p></div>
 </section>
-<section class="turn user" id="p14">
-  <div class="who"><span class="badge u">Prompt 14</span><time>2026-08-29 08:04:44</time></div>
+<section class="turn user" id="p11">
+  <div class="who"><span class="badge u">Exchange 11</span><time>2026-08-29 08:04:44</time></div>
   <div class="bubble"><p>proceed</p></div>
 </section>
 <section class="turn asst">
@@ -733,27 +673,8 @@ Ref:    reference/pi pinned at v0.84.4</code></pre>
 <p><strong>T0.2 — the differential harness</strong>: normalisers, HTTP fixture recorder, replay runner, golden-buffer capture. It's the gate on wave 2, roughly two weeks of work, and my own docs say build it <em>before</em> any porting starts. That's what I'd do next.</p>
 <p>Worth flagging: D1 and D5 are still marked <strong>Proposed</strong>. Both now have evidence behind them, and nothing so far depends on your sign-off — but wave 6 does, and T0.2 is the last work that doesn't.</p></div>
 </section>
-<section class="turn user" id="p15">
-  <div class="who"><span class="badge u">Prompt 15</span><time>2026-08-29 08:18:03</time></div>
-  <div class="bubble"><p>commit and push</p></div>
-</section>
-<section class="turn asst">
-  <div class="who"><span class="badge a">Claude</span></div>
-  <div class="bubble"><p>Nothing to commit — that push already went through. Local <code>HEAD</code>, <code>origin/main</code> and the working tree are all at <code>19e1d70</code>.</p>
-<p>While I'm here, one thing in that output deserves a check. <code>git submodule status</code> describes the pin as <code>v0.0.2-5566-gb79e4cc83</code>, not <code>v0.84.4</code> — let me confirm my CI pin-check isn't about to fail on that discrepancy.</p></div>
-</section>
-<section class="turn asst">
-  <div class="who"><span class="badge a">Claude</span></div>
-  <div class="bubble"><p>Nothing to commit — the push already landed. Everything is at <code>19e1d70</code>, working tree clean, <code>main</code> in sync with <code>origin/main</code>.</p>
-<pre class="code"><code>19e1d70  T0.1: scaffold the .NET 10 solution
-137a680  Run D1 acceptance test round 2; D1 passes both rounds
-21b32aa  Revise feasibility report to rev 2; rename doc/ to AI/
-01f2f7c  Run D1 acceptance test; correct two claims it disproved</code></pre>
-<p>The submodule discrepancy turned out to be benign, and worth knowing: <code>v0.84.4</code> is a <strong>lightweight</strong> tag, so plain <code>git describe</code> skips it and reports the nearest annotated tag instead (<code>v0.0.2-5566-g…</code>). The pin itself is exact — <code>HEAD</code> and <code>v0.84.4</code> both resolve to <code>b79e4cc83</code>, and the CI check passes because it uses <code>--tags --exact-match</code>. If you ever see that <code>v0.0.2-…</code> string in submodule output, it's cosmetic, not drift.</p>
-<p>Nothing outstanding on my side. <strong>T0.2 — the differential harness</strong> is next whenever you want it: normalisers, HTTP fixture recorder, replay runner, golden-buffer capture. It's the gate on wave 2, and the last piece of work before any porting starts.</p></div>
-</section>
-<section class="turn user" id="p16">
-  <div class="who"><span class="badge u">Prompt 16</span><time>2026-08-29 08:18:57</time></div>
+<section class="turn user" id="p12">
+  <div class="who"><span class="badge u">Exchange 12</span><time>2026-08-29 08:18:57</time></div>
   <div class="bubble"><p>There is github error</p></div>
 </section>
 <section class="turn asst">
@@ -817,8 +738,8 @@ b9fbe25  Fix CI: verify the upstream pin by commit SHA
 <p>The scaffold is now genuinely validated end-to-end on a clean Linux machine, not just on mine — which is the thing that actually matters before delegating packets to Codex.</p>
 <p><strong>T0.2 (differential harness)</strong> remains next, and D1/D5 still await your sign-off before wave 6.</p></div>
 </section>
-<section class="turn user" id="p17">
-  <div class="who"><span class="badge u">Prompt 17</span><time>2026-08-29 08:40:17</time></div>
+<section class="turn user" id="p13">
+  <div class="who"><span class="badge u">Exchange 13</span><time>2026-08-29 08:40:17</time></div>
   <div class="bubble"><p>"Move 'AGENTS.md' from 'codex' folder to root folder.  Rename 'codex' to 'ÍmplementationKit'.</p></div>
 </section>
 <section class="turn asst">
@@ -860,8 +781,8 @@ reference/pi           submodule @ v0.84.4, pin enforced in CI</code></pre>
 <p>One note on the two non-ASCII folder names: <code>Á</code> and <code>Í</code> are consistent enough that I've taken them as deliberate rather than typos. They work fine — git quotes them in stat output and <code>file://</code> URLs need escaping, nothing more. Say the word if either was meant to be plain ASCII.</p>
 <p><strong>T0.2 (differential harness)</strong> is still the next piece of work, and D1/D5 await your sign-off before wave 6.</p></div>
 </section>
-<section class="turn user" id="p18">
-  <div class="who"><span class="badge u">Prompt 18</span><time>2026-08-29 08:45:29</time></div>
+<section class="turn user" id="p14">
+  <div class="who"><span class="badge u">Exchange 14</span><time>2026-08-29 08:45:29</time></div>
   <div class="bubble"><p>I would transfer implementation task to Codex now. What prompt shall I use for Codex?</p></div>
 </section>
 <section class="turn asst">
@@ -903,8 +824,8 @@ reference/pi           submodule @ v0.84.4, pin enforced in CI</code></pre>
 <ul><li><strong>Skips.</strong> CI enforces a skip budget of zero, so a skipped test is a red build — but check the PR <em>narrative</em> too, for tests quietly not ported at all.</li><li><strong>Scope.</strong> Any edit outside <code>src/Pi.Protocol/<strong></code> and <code>tests/Pi.Protocol.Tests/</strong></code> is a packet violation worth pushing back on, even if the change looks reasonable. Parallel tasks depend on that discipline holding.</li></ul>
 <p>Still open on the critical path: <strong>T0.2</strong> (differential harness) before wave 2, and your sign-off on <strong>D1/D5</strong> before wave 6.</p></div>
 </section>
-<section class="turn user" id="p19">
-  <div class="who"><span class="badge u">Prompt 19</span><time>2026-08-29 08:52:08</time></div>
+<section class="turn user" id="p15">
+  <div class="who"><span class="badge u">Exchange 15</span><time>2026-08-29 08:52:08</time></div>
   <div class="bubble"><p>commit and git push. After taht export this session as 'standalone hTML file named 'ClaudeSession-20260829-1.html" and save it to ''ÁI' folder.</p></div>
 </section>
 <section class="turn asst">
@@ -950,8 +871,8 @@ reference/pi           submodule @ v0.84.4, pin enforced in CI</code></pre>
 <ol><li><strong>Leave untracked</strong> — you have the file, nothing is published.</li><li><strong>Commit as-is</strong> — say the word and it's one command.</li><li><strong>Commit a redacted version</strong> — I can scrub the email and rewrite home paths to <code>~</code> before committing.</li></ol>
 <p>I'd lean to 3 if you want it in the repo at all, since the email and username add nothing to the record's value.</p></div>
 </section>
-<section class="turn user" id="p20">
-  <div class="who"><span class="badge u">Prompt 20</span><time>2026-08-29 15:14:25</time></div>
+<section class="turn user" id="p16">
+  <div class="who"><span class="badge u">Exchange 16</span><time>2026-08-29 15:14:25</time></div>
   <div class="bubble"><p>Codex has made many progress. Please do a through code review, identify area for improve, and refactor the code when necessary.</p></div>
 </section>
 <section class="turn asst">
@@ -1067,8 +988,8 @@ reference/pi           submodule @ v0.84.4, pin enforced in CI</code></pre>
 <h5>My recommendation</h5>
 <p><strong>Pause feature waves and run R1 first.</strong> Five waves of implementation currently rest on an oracle that doesn't exist. Every additional wave built on top compounds the risk, and porting tests after the fact against an implementation you've grown attached to is much harder than porting them alongside.</p></div>
 </section>
-<section class="turn user" id="p21">
-  <div class="who"><span class="badge u">Prompt 21</span><time>2026-08-29 15:30:52</time></div>
+<section class="turn user" id="p17">
+  <div class="who"><span class="badge u">Exchange 17</span><time>2026-08-29 15:30:52</time></div>
   <div class="bubble"><p>Add to ClaudeSession-20260829-1.html. Also simplify this file , to only contain prompt and response, remove all intermediate contents.</p></div>
 </section>
 <section class="turn asst">
@@ -1103,10 +1024,264 @@ reference/pi           submodule @ v0.84.4, pin enforced in CI</code></pre>
   <div class="who"><span class="badge a">Claude</span></div>
   <div class="bubble"><p>A 16px overflow at 420px — inline <code>&lt;code&gt;</code> containing long paths can't wrap. Small but worth fixing.</p></div>
 </section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Fixed — the 16px overflow is now 1px of sub-pixel rounding. Renders correctly. Let me reset the viewport and commit.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Done, pushed as <code>a4f493d</code>.</p>
+<h4>Both changes</h4>
+<p><strong>Brought up to date</strong> — regenerated from the current transcript, so it now covers the full session through the wave 1–5 code review:</p>
+<div class="tw"><table><thead><tr><th></th><th>Before</th><th>After</th></tr></thead><tbody><tr><td>Prompts</td><td>19</td><td><strong>21</strong></td></tr><tr><td>Responses</td><td>132</td><td><strong>168</strong></td></tr><tr><td>Tool blocks</td><td>219</td><td><strong>0</strong></td></tr><tr><td>Size</td><td>436 KB</td><td><strong>108 KB</strong></td></tr></tbody></table></div>
+<p><strong>Simplified</strong> — tool calls, tool results and internal reasoning are gone. The diff is 812 insertions against 5,785 deletions, which is a fair measure of how much of that file was working detail rather than conversation.</p>
+<p>What's kept: every prompt and every response, with markdown rendered properly (headings, tables, lists, code blocks), the sticky prompt index in the sidebar, timestamps, and the print stylesheet. Still fully standalone — zero external references, all CSS inline.</p>
+<h4>One defect found while verifying</h4>
+<p>The page scrolled horizontally by 16px on narrow viewports. Long inline <code>code</code> spans — file paths like <code>ÍmplementationKit/packets/T1.2-pi-protocol.md</code> — have no wrap opportunity and were pushing the layout. Inline code now wraps with <code>overflow-wrap: anywhere</code>; fenced blocks keep their own horizontal scroll, since wrapping code samples would be worse than scrolling them. Residual is 1px of sub-pixel rounding, not worth chasing.</p>
+<h4>Worth noting</h4>
+<p>That file is now tracked and pushed to a <strong>public</strong> repo — Codex committed the earlier version in <code>b159011</code>, which resolved the question I'd left open last time. The slimmed version actually reduces the exposure: it still carries your email and <code>C:\Users\admin</code> paths in the prose, but the ~95 path references that lived in tool payloads are gone with them. If you'd like the remaining ones scrubbed, that's a small change to the exporter — say the word.</p></div>
+</section>
+<section class="turn user" id="p18">
+  <div class="who"><span class="badge u">Exchange 18</span><time>2026-08-29 15:35:25</time></div>
+  <div class="bubble"><p>Back to implementation, just now you said "Pause feature waves and run R1 first. Five waves of implementation currently rest on an oracle that doesn't exist. Every additional wave built on top compounds the risk, and porting tests after the fact against an implementation you've grown attached to is much harder than porting them alongside."</p>
+<p>Please proceed.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Let me size R1.1 properly before diving in.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>That changes things — most upstream agent tests target a <code>harness/</code> subsystem. Let me check whether the <em>implementation</em> is even complete, which my review didn't verify.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>That's a significant correction to my own review — I assessed code <em>quality</em> but never <em>completeness</em>. Let me confirm the gap concretely.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Confirmed: <code>harness/</code> is 10,065 LOC, entirely unported — no Session, Compaction, Skills, or Reducer types exist in C#. So R1.1's real scope is far smaller than 226. Let me check what the remaining tests actually depend on.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>No harness dependency — these are portable against the existing C# code. Let me enumerate exactly which cases are missing.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>45 upstream cases, ~8 covered. Let me study the existing C# test harness so ports match its idiom.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Helpers are solid and reusable. Let me read the upstream bodies for the highest-value untested behaviours — execution mode and termination semantics.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Let me check whether the C# <code>AgentTool</code> even supports <code>executionMode</code> — if not, that's a finding in itself.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>The C# core has full feature parity — <code>ExecutionMode</code>, <code>ShouldStopAfterTurn</code>, <code>PrepareNextTurn</code>, <code>TransformContext</code>, <code>SessionId</code> all exist. So these tests are portable. Let me read the exact config surface.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Now I have the full surface. Let me check the remaining types I need.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>I have the full API surface. Let me extract shared fixtures and write the ported cases.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Three compile errors. Let me check the <code>UserMessage.Content</code> shape.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p><code>UserMessage.Content</code> is <code>object</code> — mirroring upstream's <code>string | ContentBlock[]</code> union. Let me add a helper and fix the three errors.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Compiles. Now the moment that matters — do the ported tests pass, or do they surface divergences?</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p><strong>3 of 14 failed.</strong> That's R1 doing its job. But before calling them bugs, I must verify my ports are faithful — let me check each against upstream.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Important — both of those upstream tests target <strong><code>agentLoopContinue</code></strong>, a different entry point. My ports called <code>RunAsync</code>. Those two failures are my porting errors, not implementation bugs. Let me check the C# equivalent exists.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Significant: <code>AgentLoop</code> has only <code>RunAsync</code> — upstream's <code>agentLoopContinue</code> isn't ported. Let me check whether <code>Agent</code> provides it, and read the rest of the steering test.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>All three are <strong>my porting errors</strong>, not implementation bugs — an important distinction:</p>
+<ul><li>Two target <code>agentLoopContinue</code>, which has no C# equivalent (<code>Agent.ContinueAsync</code> is the higher-level wrapper, not the loop entry point)</li><li>The steering test asserts tools execute <em>before steering is injected</em>; I wrongly asserted the callback isn't <em>invoked</em> early</li></ul>
+<p>Let me correct them faithfully.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>All green: 22 passed, 2 skipped with documented reasons. Agent went 10 → 24 tests. Let me record the findings and make the bigger gap permanently visible.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Now extending the parity tool to track implementation completeness — the gap my review missed.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>The script works, but Python collapsed the <code>\n</code> escapes into literal newlines inside the printf formats. Let me clean that up.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>R1.1 done, CI green, pushed as <code>f5efee2</code>. <strong>308 tests</strong> (was 294): 306 pass, 2 skipped with documented reasons.</p>
+<h4>R1 immediately found something bigger than a test gap</h4>
+<p>Sizing the work revealed that <strong><code>pi-agent-core</code> is not fully ported</strong>. The <code>harness/</code> subsystem is <strong>10,065 LOC and entirely absent</strong> in C# — session storage, JSONL codec, compaction, branch summarisation, the reducer, skills, prompt templates, system-prompt assembly, truncation, search.</p>
+<p>So roughly <strong>180 of the 226 upstream agent cases can't be ported at all</strong> — the code they test doesn't exist. R1's real scope today is ~46 cases, not 226.</p>
+<p>The same pattern across the project:</p>
+<div class="tw"><table><thead><tr><th>Package</th><th>Upstream LOC</th><th>Ported</th><th>Ratio</th></tr></thead><tbody><tr><td>protocol</td><td>1,236</td><td>3,493</td><td>282%</td></tr><tr><td>client</td><td>1,225</td><td>1,533</td><td>125%</td></tr><tr><td>server</td><td>2,299</td><td>2,086</td><td>90%</td></tr><tr><td>telemetry</td><td>935</td><td>741</td><td>79%</td></tr><tr><td>ai</td><td>23,668</td><td>16,989</td><td>71%</td></tr><tr><td><strong>agent</strong></td><td>12,640</td><td>2,334</td><td><strong>18%</strong></td></tr><tr><td><strong>tui</strong></td><td>17,000</td><td>1,723</td><td><strong>10%</strong></td></tr></tbody></table></div>
+<p>C# runs 1.2–1.5× more verbose than TypeScript, so ~100% would already mean under-ported.</p>
+<p><strong>My wave 1–5 review missed this</strong> — I measured code <em>quality</em> and never <em>completeness</em>, and the commit messages ("Port the Pi TUI differential renderer <strong>core</strong>") were accurate about scope while I read them as package-complete. <code>tools/test-parity.sh</code> now reports implementation LOC and flags anything under 40%, so it can't recur silently.</p>
+<h4>Three tests failed. All three were my errors.</h4>
+<p>Worth stating plainly, because the packet rule is "a failing ported test is a finding" — and the first discipline that rule demands is checking your own port first.</p>
+<ul><li>Two targeted <code>agentLoopContinue</code>; I called <code>AgentLoop.RunAsync</code></li><li>One asserted <code>GetSteeringMessages</code> isn't <em>invoked</em> before tools finish; upstream only asserts both tools <em>execute</em> before steering is injected</li></ul>
+<p>The third is corrected and passes. The other two exposed a <strong>genuine API gap</strong>: upstream exports both <code>agentLoop</code> and <code>agentLoopContinue</code>, and only the former is ported. Skipped with reasons, <code>.skip-budget</code> raised to 2.</p>
+<h4>What the 22 passing tests establish</h4>
+<p>The ported loop is faithful on the semantics most likely to break silently — per-tool <code>Sequential</code> mode forcing serial scheduling under a parallel config, parallel batches genuinely overlapping (asserted by a barrier that deadlocks under serialisation), <code>ShouldStopAfterTurn</code> beating a non-empty follow-up queue, termination requiring <em>every</em> result to set <code>Terminate</code>, and <code>PrepareNextTurn</code> applying to the following turn rather than the current one.</p>
+<h4>Recommendation</h4>
+<p><strong>The sequencing question has changed.</strong> R1 assumed implementation was complete and only tests were missing. That's false for agent and tui. Backfilling tests against 18% of a package has limited value.</p>
+<p>I'd suggest, in order:</p>
+<ol><li><strong>Port <code>agentLoopContinue</code></strong> — small, well-bounded, un-skips two cases and returns the budget to 0</li><li><strong>Decide on the agent harness</strong> (10,065 LOC). <code>Pi.CodingAgent</code> has no session, compaction or skills layer to build on until it exists — this is on the critical path, not optional</li><li>Then resume R1 against whatever is actually complete</li></ol>
+<p>Want me to continue with <code>agentLoopContinue</code> and the remaining <code>agent.test.ts</code> cases, or write the packets for the harness decision first?</p></div>
+</section>
+<section class="turn user" id="p19">
+  <div class="who"><span class="badge u">Exchange 19</span><time>2026-08-29 15:48:30</time></div>
+  <div class="bubble"><p>proceed.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Starting with <code>agentLoopContinue</code> — small, well-bounded, and it clears the skip budget. Let me read the upstream implementation.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Clean difference: no prompts appended, no message events emitted, plus two guards. Let me read the C# <code>RunAsync</code> to add the parallel entry point.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p><code>RunContinuationAsync</code> <strong>does exist</strong> — my earlier grep only searched for <code>RunAsync|ContinueAsync</code> and missed it. My "not ported" finding was wrong. Let me see the full surface properly.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>The port is <strong>complete and faithful</strong> — <code>Start</code>/<code>StartContinuation</code>/<code>RunAsync</code>/<code>RunContinuationAsync</code> map exactly to upstream's four entry points, both guards included with identical messages. <strong>My "API gap" finding was wrong</strong>, caused by another naive grep. Let me un-skip those tests properly.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>All 25 pass, zero skips, budget back to 0. Let me correct the findings doc — §3 was wrong.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>The §2 table still says "API missing" — stale now. Let me fix it, then port <code>agent.test.ts</code>.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Agent's surface is comprehensive. Let me read the subtlest upstream cases before porting.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Now I have the semantics. Let me check the stream event types I'll need for controllable streams.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>I have everything. Writing the <code>agent.test.ts</code> ports.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Four failures — <code>new Agent()</code> throws <em>at construction</em>: "No default stream function has been configured." Let me check what upstream does.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Upstream always passes <code>streamFn: unusedStreamFunction</code> — its constructor does <code>streamFn ?? getDefaultStreamFn()</code>, which throws the same way. <strong>C# is faithful; my tests were wrong</strong> for constructing bare agents. Fixing.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>All 40 pass. Let me run full verification and commit.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Two issues in the full run that didn't appear in isolation. Let me look.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Both are my defects. Let me check what upstream's abort test actually asserts.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Upstream's abort test just asserts <code>abort()</code> doesn't throw when nothing is running — I invented an elaborate racy scenario. Another unfaithful port. Fixing both defects.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p><strong>R1.1 complete.</strong> CI green, pushed as <code>df45382</code>. <code>Pi.AgentCore.Tests</code>: <strong>10 → 40 cases</strong>, all passing, zero skips. Suite total 294 → 324.</p>
+<h4>First, a correction</h4>
+<p>My previous finding that <code>agentLoopContinue</code> isn't ported was <strong>wrong</strong>. It is ported. <code>AgentLoop</code> exposes all four upstream entry points:</p>
+<div class="tw"><table><thead><tr><th>Upstream</th><th>C#</th></tr></thead><tbody><tr><td><code>agentLoop</code></td><td><code>Start</code></td></tr><tr><td><code>agentLoopContinue</code></td><td><code>StartContinuation</code></td></tr><tr><td><code>runAgentLoop</code></td><td><code>RunAsync</code></td></tr><tr><td><code>runAgentLoopContinue</code></td><td><code>RunContinuationAsync</code></td></tr></tbody></table></div>
+<p>Both guards present with upstream's exact messages. I'd grepped for <code>RunAsync|ContinueAsync</code> and read the absence of <code>ContinueAsync</code> as an absent API — <code>RunContinuationAsync</code> doesn't match that pattern. Both cases are now un-skipped and pass, budget back to 0, plus one added for the assistant-tail guard that upstream implements but never tests.</p>
+<p>That's the <strong>second</strong> false finding from a naive grep this review (after the <code>.Result</code> matches that were record properties). I've recorded the lesson in the findings doc: grep locates candidates, it doesn't establish absence.</p>
+<h4>The headline result</h4>
+<p><strong>Seven ported tests failed. All seven were my porting errors. Zero were implementation defects.</strong></p>
+<ul><li>Four constructed a bare <code>new Agent()</code> — upstream always passes <code>streamFn: unusedStreamFunction</code>, and its constructor throws identically</li><li>One asserted a callback wasn't <em>invoked</em>; upstream asserts only execution <em>ordering</em></li><li>One raced on abort mid-run; upstream asserts only that <code>abort()</code> while idle doesn't throw (it passed in Debug, failed in Release — a genuinely bad test I'd written)</li><li>Two targeted the API above</li></ul>
+<p>That's a meaningful signal about Codex's work: <strong>the ported agent core is holding up under a faithful suite.</strong></p>
+<h4>What's now verified</h4>
+<p>Scheduling and termination semantics that would fail silently — per-tool <code>Sequential</code> forcing serial execution under a parallel config, parallel batches genuinely overlapping (asserted via a barrier that deadlocks under serialisation), termination requiring <em>every</em> result to set <code>Terminate</code>, <code>PrepareNextTurn</code> applying to the following turn. Plus the Agent lifecycle: async subscribers awaited before <code>PromptAsync</code> resolves, <code>Reset</code> during a run throwing without corrupting the transcript, re-entry guards.</p>
+<h4>Where this leaves R1</h4>
+<p>Agent parity is 16% of upstream's 226 cases — but that's roughly <strong>83% of what's achievable</strong>. The remaining ~180 cases target the 10,065-LOC harness that doesn't exist in C#.</p>
+<pre class="code"><code>protocol   154%   telemetry 157%   ← complete
+agent       16%   (≈83% of achievable)
+client      19%   server 18%
+ai           7%   tui 2%</code></pre>
+<p>The next genuinely useful work isn't more agent tests — it's <strong>the harness decision</strong>. <code>Pi.CodingAgent</code> has no session, compaction, or skills layer to build on until it exists, and that blocks wave 6 entirely.</p>
+<p>Want me to write the harness scoping packet, or continue R1 into client/server (small, and it would finally wire the cross-runtime conformance oracle)?</p></div>
+</section>
+<section class="turn user" id="p20">
+  <div class="who"><span class="badge u">Exchange 20</span><time>2026-08-29 16:00:57</time></div>
+  <div class="bubble"><p>Now what is your view of the code quality of Codex code?</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Let me check one thing before answering, because the pattern matters more than the verdict.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><h4>The code is good. The engineering process wasn't.</h4>
+<p>Those are separable, and conflating them would give you the wrong read.</p>
+<h5>The evidence that actually counts</h5>
+<p>Not the clean build — that's table stakes. The real signal: I ported <strong>40 of upstream's own tests</strong> against Codex's agent implementation. Seven failed. <strong>All seven were my porting errors. Zero were implementation defects.</strong></p>
+<p>Every time the C# disagreed with my expectation, the C# was right and I was wrong. For a cross-language port of subtle concurrent code — tool scheduling, termination semantics, subscriber ordering — that's a genuinely strong result. I've been trying to break this code and haven't managed it.</p>
+<h5>Where it's specifically strong</h5>
+<p>The documented hazards were respected without exception, and these were the traps most likely to produce a plausible-but-wrong port:</p>
+<ul><li><strong>CBOR hand-ported</strong> (745 LOC) rather than swapped for <code>System.Formats.Cbor</code>, exactly as the T1.2 packet demanded proof before substitution</li><li><strong><code>EnsureKeys</code> rejects unknown fields</strong> — <code>System.Text.Json</code> would have silently ignored them, which is a wire-compatibility bug you'd find in production</li><li><strong>SSE uses a stateful decoder</strong>, so UTF-8 code points split across chunks survive</li><li><strong><code>PartialJsonParser</code> written from scratch</strong> (448 LOC) because upstream delegates to an npm package — the docs said port it, don't take a dependency, and that's what happened</li></ul>
+<p>It also made an <em>undocumented but correct</em> architectural call: <code>JsonNode</code> for dynamic provider payloads, a strict hand-rolled value model for the protocol wire. I reviewed that and blessed it rather than "fixing" it.</p>
+<p>Zero stubs, zero TODOs, zero <code>async void</code>, zero blocking waits, zero swallowed exceptions. Cancellation handled deliberately. That's disciplined work.</p>
+<h5>Where it failed</h5>
+<p>Verification. And the shape of the failure is the interesting part:</p>
+<div class="tw"><table><thead><tr><th>#</th><th>Package</th><th>Coverage</th></tr></thead><tbody><tr><td>1</td><td>protocol</td><td><strong>154%</strong></td></tr><tr><td>2</td><td>telemetry</td><td><strong>157%</strong></td></tr><tr><td>3–14</td><td>ai</td><td>7%</td></tr><tr><td>15</td><td>agent</td><td>4%</td></tr><tr><td>17–18</td><td>client / server</td><td>~19%</td></tr><tr><td>19–20</td><td>tui</td><td><strong>2%</strong></td></tr></tbody></table></div>
+<p>The first two packages <em>exceed</em> upstream. Everything from commit 3 onward collapses and never recovers. It's not a size effect — <code>client</code> is the same size as <code>protocol</code> and landed at 19%. It's position in the run.</p>
+<p>Plus: <code>agent</code> and <code>tui</code> are only 18% and 10% <em>implemented</em>, and one packet (Bedrock) reached outside its scope to re-add two NuGet packages referenced by nothing.</p>
+<h5>My share of that</h5>
+<p>Substantial, and worth stating plainly:</p>
+<ul><li>My skip-audit counted tests that were <em>ported then skipped</em>. It couldn't see tests never ported. <strong>Green CI told Codex it was finished</strong> — the gate was measuring almost nothing for five waves.</li><li>I supplied no completeness measure at all, which is why "renderer <strong>core</strong>" read to me as package-complete.</li><li>I wrote exactly <strong>one</strong> detailed packet, for protocol — the best-verified package in the repo.</li></ul>
+<p>An agent optimises against the visible gate. Mine pointed at the wrong thing.</p>
+<h5>The limit on my confidence</h5>
+<p>The 7/7 result covers <strong>one package</strong>. <code>Pi.Ai</code> is 16,989 LOC at 7% coverage and <code>Pi.Tui</code> at 2% — essentially unverified. My verdict is "high quality where I've looked," and I've looked hard at agent and protocol only.</p>
+<p>I'd also weight my own judgment down slightly: I produced two false findings this review from naive greps (<code>.Result</code> matches that were record properties, and a "missing API" that was fully ported).</p>
+<h5>Bottom line</h5>
+<p>If I were assessing a contractor: <strong>I'd keep them, and I'd change how I brief them.</strong> The code is better than most human-written port work I'd expect at this scale. What's missing is exactly what an unguarded agent stops doing when the gate goes green — and that's a management problem, not a capability one.</p>
+<p>The concrete fix is already in: <code>tools/test-parity.sh</code> now ratchets test counts <em>and</em> reports implementation completeness. The next real test is whether coverage rises when the gate finally points at the right thing.</p></div>
+</section>
 
 </main></div>
 <footer><div class="wrap">
-<p style="margin:0 0 6px"><b>Session transcript exported from Claude Code.</b> Prompts and responses only — tool calls, tool results and internal reasoning are intermediate working detail and are excluded.</p>
-<p style="margin:0">Generated 2026-08-29 · 189 entries from 1,674 transcript records.</p>
+<p style="margin:0 0 6px"><b>Session transcript exported from Claude Code.</b> Prompts and responses only — tool calls, tool results and internal reasoning are excluded as intermediate working detail.</p>
+<p style="margin:0 0 6px">A further 5 exchanges were omitted as routine: commit-and-push confirmations, file renames, a commit-history question, and requests about this transcript itself. Selection is by exchange rather than by prompt, so a one-word instruction answered with substantial work is kept.</p>
+<p style="margin:0">Generated 2026-08-29 · 221 entries from 2,103 transcript records.</p>
 </div></footer>
 </body></html>
