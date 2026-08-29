@@ -47,9 +47,21 @@ callback-taking methods (`NewSession({ setup, withSession })`) → `Func<>`/`Act
 
 | id | Source | Target | LOC | Fit |
 |----|--------|--------|-----|-----|
-| T1.1 | `packages/telemetry/src` | `Pi.Telemetry` | 935 | A |
 | T1.2 | `packages/protocol/src` | `Pi.Protocol` | 1,236 | A |
 | T1.3 | `packages/ai/src/providers/faux.ts` | `Pi.Ai.Testing` | 708 | A |
+| T1.1 | `packages/telemetry/src` | `Pi.Telemetry` | 935 | **C** — see below |
+
+**T1.1 was mis-rated A and is actually C.** `telemetry/src/index.ts` is 29 type-only declarations
+against 2 runtime functions, with 11 uses of conditional and mapped types
+(`InferStartAttributes<T>`, `InferRequiredAndOptionalAttributes<T>`). Those derive attribute types
+from a schema value at compile time. C# generics cannot express that, so someone must first *decide*
+how schema-derived attribute typing is represented — source generator, analyzer, or runtime
+validation with weaker static guarantees. That decision is a design task, not a translation.
+
+**Do T1.2 first.** Protocol is 1,236 LOC with 53 typebox schema definitions, zero conditional or
+mapped types, and real upstream tests. It is byte-verifiable, and merging it turns on the
+cross-runtime conformance oracle (`differential-testing.md` §4), which is the cheapest defect
+detection available on the whole project.
 
 Run these three first regardless of schedule pressure: they are small, independent, and they
 calibrate how much review each Codex PR actually needs before you commit to the large waves.
