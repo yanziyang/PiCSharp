@@ -288,16 +288,60 @@ public sealed class AgentLoopSemanticsTests
 
     // ---------------------------------------------------------------- context handling
 
-    // Upstream exports two loop entry points from agent-loop.ts: `agentLoop` and
-    // `agentLoopContinue`. Only `agentLoop` is ported (AgentLoop.RunAsync).
-    // Agent.ContinueAsync is the higher-level Agent wrapper, not the loop entry point,
-    // so these two upstream cases have nothing to target. See docs/spikes/r1-agent-findings.md.
-    [Fact(Skip = "agentLoopContinue is not ported; no AgentLoop.ContinueAsync exists")]
-    public void Should_throw_when_context_has_no_messages() => Assert.Fail("not reachable");
+    // Upstream's agentLoopContinue maps to AgentLoop.StartContinuation (stream) and
+    // AgentLoop.RunContinuationAsync (task). Both guards are present with upstream's
+    // exact messages.
+    [Fact]
+    public void Should_throw_when_context_has_no_messages()
+    {
+        var error = Assert.Throws<InvalidOperationException>(() => AgentLoop.StartContinuation(
+            new AgentContext { SystemPrompt = "You are helpful." },
+            Config(),
+            Replay(Assistant("unused")),
+            TestContext.Current.CancellationToken));
 
-    [Fact(Skip = "agentLoopContinue is not ported; no AgentLoop.ContinueAsync exists")]
-    public void Should_continue_from_existing_context_without_emitting_user_message_events() =>
-        Assert.Fail("not reachable");
+        Assert.Equal("Cannot continue: no messages in context", error.Message);
+    }
+
+    /// <summary>
+    /// Additional coverage beyond upstream's suite: the second guard in agentLoopContinue
+    /// is implemented but has no upstream test of its own.
+    /// </summary>
+    [Fact]
+    public void Should_throw_when_continuing_from_an_assistant_tail()
+    {
+        var messages = new List<Message> { UserMessage.Text("hi", 1), Assistant("reply") };
+
+        var error = Assert.Throws<InvalidOperationException>(() => AgentLoop.StartContinuation(
+            new AgentContext { Messages = messages },
+            Config(),
+            Replay(Assistant("unused")),
+            TestContext.Current.CancellationToken));
+
+        Assert.Equal("Cannot continue from message role: assistant", error.Message);
+    }
+
+    [Fact]
+    public async Task Should_continue_from_existing_context_without_emitting_user_message_events()
+    {
+        var events = new List<AgentEvent>();
+        var existing = new List<Message> { UserMessage.Text("Hello", 1) };
+
+        var result = await AgentLoop.RunContinuationAsync(
+            new AgentContext { SystemPrompt = "You are helpful.", Messages = existing },
+            Config(),
+            Replay(Assistant("Response")),
+            Collect(events),
+            TestContext.Current.CancellationToken);
+
+        // Only the new assistant message is returned; the existing user message is not replayed.
+        Assert.Single(result);
+        Assert.Equal("assistant", result[0].Role);
+
+        var ends = events.OfType<MessageEndEvent>().ToList();
+        Assert.Single(ends);
+        Assert.Equal("assistant", ends[0].Message.Role);
+    }
 
     [Fact]
     public async Task Should_apply_transformContext_before_convertToLlm()

@@ -1,7 +1,7 @@
 # R1.1 — Agent test backfill: findings
 
-**Run:** 2026-08-29 · **Scope:** `reference/pi/packages/agent/test/agent-loop.test.ts`
-**Result:** `Pi.AgentCore.Tests` 10 → 24 cases. 22 pass, 2 skipped against a missing API.
+**Run:** 2026-08-29 · **Scope:** `agent-loop.test.ts` and `agent.test.ts`
+**Result:** `Pi.AgentCore.Tests` 10 → 40 cases, all passing, no skips. Suite total 294 → 324.
 
 ---
 
@@ -45,47 +45,76 @@ discipline that rule requires is checking the port before blaming the implementa
 
 | Upstream case | Why it failed | Verdict |
 |---|---|---|
-| `should throw when context has no messages` | Targets `agentLoopContinue`; I called `AgentLoop.RunAsync` | port error → **skipped**, API missing |
-| `should continue from existing context without emitting user message events` | Same: targets `agentLoopContinue` | port error → **skipped**, API missing |
+| `should throw when context has no messages` | Targets `agentLoopContinue`; I called `AgentLoop.RunAsync` | port error → **corrected** to `StartContinuation`, now passes |
+| `should continue from existing context without emitting user message events` | Same: targets `agentLoopContinue` | port error → **corrected** to `RunContinuationAsync`, now passes |
 | `should inject queued messages after all tool calls complete` | I asserted `getSteeringMessages` is not *invoked* before tools finish. Upstream asserts both tools *execute* before steering is injected — a weaker and different claim. | port error → **corrected**, now passes |
 
-## 3. Genuine API gap: `agentLoopContinue`
+## 3. The "missing API" finding was wrong — corrected
 
-Upstream `agent-loop.ts` exports two loop entry points:
+An earlier revision of this document claimed `agentLoopContinue` was not ported, and two tests were
+skipped against that claim. **That was incorrect.** The C# port maps all four upstream entry points
+faithfully:
 
-```ts
-export function agentLoop(...)          // ported as AgentLoop.RunAsync
-export function agentLoopContinue(...)  // NOT ported
-```
+| Upstream (`agent-loop.ts`) | C# (`AgentLoop`) |
+|---|---|
+| `agentLoop` | `Start` |
+| `agentLoopContinue` | `StartContinuation` |
+| `runAgentLoop` | `RunAsync` |
+| `runAgentLoopContinue` | `RunContinuationAsync` |
 
-`agentLoopContinue` resumes from an existing context without re-emitting user-message events, and
-throws `"Cannot continue: no messages in context"` when the transcript is empty.
+Both guards are present with upstream's exact messages: `"Cannot continue: no messages in context"`
+and `"Cannot continue from message role: assistant"`.
 
-`Agent.ContinueAsync` exists but is the higher-level `Agent` wrapper, not the loop entry point, and
-does not satisfy these tests. Two cases are skipped against this gap (`.skip-budget` raised to 2).
+The error came from grepping for `RunAsync|ContinueAsync` and concluding from the absence of
+`ContinueAsync` that the API was missing. `RunContinuationAsync` does not match that pattern. This is
+the second time in this review that a naive grep produced a false finding — the first being
+`.Result` matches that turned out to be domain record properties rather than blocking calls.
 
-**Recommended:** port `agentLoopContinue` as `AgentLoop.ContinueAsync` and un-skip both cases. Small
-and well-bounded — it is the same loop with a different entry condition.
+**Both cases are now un-skipped and pass**, plus one added case covering the assistant-tail guard,
+which upstream implements but does not test. `.skip-budget` is back to 0.
+
+**Process note.** Grep is adequate for locating candidates and inadequate for concluding absence.
+Confirm any "X is missing" claim by listing the actual public surface before recording it.
 
 ## 4. What passes
 
-The 22 passing cases confirm the ported loop is behaviourally faithful on the semantics most likely
-to break silently:
+40 cases now cover the loop and the Agent wrapper. The behaviours confirmed faithful are the ones
+most likely to break silently:
 
+**Loop scheduling and termination**
 - Per-tool `ExecutionMode.Sequential` forces serial scheduling even under a parallel config, and a
   single sequential tool serialises a mixed batch
 - Parallel batches genuinely overlap (asserted by a barrier that deadlocks under serialisation)
 - `ShouldStopAfterTurn` beats a non-empty follow-up queue
 - Termination requires *every* tool result to set `Terminate`; mixed batches continue
 - A blocked-and-terminating call stops the loop, but only when it is the whole batch
-- `TransformContext` runs before `ConvertToLlm`
-- `PrepareNextTurn` model replacement applies to the following turn, not the current one
-- `SessionId` reaches the stream function options
+- `TransformContext` runs before `ConvertToLlm`; `PrepareNextTurn` applies to the following turn
+- Both continuation guards throw upstream's exact messages
+
+**Agent lifecycle**
+- Async subscribers are awaited before `PromptAsync` resolves, and by `WaitForIdleAsync`
+- `Reset` during a run throws and leaves both the streaming flag and transcript intact
+- `PromptAsync` and `ContinueAsync` reject re-entry while streaming
+- `ContinueAsync` drains the follow-up queue
+- `SessionId` reaches the stream options from both `AgentLoopConfig` and `AgentOptions`
+
+## 4b. A second round of porting errors
+
+Four more ported tests failed on first run, and again all four were mine, not the implementation's:
+
+| Cause | Fix |
+|---|---|
+| Four cases constructed a bare `new Agent()`. Upstream always passes `streamFn: unusedStreamFunction`; its constructor resolves `streamFn ?? getDefaultStreamFn()` and throws when neither exists. C# behaves identically. | Pass a stream function, as upstream does |
+| `Should_handle_abort_controller` invented an elaborate abort-mid-run scenario with a race that passed in Debug and failed in Release. Upstream asserts only that `abort()` does not throw when idle. | Replaced with the faithful one-line assertion |
+
+Running total for this backfill: **seven ported tests failed, seven were porting errors, zero were
+implementation defects.** That is a meaningful result in itself — the ported agent core is holding up
+well under a faithful suite.
 
 ## 5. Next
 
-1. Port `agentLoopContinue`, un-skip the two cases, return `.skip-budget` to 0.
-2. Port `agent.test.ts` (22 cases) — state, subscribers, queues, reset and concurrency guards.
+1. ~~Port `agentLoopContinue`~~ — already ported; the two cases are un-skipped and pass.
+2. ~~Port `agent.test.ts`~~ — done. State, subscribers, queues, reset and concurrency guards ported.
 3. Decide whether the agent harness (10,065 LOC) is in scope. Until it is, the agent package cannot
    exceed roughly 20% test parity, and `Pi.CodingAgent` has no session, compaction or skills layer
    to build on.
