@@ -53,3 +53,10 @@ docs/differential-testing.md
 docs/session-format.md
 docs/tui-strategy.md
 docs/dependencies.md
+
+--------------------------------------------------
+Prompt:
+
+I would transfer implementation task to Codex now. What prompt shall I use for Codex?
+
+Response:
