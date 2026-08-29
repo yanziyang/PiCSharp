@@ -40,6 +40,26 @@ count_upstream() {
   find "$REF/$pkg" -name '*.test.ts' -not -path '*/node_modules/*' -exec grep -hoE '^[[:space:]]*(it|test)\(' {} + 2>/dev/null | wc -l | tr -d ' '
 }
 
+# Implementation LOC. C# runs 1.2-1.5x more verbose than TypeScript, so a ratio
+# near 100% indicates UNDER-porting, not parity. Reported, not gated: this is a
+# visibility signal, and the wave 1-5 review missed it entirely.
+loc_upstream() {
+  local pkg="$1"
+  [ -d "$REF/$pkg/src" ] || { echo 0; return; }
+  find "$REF/$pkg/src" -name '*.ts' ! -name '*.test.ts' -exec cat {} + 2>/dev/null | wc -l | tr -d ' '
+}
+
+loc_ported() {
+  local proj="$1"
+  local dirs=""
+  for d in "src/$proj" "src/$proj.Abstractions" "src/$proj.Testing"; do
+    [ -d "$d" ] && dirs="$dirs $d"
+  done
+  [ -n "$dirs" ] || { echo 0; return; }
+  # shellcheck disable=SC2086
+  find $dirs -name '*.cs' ! -path '*/obj/*' ! -path '*/bin/*' -exec cat {} + 2>/dev/null | wc -l | tr -d ' '
+}
+
 count_ported() {
   local proj="$1"
   local dir="tests/${proj}.Tests"
@@ -92,6 +112,22 @@ if [ "$fail" = "1" ]; then
 fi
 
 echo ""
-echo "All packages at or above their recorded floors."
+echo "IMPLEMENTATION COMPLETENESS  (LOC; C# runs 1.2-1.5x more verbose, so <100% means under-ported)"
+printf '%-12s %-16s %10s %10s %8s
+' PACKAGE PROJECT UPSTREAM PORTED RATIO
+printf '%s
+' "----------------------------------------------------------------------------"
+while read -r pkg proj _floor _recorded; do
+  case "$pkg" in ""|\#*) continue;; esac
+  u=$(loc_upstream "$pkg"); g=$(loc_ported "$proj")
+  r=0; [ "$u" -gt 0 ] && r=$(( g * 100 / u ))
+  flag=""
+  [ "$r" -lt 40 ] && flag="   <-- substantially unported"
+  printf '%-12s %-16s %10s %10s %7s%%%s
+' "$pkg" "$proj" "$u" "$g" "$r" "$flag"
+done < "$BUDGET"
+
+echo ""
+echo "All packages at or above their recorded test floors."
 echo "Percentages are coverage against the upstream suite, which docs/differential-testing.md"
 echo "treats as the specification. Low percentages are technical debt, not passing grades."
