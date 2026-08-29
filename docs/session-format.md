@@ -3,6 +3,13 @@
 **Status:** Proposed — sign off before T6.2
 **Upstream reference:** `reference/pi/packages/coding-agent/src/core/session-manager.ts` (1,716 LOC)
 
+> **Scope.** This document describes the **coding-agent** session format only: `type: "session"`,
+> optional `version` where absent means v1, and a string `timestamp`. It is *not* the agent-harness
+> session format, which is a separate on-disk format under
+> `packages/agent/src/harness/session/` using `kind: "header"`, `version: 4`, a numeric `createdAt`
+> and a `metadata` bag. The two are unrelated and must not be conflated when porting. See
+> `ÍmplementationKit/packets/H1-harness-session.md`.
+
 ---
 
 ## Decision
