@@ -19,9 +19,12 @@ jobs:
         with:
           submodules: recursive
 
+      # Install exactly what global.json asks for. 'dotnet-version: 10.0.x' can
+      # resolve to a lower SDK feature band than global.json requires, which
+      # fails the build with a confusing "compatible SDK not found".
       - uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '10.0.x'
+          global-json-file: global.json
 
       # Node is required by Pi.Conformance.Tests, which runs the C# client
       # against the unmodified TypeScript pi-server. It is never shipped.
@@ -29,14 +32,20 @@ jobs:
         with:
           node-version: '22.19'
 
+      # Compare commit SHAs, not tags: actions/checkout fetches submodules
+      # shallowly, so no tags are present and `git describe` cannot work here.
       - name: Verify reference is pinned
         run: |
-          cd reference/pi
-          tag=$(git describe --tags --exact-match 2>/dev/null || echo "UNPINNED")
-          echo "reference/pi is at: $tag"
-          if [ "$tag" != "v0.84.4" ]; then
-            echo "::error::reference/pi must stay pinned at v0.84.4 (found: $tag)."
+          line=$(grep -vE '^[[:space:]]*(#|$)' reference/PINNED | head -1)
+          want_tag=$(echo "$line" | awk '{print $1}')
+          want_sha=$(echo "$line" | awk '{print $2}')
+          have_sha=$(git -C reference/pi rev-parse HEAD)
+          echo "expected: $want_tag  $want_sha"
+          echo "actual:              $have_sha"
+          if [ "$have_sha" != "$want_sha" ]; then
+            echo "::error::reference/pi is not at the pinned commit ($want_tag)."
             echo "Bumping the upstream reference is a deliberate, separate decision - see AGENTS.md."
+            echo "If the bump is intended, update reference/PINNED in the same commit."
             exit 1
           fi
 

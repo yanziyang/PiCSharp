@@ -105,3 +105,5 @@ The upstream test suite is 115,921 lines across 472 files. It is the only reliab
 - Do not add a NuGet dependency without an approved entry in `docs/dependencies.md`.
 - Do not introduce a Node.js dependency anywhere in the shipping product.
 - Do not upgrade the pinned upstream reference. That is a deliberate, separate decision.
+  The pin is recorded in `reference/PINNED` and enforced in CI by commit SHA. Changing it
+  means updating the submodule pointer and that file in the same commit.

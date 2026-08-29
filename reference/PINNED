@@ -1,0 +1,8 @@
+# Upstream Pi reference pin.
+#
+# Bumping this is a deliberate, separate decision (AGENTS.md, "Do not").
+# To change it you must update BOTH the submodule pointer and this file in the
+# same commit, which is what makes the bump visible in review.
+#
+# Format: <tag> <commit-sha>
+v0.84.4 b79e4cc834970cca69daebffab7df1da7d1e52c4
