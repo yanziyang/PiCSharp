@@ -14,9 +14,13 @@
     <PackageVersion Include="xunit.runner.visualstudio" Version="4.0.0" />
   </ItemGroup>
 
+  <ItemGroup Label="Approved provider integrations">
+    <PackageVersion Include="AWSSDK.BedrockRuntime" Version="4.0.101.4" />
+  </ItemGroup>
+
   <!-- Approved in docs/dependencies.md §3 but not yet referenced. Add the
        PackageVersion when the consuming wave starts, not before:
-         AWSSDK.BedrockRuntime   (T2.7)
+         AWSSDK.BedrockRuntime   (T3.7; referenced above)
          YamlDotNet              (wave 3 / 6)
          DiffPlex                (wave 3 / 6)
          Markdig                 (wave 5 / 6)

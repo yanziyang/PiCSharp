@@ -3,6 +3,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Pi.Ai.Abstractions\Pi.Ai.Abstractions.csproj" />
     <ProjectReference Include="..\Pi.Telemetry\Pi.Telemetry.csproj" />
+    <PackageReference Include="AWSSDK.BedrockRuntime" />
   </ItemGroup>
 
 </Project>
