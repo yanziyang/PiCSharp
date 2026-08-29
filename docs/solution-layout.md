@@ -20,43 +20,42 @@ be able to derive the C# path without asking, and vice versa.
 
 ```
 PiCSharp/
-├── AGENTS.md                      # copied from codex/AGENTS.md at scaffold
-├── PiCSharp.slnx                   # .NET 10 defaults to the XML solution format
-├── global.json                     # pins the SDK and opts into the MTP test runner
-├── Directory.Build.props          # shared compiler settings — see §4
-├── Directory.Packages.props       # central package management
-├── .editorconfig                  # analyser + formatting rules
+├── AGENTS.md                    # repository-wide conventions, read by Codex
+├── PiCSharp.slnx                # .NET 10 defaults to the XML solution format
+├── global.json                  # pins the SDK; opts into the MTP test runner
+├── Directory.Build.props        # shared compiler settings — see §4
+├── Directory.Packages.props     # central package management
+├── .editorconfig                # analyser + formatting rules
+├── .gitattributes               # LF in the repo and the working tree
+├── .skip-budget                 # skipped-test ceiling, enforced in CI
+├── .github/workflows/ci.yml     # build, format, test, pin check, skip audit
 ├── reference/
-│   └── pi/                        # git submodule, pinned to v0.84.4. READ ONLY.
-├── docs/                          # this directory
-├── codex/                         # delegation kit: task template, work breakdown
+│   ├── PINNED                   # expected tag + commit SHA, enforced in CI
+│   └── pi/                      # git submodule @ v0.84.4. READ ONLY.
+├── docs/                        # design decisions (this directory)
+│   └── spikes/                  # validation spikes
+├── ÍmplementationKit/           # delegation kit: work breakdown, task template
+├── ÁI/                          # feasibility report, diagrams, icons
 ├── src/
 │   ├── Pi.Telemetry/
 │   ├── Pi.Protocol/
-│   ├── Pi.Ai.Abstractions/        # see §2 — a split with no upstream counterpart
+│   ├── Pi.Ai.Abstractions/      # see §2 — a split with no upstream counterpart
 │   ├── Pi.Ai/
-│   ├── Pi.Ai.Testing/             # faux provider (T1.3)
+│   ├── Pi.Ai.Testing/           # faux provider (T1.3)
 │   ├── Pi.AgentCore/
 │   ├── Pi.Client/
 │   ├── Pi.Server/
 │   ├── Pi.SessionBackends.Sqlite/
 │   ├── Pi.Tui/
-│   ├── Pi.CodingAgent/            # library: core, tools, modes, extension host
-│   └── Pi.Cli/                    # executable: `pi`. AOT-published.
+│   ├── Pi.CodingAgent/          # library: core, tools, modes, extension host
+│   └── Pi.Cli/                  # executable: `pi`. AOT-published.
 ├── tests/
-│   ├── Pi.Telemetry.Tests/
-│   ├── Pi.Protocol.Tests/
-│   ├── Pi.Ai.Tests/
-│   ├── Pi.AgentCore.Tests/
-│   ├── Pi.Client.Tests/
-│   ├── Pi.Server.Tests/
-│   ├── Pi.Tui.Tests/
-│   ├── Pi.CodingAgent.Tests/
-│   ├── Pi.Conformance.Tests/      # cross-runtime: C# ↔ TypeScript (§5)
-│   └── fixtures/                  # recorded HTTP, golden buffers, session files
+│   ├── Pi.<Package>.Tests/      # one per src library
+│   ├── Pi.Conformance.Tests/    # cross-runtime: C# ⇄ TypeScript (§5)
+│   └── fixtures/                # recorded HTTP, golden buffers, session files
 └── tools/
-    ├── record-fixtures/           # drives the TS build to capture fixtures
-    └── generate-models/           # port of Pi's model-catalogue generator
+    ├── record-fixtures/         # drives the TS build to capture fixtures
+    └── generate-models/         # port of Pi's model-catalogue generator
 ```
 
 ---

@@ -1,0 +1,14 @@
+# Normalise everything to LF in the repository and in the working tree.
+# CI runs on Linux; .editorconfig enforces LF; .NET tooling on Windows is
+# perfectly happy with LF. Mixed endings make `dotnet format --verify-no-changes`
+# fail on CI while passing locally, which is how this file came to exist.
+* text=auto eol=lf
+
+# Binary assets - never touch these.
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.ico  binary
+*.pdf  binary
+*.node binary
