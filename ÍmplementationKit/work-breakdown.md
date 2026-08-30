@@ -3,6 +3,28 @@
 Upstream: `earendil-works/pi` @ **v0.84.4** (frozen). 123,629 LOC production, 115,921 LOC tests.
 All line counts below are measured from the pinned tree, production code only (tests excluded).
 
+> ## Status — reconciled 2026-08-30
+>
+> This plan was written before any code existed and has drifted. Recorded here rather than left
+> implicit, because a stale plan is worse than no plan.
+>
+> **What was delivered.** Codex ported waves 1–5 in 21 commits, in its own order. Protocol,
+> telemetry, client and server are complete. `Pi.Ai` is at 71% implementation and 7% test parity.
+> `Pi.Tui` is at 10% and 2%.
+>
+> **Where this document was wrong.** Wave 3 is headed "`Pi.AgentCore` — 12,640 LOC" but its four
+> tasks (T3.1–T3.4) describe roughly 3,800 LOC. The `harness/` subsystem — session, reducer, skills,
+> agent-harness, env, tools, utils, about 8,000 lines — was never enumerated. Following the plan as
+> written would produce an agent core with no harness, which is exactly what happened. The `H`-series
+> packets in `packets/` are the corrected wave 3, not a departure from it. See §Wave 3.
+>
+> **What was added and is not in this plan.** `R1` (test backfill) exists because waves 2–5 landed
+> implementations without their upstream suites, which this document assumed would never happen.
+>
+> **What is still un-started from this plan.** `T0.2`, the differential harness. It was specified as
+> a prerequisite for wave 2 and never built. `Pi.Conformance.Tests` still contains only the scaffold
+> placeholder, so the cross-runtime oracle does not exist.
+
 **Delegation fit** ratings mean:
 - **A** — mechanical translation with a strong test oracle. Delegate freely, review normally.
 - **B** — translation with semantic risk. Delegate with a differential test in the packet; review closely.
@@ -102,15 +124,33 @@ T2.4–T2.13 are mutually independent and write to disjoint files — the best p
 
 ## Wave 3 · `Pi.AgentCore` — 12,640 LOC
 
-Depends on wave 2. Semantic risk is high: streaming, tool-call batching and compaction semantics
-must match exactly or ported extensions misbehave in ways unit tests miss.
+**Corrected 2026-08-30.** The original four tasks below covered only the non-harness core, roughly
+3,800 LOC of the 12,640 this wave claims. The `harness/` subsystem was omitted. The corrected wave is
+the union of both halves.
 
-| id | Scope | Fit |
-|----|-------|-----|
-| T3.1 | Agent loop and turn orchestration | B |
-| T3.2 | Tool calling: schema, dispatch, result normalisation | B |
-| T3.3 | State management, message model, usage accounting | B |
-| T3.4 | Compaction | B |
+### 3a · Core — delivered
+
+| id | Scope | Fit | Status |
+|----|-------|-----|--------|
+| T3.1 | Agent loop and turn orchestration | B | delivered |
+| T3.2 | Tool calling: schema, dispatch, result normalisation | B | delivered |
+| T3.3 | State management, message model, usage accounting | B | delivered |
+| T3.4 | Compaction | B | delivered as part of `H2` |
+
+Tests for T3.1–T3.3 were backfilled by `R1.1`, which took the package from 4% to 16% parity and
+found seven porting errors, all in the ported tests rather than the implementation.
+
+### 3b · Harness — the omitted 8,000 LOC
+
+| id | Scope | LOC | Status |
+|----|-------|-----|--------|
+| `H1` | `session/` — types, state, JSONL codec/storage/repo, memory backend, conformance suite | 3,236 | delivered `0bf2b36` |
+| `H2` | harness `types`/`events`/`messages`/`result`, `reducer.ts`, `compaction/` | 2,575 | delivered `5b766f7` |
+| `H3` | `telemetry.ts`, `skills.ts`, `agent-harness.ts` | 1,509 | **next** |
+| `H4` | `env/`, `tools/`, `utils/` | 2,449 | not yet written |
+
+`agent-harness.ts` in `H3` is what wave 6 builds on. Until `H4`, the harness has no environment
+adapter and no built-in tool implementations.
 
 Every packet in this wave must require a differential test against the TS implementation driven by
 the faux provider (T1.3).
@@ -131,6 +171,9 @@ before either side is finished. Do this in CI. It catches wire-level drift that 
 ---
 
 ## Wave 5 · `Pi.Tui` — 17,000 LOC (independent stream)
+
+> **Status:** 10% implemented, 2% test parity. Only T5.1 (layout) and part of T5.2 (differential
+> renderer) exist. Unassigned. This is the largest remaining gap in the project after the harness.
 
 `pi-tui` has no internal dependencies — it is built first upstream. Start it in parallel with wave 2
 under a dedicated owner; it is the least predictable work in the project.
