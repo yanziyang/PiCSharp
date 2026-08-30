@@ -1,6 +1,7 @@
 # `H1` — Port the agent-harness session subsystem
 
 **Wave:** harness (unblocks wave 6)  **Delegation fit:** B  **Depends on:** `Pi.AgentCore` (on `main`)
+**Status:** ✅ Delivered in `0bf2b36`. 8,106 lines: 5,897 implementation, 2,203 tests. Agent parity 16% → 42%, completeness 18% → 65%.
 
 ---
 
@@ -99,9 +100,13 @@ covered by 40 passing tests and a change there is a separate decision.
   `docs/session-format.md` documents the **coding-agent** format and does **not** apply here. Its
   scope note says so. Read `jsonl/types.ts` for this one.
 
-- **Preserve unknown fields.** A file written by a newer Pi may carry fields we do not model. Capture
-  them with `[JsonExtensionData]` and write them back untouched, or opening an existing session
-  silently destroys data.
+- ~~**Preserve unknown fields** with `[JsonExtensionData]`.~~ **This hazard was wrong and has been
+  withdrawn.** Upstream's `jsonl/codec.ts` parses strictly into typed records via `requireString` /
+  `requireSequence` and throws on unrecognised entry, record and operation types. It keeps no
+  passthrough bag. The requirement was carried over from `docs/session-format.md`, which describes
+  the *coding-agent* v1 format — the very conflation this packet's first hazard warns against.
+  The delivered implementation correctly follows upstream over this instruction, as `AGENTS.md`
+  requires when the two disagree.
 
 - **Append-only means append-only.** Match upstream's flush and durability behaviour in
   `jsonl/storage.ts`. A crash must not leave a truncated entry.
