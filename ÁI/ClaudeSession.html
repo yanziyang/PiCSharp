@@ -56,8 +56,8 @@ footer{border-top:1px solid var(--line);background:var(--panel);padding:26px 0 4
 <div class="meta">
 <div>Dates<b>29–30 August 2026</b></div>
 <div>Project<b>C:\MyProjects\PiCSharp</b></div>
-<div>Exchanges<b>45</b></div>
-<div>Responses<b>72</b></div>
+<div>Exchanges<b>48</b></div>
+<div>Responses<b>76</b></div>
 <div>Model<b>Claude Opus 5</b></div>
 </div></div></header>
 <div class="shell">
@@ -107,6 +107,9 @@ footer{border-top:1px solid var(--line);background:var(--panel);padding:26px 0 4
 <a href="#p43"><span class="n">43</span>Update ClaudeSession.html and push</a>
 <a href="#p44"><span class="n">44</span>T5.2b is done.</a>
 <a href="#p45"><span class="n">45</span>yes, proceed — Why this file, and why now</a>
+<a href="#p46"><span class="n">46</span>Update ClaudeSession.html and push</a>
+<a href="#p47"><span class="n">47</span>Merged and pushed directly to `main`; no PR was created.</a>
+<a href="#p48"><span class="n">48</span>one packet — One packet is right here</a>
 </nav>
 <main>
 <section class="turn user" id="p1">
@@ -1204,11 +1207,61 @@ AgentHarness.cs    1,300 lines   untracked</code></pre>
 <p>Two things I verified rather than assumed, having been burned once. The 7 Kitty cases genuinely need <code>renderImage</code> from <code>components/image.ts</code> — the protocol encoder — so they correctly stay with T5.5. But <code>deleteKittyImage</code>, which <code>tui-main-screen.ts</code> does need, is a one-line escape string and needs none of it. And every candidate test file except <code>terminal-colors</code> (which imports the package barrel) depends only on already-ported code plus this one file — that's what made a 99-case packet possible instead of a 25-case one.</p>
 <p>I also carried forward the two process lessons: don't re-read <code>TERMUX_VERSION</code> per render from the render thread (second flake in this package traced to Node's single-threaded assumptions), and <strong>run the suite three times</strong> — a single green run doesn't establish stability, which is exactly how both flakes got in.</p></div>
 </section>
+<section class="turn user" id="p46">
+  <div class="who"><span class="badge u">Exchange 46</span><time>2026-08-30 12:14:28</time></div>
+  <div class="bubble"><p>Update ClaudeSession.html and push</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Pushed as <code>67a9e84</code>. <strong>45 exchanges, 72 responses, 174 KB.</strong></p>
+<p>The three new exchanges are the substantive ones: the T5.2b review, and the T5.2c handoff. The filters I added last time held — the short-prompt fallback picked up <code>yes, proceed — Why this file, and why now</code>, and no harness plumbing leaked in as a prompt bubble. The one string match for "I hit my usage limit" is inside the before/after table in my own response about fixing that very problem, which is correct.</p>
+<p>Sections balance 117/117, source resolved to the live transcript.</p>
+<p>The repo is now at:</p>
+<div class="tw"><table><thead><tr><th></th><th></th></tr></thead><tbody><tr><td>Tests</td><td>958 passing, 9 skipped</td></tr><tr><td>Tui parity</td><td>38% (325 executing cases)</td></tr><tr><td>Tui completeness</td><td>58%</td></tr><tr><td>Next packet</td><td><code>T5.2c</code> — <code>tui-main-screen.ts</code>, 99 cases</td></tr></tbody></table></div>
+<p>Codex has the T5.2c prompt from my last message whenever you're ready to hand it over.</p></div>
+</section>
+<section class="turn user" id="p47">
+  <div class="who"><span class="badge u">Exchange 47</span><time>2026-08-30 14:48:14</time></div>
+  <div class="bubble"><p>Merged and pushed directly to <code>main</code>; no PR was created.</p>
+<ul><li><code>c6b0e07</code> — Port main-screen TUI and tests</li><li><code>9142ca5</code> — Fix T5.2b render/input concurrency defect separately</li><li>Remote <code>main</code> now points to <code>9142ca5</code></li><li>Working tree is clean</li></ul>
+<p>Validation: three consecutive non-E2E full-suite runs each passed with 1,028 passed, 8 skipped, 0 failed. Build, formatting, and parity checks passed. Handoff notes:</p>
+<ul><li>All 69 overlay cases passed without overlay-specific fixes.</li><li>The packet lists 98 distinct scoped cases, not 99; Termux is double-counted. All 98 were delivered.</li><li>Seven Kitty image-render cases remain skipped for T5.5.</li><li>E2E tests were excluded per repository rules.</li></ul></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Four clean parallel runs — but that's not proof of absence. The attribute <em>is</em> doing real work: <code>TERMUX_VERSION</code> and <code>PI_DEBUG_REDRAW</code> are still process globals mutated by <code>TuiRenderTests</code>, and many other classes construct a <code>TuiMainScreen</code> that reads them. Restoring it with the reason recorded:</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>T5.2c verified and pushed as <code>6061bf2</code>. <strong>1,036 tests, 0 failed, 8 skipped</strong>; tui parity 38% → 48%, completeness 58% → 63%.</p>
+<p><strong>Your count correction is right, and I confirmed it.</strong> <code>TuiRenderTests.cs</code> has 20 <code>[Fact]</code>s, not 21 — the Termux case was already one of the existing 20, so my table's "21 of 27" counted it twice. 44+24+1+4+2+2+1+20 = <strong>98</strong>, all delivered. Eight packets in, this is the first time a discrepancy came back in the handoff rather than turning up in a diff.</p>
+<p>Two results worth calling out:</p>
+<ul><li><strong>All 69 overlay cases passed with no overlay fixes.</strong> That retires hazard 4 — <code>tui.ts</code>'s overlay implementation was correct when it shipped in T5.2b with zero coverage. Good news that had to be earned by testing it.</li><li><strong>Hazard 5 was fixed at the root</strong>, not worked around: <code>_isTermuxSession</code> is read once in the constructor. And <code>9142ca5</code> is a genuine T5.2b defect fix — a lock serialising <code>AddChild</code>/<code>RemoveChild</code>/<code>Clear</code>/<code>Stop</code> against the render loop — in its own commit, exactly as asked.</li></ul>
+<p><strong>One thing the handoff didn't mention.</strong> <code>c6b0e07</code> added <code>[assembly: Parallelization(Mode = ParallelMode.None)]</code>, turning off all parallelism in <code>Pi.Tui.Tests</code>. I checked whether it was masking something: disabled it and ran the project four times, all clean. But four runs isn't proof for a race, and the attribute <em>is</em> doing real work — <code>TERMUX_VERSION</code> and <code>PI_DEBUG_REDRAW</code> are still process globals that <code>TuiRenderTests</code> mutates, while many other classes construct a <code>TuiMainScreen</code> that reads them. Reading Termux at construction closed the bad window; this closes the cross-class one.</p>
+<p>So I kept it and wrote the reason next to it. An unexplained <code>ParallelMode.None</code> is precisely what someone deletes in six months as cruft, and the tighter fix — injecting both settings instead of reading the environment — deviates from upstream, so it deserves its own decision rather than a silent one.</p>
+<p>Wave 5's remaining path is now clear: <code>components/select-list.ts</code> (229 LOC, 5 cases) unblocks <strong>T5.3b <code>components/editor.ts</code></strong> — 2,363 LOC and 185 cases, the largest single file in the project. <code>markdown.test.ts</code> (81 cases) and T5.5 (<code>terminal-image.ts</code>, which reclaims the 7 skipped Kitty cases) are also unblocked. Want me to write <code>select-list</code> and <code>editor</code> as one packet or two?</p></div>
+</section>
+<section class="turn user" id="p48">
+  <div class="who"><span class="badge u">Exchange 48</span><time>2026-08-30 15:04:59</time></div>
+  <div class="bubble"><p>one packet</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Pushed as <code>ae5d65e</code>. Here's the prompt for Codex:</p>
+<pre class="code" data-lang="bash"><code>codex "Read ÍmplementationKit/packets/T5.3b-editor-and-select-list.md and implement it. Port components/select-list.ts (229 LOC) and components/editor.ts (2,363 LOC) with all 191 upstream cases, names verbatim, and un-skip editor-history-keybindings. Editor must be public, non-sealed, with Render, HandleInput and Invalidate virtual - extensions subclass it and call base, and in C# a non-virtual member can never be overridden. Ship a test proving that. Two commits is fine, one PR. Run the full suite at least three times. Name in the PR anything you do not deliver or any instruction you override."</code></pre>
+<p><strong>One packet is right here</strong> — <code>editor.ts</code> imports <code>select-list.ts</code> directly, so splitting them would leave the editor unbuildable for a packet.</p>
+<p>This is the first time every dependency is in place. <code>editor.test.ts</code> constructs <code>TuiMainScreen</code> <strong>170 times</strong>, which only became possible with T5.2c landing yesterday. Autocomplete, keybindings, keys, kill-ring, undo-stack, utils, word-navigation — all ported and covered. 191 cases total, including the <code>editor-history-keybindings</code> case that's been skipped since T5.3a.</p>
+<p><strong>The packet's weight is on Amendment D, not on size.</strong> <code>extension-api.md</code> commits to editor-replacing extensions <em>subclassing</em> <code>Editor</code>. TypeScript lets you override anything; C# does not, and the failure mode is nasty — a missing <code>virtual</code> produces no warning at the point where it matters, because the extension simply cannot be written. It forecloses the model rather than breaking a test.</p>
+<p>So I pinned the minimum surface from the three bundled extensions that actually do this:</p>
+<div class="tw"><table><thead><tr><th>Extension</th><th>Overrides</th><th>Calls</th></tr></thead><tbody><tr><td><code>modal-editor.ts</code></td><td><code>handleInput</code></td><td><code>super.handleInput</code>, repeatedly</td></tr><tr><td><code>rainbow-editor.ts</code></td><td><code>handleInput</code>, <code>render(width)</code></td><td>both <code>super.</code></td></tr><tr><td><code>border-status-editor.ts</code></td><td><code>render(width)</code></td><td><code>super.render(width)</code>, then decorates</td></tr></tbody></table></div>
+<p>Amendment D is currently validated <em>on paper</em> — I read two TypeScript extensions and judged them portable. That's weaker evidence than it looked. The packet requires a C# test proving a subclass can override both and call <code>base.</code>, which is the same move that let <code>AutocompleteProviderFactory</code> come off the residual-risk list in T5.6. If it passes, D1's riskiest commitment stops being an assumption.</p>
+<p>One smaller thing worth flagging: <code>wordWrapLine</code>'s optional pre-segmented parameter is easy to quietly drop in translation, and the CJK and emoji wrapping tests are exactly what it exists for.</p></div>
+</section>
 
 </main></div>
 <footer><div class="wrap">
 <p style="margin:0 0 6px"><b>Session transcript exported from Claude Code.</b> Prompts and responses only — tool calls, tool results and internal reasoning are excluded as intermediate working detail.</p>
-<p style="margin:0 0 6px">This is a curated record, not a complete one. Bare continuations such as “proceed” are folded into the preceding exchange, keeping the work they triggered without the empty prompt. Short progress narration between tool calls is dropped. A further 5 exchanges were omitted as routine housekeeping.</p>
-<p style="margin:0">Generated 2026-08-30 · 117 entries from 3,035 transcript records.</p>
+<p style="margin:0 0 6px">This is a curated record, not a complete one. Bare continuations such as “proceed” are folded into the preceding exchange, keeping the work they triggered without the empty prompt. Short progress narration between tool calls is dropped. A further 6 exchanges were omitted as routine housekeeping.</p>
+<p style="margin:0">Generated 2026-08-30 · 124 entries from 3,239 transcript records.</p>
 </div></footer>
 </body></html>
