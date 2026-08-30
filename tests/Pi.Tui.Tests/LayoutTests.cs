@@ -148,7 +148,7 @@ public sealed class LayoutTests
         Assert.Equal(["    ", " x  ", "    "], box.Render(4));
 
         var truncated = new TruncatedText("abcdef", 1, 1);
-        Assert.Equal(["      ", " abcd ", "      "], truncated.Render(6));
+        Assert.Equal(["      ", " a\x1b[0m...\x1b[0m ", "      "], truncated.Render(6));
 
         var spacer = new Spacer(2);
         Assert.Equal(["", ""], spacer.Render(4));
@@ -165,7 +165,7 @@ public sealed class LayoutTests
     }
 
     private static string[] VisibleLines(IEnumerable<string> lines) =>
-        lines.Select(line => line.Replace(TuiConstants.CursorMarker, string.Empty, StringComparison.Ordinal).TrimEnd())
+        lines.Select(line => TextMeasurement.StripTerminalSequences(line).TrimEnd())
             .ToArray();
 
     private sealed class CountingComponent(string line) : IComponent

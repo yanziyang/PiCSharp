@@ -278,7 +278,7 @@ public static class LayoutEngine
         var intrinsicWidths = entries
             .Select(entry => entry.Basis is not null
                 ? ToSize(entry.Basis)
-                : RenderCached(context, entry.Component, safeWidth).DefaultIfEmpty(string.Empty).Max(LineLayout.VisibleWidth))
+                : RenderCached(context, entry.Component, safeWidth).DefaultIfEmpty(string.Empty).Max(TextMeasurement.VisibleWidth))
             .ToArray();
         var widths = StackLayoutMath.AllocateStackSizes(entries, intrinsicWidths, safeWidth, stack.Gap);
         var crossIntrinsicHeights = entries

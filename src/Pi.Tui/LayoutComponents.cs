@@ -88,7 +88,7 @@ public sealed class Text : IComponent
         var leftMargin = new string(' ', paddingX);
         var rightMargin = leftMargin;
         var contentLines = new List<string>();
-        foreach (var wrapped in WrapText(normalized, contentWidth))
+        foreach (var wrapped in TextMeasurement.WrapTextWithAnsi(normalized, contentWidth))
         {
             var line = leftMargin + wrapped + rightMargin;
             contentLines.Add(ApplyBackgroundOrPadding(line, safeWidth));
@@ -115,35 +115,8 @@ public sealed class Text : IComponent
 
     private string ApplyBackgroundOrPadding(string line, int width)
     {
-        var padded = line + new string(' ', Math.Max(0, width - LineLayout.VisibleWidth(line)));
+        var padded = line + new string(' ', Math.Max(0, width - TextMeasurement.VisibleWidth(line)));
         return _customBackground is null ? padded : _customBackground(padded);
-    }
-
-    private static IEnumerable<string> WrapText(string text, int width)
-    {
-        foreach (var logicalLine in text.Split('\n'))
-        {
-            if (logicalLine.Length == 0)
-            {
-                yield return string.Empty;
-                continue;
-            }
-
-            var remaining = logicalLine;
-            while (remaining.Length > width)
-            {
-                var breakAt = remaining.LastIndexOf(' ', width - 1);
-                if (breakAt <= 0)
-                {
-                    breakAt = width;
-                }
-
-                yield return remaining[..breakAt];
-                remaining = remaining[breakAt..].TrimStart();
-            }
-
-            yield return remaining;
-        }
     }
 }
 
@@ -206,7 +179,7 @@ public sealed class Box : Container
 
     private string ApplyBackground(string line, int width)
     {
-        var padded = line + new string(' ', Math.Max(0, width - LineLayout.VisibleWidth(line)));
+        var padded = line + new string(' ', Math.Max(0, width - TextMeasurement.VisibleWidth(line)));
         return _background is null ? padded : _background(padded);
     }
 }
@@ -236,10 +209,10 @@ public sealed class TruncatedText : IComponent
         var emptyLine = new string(' ', safeWidth);
         var result = Enumerable.Repeat(emptyLine, _paddingY).ToList();
         var availableWidth = Math.Max(1, safeWidth - _paddingX * 2);
-        var firstLine = _text.Split('\n')[0];
-        var display = firstLine[..Math.Min(firstLine.Length, availableWidth)];
+        var firstLine = _text.Split(['\r', '\n'], StringSplitOptions.None)[0];
+        var display = TextMeasurement.TruncateToWidth(firstLine, availableWidth);
         var line = new string(' ', _paddingX) + display + new string(' ', _paddingX);
-        result.Add(line + new string(' ', Math.Max(0, safeWidth - LineLayout.VisibleWidth(line))));
+        result.Add(line + new string(' ', Math.Max(0, safeWidth - TextMeasurement.VisibleWidth(line))));
         result.AddRange(Enumerable.Repeat(emptyLine, _paddingY));
         return result;
     }

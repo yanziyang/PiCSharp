@@ -165,7 +165,7 @@ public sealed class HStack : Stack
         }
 
         var intrinsicWidths = entries
-            .Select(entry => entry.Component.Render(safeWidth).DefaultIfEmpty(string.Empty).Max(LineLayout.VisibleWidth))
+            .Select(entry => entry.Component.Render(safeWidth).DefaultIfEmpty(string.Empty).Max(TextMeasurement.VisibleWidth))
             .ToArray();
         var widths = StackLayoutMath.AllocateStackSizes(entries, intrinsicWidths, safeWidth, Gap);
         var rendered = entries
@@ -358,27 +358,8 @@ internal static class StackLayoutMath
 
 internal static class LineLayout
 {
-    internal static int VisibleWidth(string line) => line.Replace(TuiConstants.CursorMarker, string.Empty, StringComparison.Ordinal).Length;
-
     internal static string Composite(string baseLine, string overlayLine, int start, int overlayWidth, int totalWidth)
-    {
-        var cells = Enumerable.Repeat(' ', Math.Max(0, totalWidth)).ToArray();
-        Copy(cells, baseLine, 0, totalWidth);
-        Copy(cells, overlayLine, Math.Max(0, start), Math.Max(0, overlayWidth));
-        return new string(cells);
-    }
-
-    private static void Copy(char[] target, string source, int start, int width)
-    {
-        var visible = source.Replace(TuiConstants.CursorMarker, string.Empty, StringComparison.Ordinal);
-        var count = Math.Min(width, visible.Length);
-        if (start >= target.Length || count <= 0)
-        {
-            return;
-        }
-
-        visible.AsSpan(0, count).CopyTo(target.AsSpan(start));
-    }
+        => TextMeasurement.CompositeTuiLine(baseLine, overlayLine, start, overlayWidth, totalWidth);
 }
 
 #pragma warning restore CA1711

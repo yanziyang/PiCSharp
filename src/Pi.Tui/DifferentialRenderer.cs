@@ -418,7 +418,7 @@ public sealed class DifferentialRenderer
             }
 
             var beforeMarker = line[..markerIndex];
-            cursor = new CursorPosition(row, LineLayout.VisibleWidth(beforeMarker));
+            cursor = new CursorPosition(row, TextMeasurement.VisibleWidth(beforeMarker));
             lines[row] = string.Concat(
                 line.AsSpan(0, markerIndex),
                 line.AsSpan(markerIndex + TuiConstants.CursorMarker.Length));
