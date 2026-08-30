@@ -2,6 +2,7 @@
 
 **Wave:** harness (completes the core; unblocks wave 6)  **Delegation fit:** B
 **Depends on:** `H1` (session, `0bf2b36`) and `H2` (reducer + compaction, `5b766f7`)
+**Status:** ✅ Delivered in `430801d`. 4,147 lines: 2,978 implementation, 1,169 tests. Agent parity 64% → 72%, completeness 95% → 118%. Telemetry parity 157% → 214%.
 
 ---
 
@@ -77,10 +78,19 @@ This also closes the `Pi.Telemetry` gap left by T1.1.
 
 ### 2. `skills.ts` needs two dependencies — one added, one ported
 
-- **`yaml`** → `YamlDotNet`, approved in `docs/dependencies.md §3` but **not yet in
-  `Directory.Packages.props`**. This is the first new dependency since the scaffold. Follow §6:
-  confirm nothing in §2 covers it, confirm it is AOT and trim clean, and state in the PR how
-  frontmatter round-trip fidelity was verified against upstream.
+- ~~**`yaml`** → add `YamlDotNet`.~~ **This instruction was wrong and has been withdrawn.**
+  Upstream's `SkillFrontmatter` reads exactly three scalar fields — `name`, `description` and
+  `disable-model-invocation`. Adding a full YAML engine to extract three top-level keys contradicts
+  `dependencies.md` Policy 4 (prefer the BCL; every avoided dependency is avoided supply-chain
+  surface) and Policy 5. The delivered implementation hand-rolled `ParseYamlFrontmatter`, handling
+  comments, block scalars, quoting and booleans, and left `Directory.Packages.props` untouched. That
+  was the better call. I prescribed the dependency from seeing `import { parse } from "yaml"` without
+  checking how much of YAML was actually consumed — the same failure mode as H1's
+  `[JsonExtensionData]` hazard.
+
+  **One process point stands:** the deviation was not reported. `AGENTS.md` requires saying so in the
+  PR when the packet and the source disagree, and this packet's acceptance criteria asked for it
+  explicitly. It was only found by diffing.
 - **`ignore`** → **port it, do not take a dependency.** `docs/dependencies.md §4` requires this:
   `.gitignore` semantics are subtle (negation, directory-only rules, precedence) and no .NET library
   matches exactly. Target `src/Pi.AgentCore/Harness/GitIgnoreMatcher.cs`. Skills honours
