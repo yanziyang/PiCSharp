@@ -126,6 +126,21 @@ pole; discovering that in month nine is avoidable.
 where a plausible-looking implementation passes unit tests and still repaints the whole screen on
 every keystroke. Have an engineer own the algorithm; delegate the surrounding code.
 
+> **Update — T5.2 has been split, and the second half is a B.** The rating above is about the diff
+> renderer specifically, and that half is delivered (`src/Pi.Tui/DifferentialRenderer.cs`). The
+> remaining half — `terminal.ts` and `tui.ts`, 1,816 LOC, 48 cases — is `T5.2b`, and the "delegate the
+> surrounding code" clause is exactly what it is.
+>
+> Its dependency on `terminal-image.ts` (T5.5, also C) was assumed to block it. Measured: `tui.ts`
+> imports 3 symbols and uses 1 in the body; `terminal.ts` imports none. The second seam, native
+> modifier detection, returns `false` on every upstream failure path, so a C# port that cannot load a
+> Node addon lands on upstream's own fallback. Both seams have a faithful degraded form, so T5.5 does
+> not gate T5.2b.
+>
+> The one thing that must not be stubbed is `isImageLine` — a `startsWith`/`includes` regression
+> upstream fixed, whose crash mode triggers precisely when the terminal reports no image support,
+> which is the stubbed configuration. See `ÍmplementationKit/packets/T5.2b-terminal-and-tui-core.md`.
+
 ---
 
 ## Verification
