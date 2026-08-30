@@ -21,6 +21,17 @@ All line counts below are measured from the pinned tree, production code only (t
 > **What was added and is not in this plan.** `R1` (test backfill) exists because waves 2–5 landed
 > implementations without their upstream suites, which this document assumed would never happen.
 >
+> **Sequence from here.** `H4` is the last `H`-series packet; after it, wave 3 is complete and the
+> remaining work is this plan's own waves, resumed in numbered order:
+>
+> | Next | Why |
+> |---|---|
+> | `H3` → `H4` | Completes wave 3. `H4`'s `env/nodejs.ts` provides the concrete `ExecutionEnv` that `coding-agent/src/server/create-harness.ts` requires, so it is a wave 6 prerequisite, not just tidiness. |
+> | **Wave 5** · `Pi.Tui` | The longest pole. 10% implemented, and T6.8 (43 interactive components, 18,302 LOC) cannot start without it. This document already said to run it as an independent stream from wave 2 onward; that never happened. |
+> | **Wave 2 verification** | `Pi.Ai` is 71% implemented at 7% test parity — 16,989 lines, the largest unverified surface in the project. Can run in parallel with wave 5. |
+> | `T0.2` | The differential harness, still unbuilt. Cheapest defect detection available. |
+> | **Waves 6, 7** | After the above. |
+>
 > **What is still un-started from this plan.** `T0.2`, the differential harness. It was specified as
 > a prerequisite for wave 2 and never built. `Pi.Conformance.Tests` still contains only the scaffold
 > placeholder, so the cross-runtime oracle does not exist.
