@@ -339,6 +339,12 @@ The spike also disproved this document's original tier-2 risk claim — see §5.
 | `modal-editor.ts` (85 L) | `CustomEditor` subclassing, `super.handleInput`, pi-tui helpers | ports; forces **D** |
 | `custom-provider-anthropic/` (611 L) | `registerProvider`, OAuth delegates, `streamSimple` | ports; forces **E** |
 
+> **`AutocompleteProviderFactory` is now proven.** `T5.6` (`139fff1`) ported `IAutocompleteProvider`
+> with its optional members as default interface implementations, and the test
+> `ExtensionProvider_CanWrapBuiltInProvider` demonstrates an extension-style provider wrapping the
+> built-in one through the factory. The mirror holds. `registerMarkdownTransformer` and
+> `onTerminalInput` standalone remain untested.
+
 **D1 passes both rounds.** Five amendments, no redesign.
 
 Still untested and deferred to implementation as low-risk: `AutocompleteProviderFactory`,
