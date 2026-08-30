@@ -113,6 +113,7 @@ public sealed class TuiRenderTests
 
             terminal.Resize(40, 15);
             await WaitForConditionAsync(() => tui.FullRedraws > initialRedraws);
+            await terminal.WaitForRenderAsync();
 
             Assert.Contains("Line 0", terminal.GetViewport()[0], StringComparison.Ordinal);
         });
@@ -183,6 +184,7 @@ public sealed class TuiRenderTests
         component.Lines = ["Line 0", "Line 1"];
         tui.RequestRender();
         await WaitForConditionAsync(() => tui.FullRedraws > initialRedraws);
+        await terminal.WaitForRenderAsync();
 
         var viewport = terminal.GetViewport();
         Assert.Contains("Line 0", viewport[0], StringComparison.Ordinal);
@@ -388,6 +390,7 @@ public sealed class TuiRenderTests
         component.Lines = Enumerable.Range(0, 7).Select(index => $"Line {index}").ToArray();
         tui.RequestRender();
         await WaitForConditionAsync(() => tui.FullRedraws > initialRedraws);
+        await terminal.WaitForRenderAsync();
 
         Assert.True(tui.FullRedraws > initialRedraws);
         Assert.Equal(["Line 2", "Line 3", "Line 4", "Line 5", "Line 6"], terminal.GetViewport());
@@ -410,6 +413,7 @@ public sealed class TuiRenderTests
         component.Lines = ["Line 0", "Line 1"];
         tui.RequestRender();
         await WaitForConditionAsync(() => tui.FullRedraws > initialRedraws);
+        await terminal.WaitForRenderAsync();
         var redrawsAfterShrink = tui.FullRedraws;
 
         component.Lines = ["Line 0", "Line 1", "Line 2"];
@@ -447,6 +451,7 @@ public sealed class TuiRenderTests
         chat.Lines = shortChat;
         tui.RequestRender();
         await WaitForConditionAsync(() => tui.FullRedraws > redrawsBeforeSwitch);
+        await terminal.WaitForRenderAsync();
 
         var viewport = terminal.GetViewport();
         Assert.All(viewport, line =>

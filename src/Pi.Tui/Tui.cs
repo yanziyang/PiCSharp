@@ -378,6 +378,7 @@ public abstract class TuiBase : Container, TUI, IDisposable
         "^(\\d+(?:\\.\\d+)?)%$",
         RegexOptions.CultureInvariant);
     private readonly object _renderGate = new();
+    private readonly object _renderExecutionGate = new();
     private readonly List<TuiInputListener> _inputListeners = [];
     private readonly List<Action<TerminalColorScheme>> _terminalColorSchemeListeners = [];
     private readonly List<OverlayEntry> _overlayStack = [];
@@ -461,6 +462,33 @@ public abstract class TuiBase : Container, TUI, IDisposable
 
     /// <summary>Sets whether a content shrink triggers a full clearing redraw.</summary>
     public void SetClearOnShrink(bool enabled) => _clearOnShrink = enabled;
+
+    /// <inheritdoc />
+    public override void AddChild(IComponent component)
+    {
+        lock (_renderExecutionGate)
+        {
+            base.AddChild(component);
+        }
+    }
+
+    /// <inheritdoc />
+    public override void RemoveChild(IComponent component)
+    {
+        lock (_renderExecutionGate)
+        {
+            base.RemoveChild(component);
+        }
+    }
+
+    /// <inheritdoc />
+    public override void Clear()
+    {
+        lock (_renderExecutionGate)
+        {
+            base.Clear();
+        }
+    }
 
     /// <summary>Hook implemented by the screen-specific TUI to produce one render frame.</summary>
     protected abstract void DoRender();
@@ -939,15 +967,18 @@ public abstract class TuiBase : Container, TUI, IDisposable
         options ??= new TuiStopOptions();
         stopped = true;
         CancelRenderTimer();
-        if (_terminalColorSchemeNotificationsEnabled)
+        lock (_renderExecutionGate)
         {
-            Terminal.Write("\x1b[?2031l");
-        }
+            if (_terminalColorSchemeNotificationsEnabled)
+            {
+                Terminal.Write("\x1b[?2031l");
+            }
 
-        BeforeTerminalStop(options);
-        Terminal.ShowCursor();
-        Terminal.Stop();
-        AfterTerminalStop(options);
+            BeforeTerminalStop(options);
+            Terminal.ShowCursor();
+            Terminal.Stop();
+            AfterTerminalStop(options);
+        }
     }
 
     /// <inheritdoc />
@@ -972,7 +1003,7 @@ public abstract class TuiBase : Container, TUI, IDisposable
             _lastRenderTimestamp = Stopwatch.GetTimestamp();
         }
 
-        DoRender();
+        ExecuteRender();
     }
 
     /// <inheritdoc />
@@ -1215,7 +1246,7 @@ public abstract class TuiBase : Container, TUI, IDisposable
             _lastRenderTimestamp = Stopwatch.GetTimestamp();
         }
 
-        DoRender();
+        ExecuteRender();
     }
 
     private void RenderTimerFired()
@@ -1233,7 +1264,7 @@ public abstract class TuiBase : Container, TUI, IDisposable
             _lastRenderTimestamp = Stopwatch.GetTimestamp();
         }
 
-        DoRender();
+        ExecuteRender();
         lock (_renderGate)
         {
             if (!stopped && _renderRequested)
@@ -1251,6 +1282,16 @@ public abstract class TuiBase : Container, TUI, IDisposable
         }
     }
 
+    private void ExecuteRender()
+    {
+        // Node's event loop never overlaps render callbacks. The .NET timer and immediate-input
+        // paths use separate thread-pool work items, so serialize them to preserve that contract.
+        lock (_renderExecutionGate)
+        {
+            DoRender();
+        }
+    }
+
     private void CancelRenderTimerLocked()
     {
         _renderTimer?.Dispose();
@@ -1258,6 +1299,14 @@ public abstract class TuiBase : Container, TUI, IDisposable
     }
 
     private void HandleTerminalInput(string data)
+    {
+        lock (_renderExecutionGate)
+        {
+            HandleTerminalInputCore(data);
+        }
+    }
+
+    private void HandleTerminalInputCore(string data)
     {
         if (ConsumeOsc11BackgroundResponse(data) || ConsumeTerminalColorSchemeReport(data))
         {
