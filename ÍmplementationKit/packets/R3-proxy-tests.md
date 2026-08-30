@@ -2,6 +2,9 @@
 
 **Wave:** remediation  **Delegation fit:** A
 **Depends on:** `R2` implementation, delivered in `831da91`
+**Status:** ✅ Delivered in `162f717`. 670 lines of tests, `src/` untouched as required. 14 cases against
+upstream's 4 — 3 for `SystemPrompt` and 11 for `Proxy`, the extra 10 being the branch coverage this packet
+asked for. Agent parity 103% → 109%. `pi-agent-core` is complete.
 
 ---
 

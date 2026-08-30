@@ -4,7 +4,7 @@
 protocol Pi.Protocol 51 33 3493
 telemetry Pi.Telemetry 15 7 974
 ai Pi.Ai 99 1360 16989
-agent Pi.AgentCore 234 226 20234
+agent Pi.AgentCore 248 226 20234
 client Pi.Client 7 36 1533
 server Pi.Server 9 50 2086
 tui Pi.Tui 227 838 6044
