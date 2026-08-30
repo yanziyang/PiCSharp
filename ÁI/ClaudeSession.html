@@ -56,8 +56,8 @@ footer{border-top:1px solid var(--line);background:var(--panel);padding:26px 0 4
 <div class="meta">
 <div>Dates<b>29–30 August 2026</b></div>
 <div>Project<b>C:\MyProjects\PiCSharp</b></div>
-<div>Exchanges<b>26</b></div>
-<div>Responses<b>231</b></div>
+<div>Exchanges<b>29</b></div>
+<div>Responses<b>240</b></div>
 <div>Model<b>Claude Opus 5</b></div>
 </div></div></header>
 <div class="shell">
@@ -88,6 +88,9 @@ footer{border-top:1px solid var(--line);background:var(--panel);padding:26px 0 4
 <a href="#p24"><span class="n">24</span>task in ÍmplementationKit/packets/H1-harness-session.md is done, committ…</a>
 <a href="#p25"><span class="n">25</span>Update ClaudeSession-20260829-1.html. Commit and push.</a>
 <a href="#p26"><span class="n">26</span>The task in ÍmplementationKit/packets/H2-harness-reducer-compaction.md i…</a>
+<a href="#p27"><span class="n">27</span>Update ClaudeSession-20260829-1.html, and rename it as ClaudeSession.htm…</a>
+<a href="#p28"><span class="n">28</span>I have doubt, why no longer follow original implementationKit? The work-…</a>
+<a href="#p29"><span class="n">29</span>After H3 finished, I think better back to the tasks in work-breakdown.md…</a>
 </nav>
 <main>
 <section class="turn user" id="p1">
@@ -1486,11 +1489,89 @@ ai           7%   tui 2%</code></pre>
 <p><strong>3. <code>ignore</code> must be ported, not depended on</strong> — <code>GitIgnoreMatcher</code> doesn't exist yet, and <code>.gitignore</code> negation and directory-only precedence are exactly the subtleties §4 says no .NET library gets right.</p>
 <p>After H3 lands, <code>agent-harness.ts</code> exists and <strong>wave 6 is unblocked</strong>. <code>env/</code>, <code>tools/</code> and <code>utils/</code> remain for H4.</p></div>
 </section>
+<section class="turn user" id="p27">
+  <div class="who"><span class="badge u">Exchange 27</span><time>2026-08-30 02:29:42</time></div>
+  <div class="bubble"><p>Update ClaudeSession-20260829-1.html, and rename it as ClaudeSession.html</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>The patch didn't match and it regenerated to the old path. Let me look at the actual line.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Regenerated to the new name. Let me verify and commit.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Done and pushed as <code>34fb0bd</code>. Git recorded it as a <strong>rename</strong>, not delete+add, so history follows the file.</p>
+<p><code>ÁI/ClaudeSession-20260829-1.html</code> → <strong><code>ÁI/ClaudeSession.html</code></strong></p>
+<div class="tw"><table><thead><tr><th></th><th></th></tr></thead><tbody><tr><td>Exchanges kept</td><td><strong>26</strong> (was 24)</td></tr><tr><td>Omitted as routine</td><td>6</td></tr><tr><td>Responses</td><td>231</td></tr><tr><td>Size</td><td>151 KB</td></tr></tbody></table></div>
+<p>Verified: zero tool blocks, zero relative references, zero broken anchors, 18 tables rendering. Now covers the H2 verification and the H3 handoff.</p>
+<p>Two things worth mentioning:</p>
+<p><strong>The exporter needed updating too</strong>, not just the file — its <code>OUT</code> path still pointed at the old name, and the first regeneration recreated the old filename alongside the new one. Caught and cleaned up before committing.</p>
+<p><strong>I widened the housekeeping filter</strong> to match <code>update claudesession…</code> as well as <code>add to claudesession…</code>, so requests about this transcript keep getting excluded now that the filename changed. This request was correctly dropped.</p>
+<p>Dropping the date suffix seems right, incidentally — it had become misleading once the session ran into 30 August, and there's nothing to disambiguate against.</p></div>
+</section>
+<section class="turn user" id="p28">
+  <div class="who"><span class="badge u">Exchange 28</span><time>2026-08-30 02:32:30</time></div>
+  <div class="bubble"><p>I have doubt, why no longer follow original implementationKit? The work-breakdown.md was written by you.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Fair challenge. Let me check the document against what's actually happened rather than defend from memory.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>You're right, and the document is worse than stale — it's misleading. Let me show you the specific defect.</p>
+<p>Wave 3 is headed <strong>"<code>Pi.AgentCore</code> — 12,640 LOC"</strong>, but its four tasks (agent loop, tool calling, state, compaction) describe roughly <strong>3,800 LOC</strong>. I never enumerated the <code>harness/</code> subsystem — session, reducer, skills, agent-harness, env, tools, utils, about 8,000 lines. So the wave header claimed the whole package while the task list covered under a third of it. Anyone following that plan would have produced exactly what Codex produced: an agent core with no harness.</p>
+<p>That's my error in the original breakdown, not a reason to abandon it. Let me reconcile the document.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Reconciled and pushed as <code>fdf63fe</code>.</p>
+<h4>Your doubt is well-founded, and partly right</h4>
+<p>Three separate things were going on, and only one of them was defensible.</p>
+<p><strong>1. The plan had a real defect.</strong> Wave 3 claimed <code>Pi.AgentCore — 12,640 LOC</code> but its four tasks covered ~3,800. The <code>harness/</code> subsystem — 8,000 lines — was never enumerated. So Codex followed the plan and produced an agent core with no harness. That wasn't Codex ignoring the plan; <strong>it was the plan being wrong</strong>. Deviating there was correct.</p>
+<p><strong>2. But I handled the deviation badly.</strong> I wrote the <code>H</code>-series into <code>packets/</code> and left <code>work-breakdown.md</code> untouched. That put two competing plans in the repo — the numbered <code>T</code>-series saying one thing, the <code>H</code>-series doing another. Exactly the drift I'd flag in someone else's review. That was a process error, and it's what your question caught.</p>
+<p><strong>3. The <code>H</code>-series was never really off-plan in substance.</strong> H1/H2/H3 are all <code>pi-agent-core</code> work. They <em>are</em> wave 3 — the two-thirds of it I failed to enumerate. Wave 3 is now split into 3a (core, delivered) and 3b (harness, mapping H1–H4), so the packets sit under the wave they always belonged to.</p>
+<h4>Two things the reconciliation surfaced</h4>
+<p>Writing it down forced me to state what's genuinely <em>not</em> being followed:</p>
+<ul><li><strong>T0.2, the differential harness, was never built.</strong> I specified it as a prerequisite for wave 2 — "without it, waves 2–6 have no oracle" — and then never assigned it. <code>Pi.Conformance.Tests</code> still holds only the scaffold placeholder, so the cross-runtime oracle doesn't exist. That's a live gap, not a resolved one.</li><li><strong>Wave 5 (<code>Pi.Tui</code>) is at 10% implementation, 2% parity, and unassigned.</strong> After the harness it's the largest hole in the project, and nothing currently points at it.</li></ul>
+<p>Both are now flagged in the document rather than living only in my replies.</p>
+<p>The plan is a working artefact, not a contract — but if it's going to be amended, the amendment belongs <em>in</em> it. Thanks for pushing on this.</p></div>
+</section>
+<section class="turn user" id="p29">
+  <div class="who"><span class="badge u">Exchange 29</span><time>2026-08-30 02:35:07</time></div>
+  <div class="bubble"><p>After H3 finished, I think better back to the tasks in work-breakdown.md?</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Let me check one thing that determines whether H4 is even needed, or whether wave 6 supersedes it.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Your instinct is right. Let me confirm the one dependency that decides H4's fate first — and it does matter.</p>
+<p><code>coding-agent/src/server/create-harness.ts</code> takes <code>env: ExecutionEnv</code>. The interface came in with H2, but <strong>something has to provide a concrete implementation</strong>, and that's <code>env/nodejs.ts</code> in H4. So H4 isn't just package completeness — it's a wave 6 prerequisite.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Yes — with one correction to the timing. Recorded in the plan as <code>57ce565</code>.</p>
+<h4>H4 first, then back to the numbered waves</h4>
+<p>The <code>H</code>-series only ever existed to cover the part of wave 3 I failed to enumerate. Once that's covered, it should stop — and I agree it shouldn't outlive its purpose.</p>
+<p>But <strong>H4 is a wave 6 prerequisite, not tidiness.</strong> <code>coding-agent/src/server/create-harness.ts</code> takes <code>env: ExecutionEnv</code>. H2 delivered the <em>interface</em>; <code>env/nodejs.ts</code> in H4 is the only concrete implementation. Without it, wave 6 has an abstraction with nothing behind it.</p>
+<p>So: <strong>H3 → H4 → wave 3 complete → resume the numbered plan.</strong></p>
+<h4>The order I'd resume in</h4>
+<div class="tw"><table><thead><tr><th>Next</th><th>Why</th></tr></thead><tbody><tr><td><strong>Wave 5 · <code>Pi.Tui</code></strong></td><td>The longest pole. 10% implemented, and T6.8 — 43 interactive components, 18,302 LOC — can't start without it. Worth noting: <em>this document already said</em> to run Tui as an independent stream from wave 2 onward. That guidance was never followed, and it's the single largest un-started item.</td></tr><tr><td><strong>Wave 2 verification</strong></td><td><code>Pi.Ai</code> is 71% implemented at <strong>7% test parity</strong> — 16,989 lines, the largest unverified surface in the project. Wave 6 will build on it. Runs in parallel with wave 5.</td></tr><tr><td><strong>T0.2</strong></td><td>The differential harness. Still unbuilt, still the cheapest defect detection available.</td></tr><tr><td><strong>Waves 6, 7</strong></td><td>After the above.</td></tr></tbody></table></div>
+<h4>One thing worth naming</h4>
+<p>Wave 5 is where the pattern that produced the original problem could repeat. It's 17,000 LOC — comparable to <code>Pi.Ai</code>, which is the package that came out at 7% parity. The difference now is that H1–H3 have shown Codex ships tests alongside code when the packet says so and the parity gate is watching.</p>
+<p>Tui also has the hardest oracle: <code>differential-testing.md</code> gates it on <strong>byte-identical golden buffers</strong> captured from the TypeScript renderer, and <code>tui-strategy.md</code> rates T5.2 (the diff renderer) as <strong>C — do not delegate as a single packet</strong>. That one needs an engineer owning the algorithm with Codex doing the surrounding code.</p>
+<p>So when you get there, wave 5 will want splitting rather than one packet. I'd write it as T5.1/T5.3/T5.4/T5.6 delegable, with T5.2 and T5.5 handled differently.</p></div>
+</section>
 
 </main></div>
 <footer><div class="wrap">
 <p style="margin:0 0 6px"><b>Session transcript exported from Claude Code.</b> Prompts and responses only — tool calls, tool results and internal reasoning are excluded as intermediate working detail.</p>
 <p style="margin:0 0 6px">A further 6 exchanges were omitted as routine: commit-and-push confirmations, file renames, a commit-history question, and requests about this transcript itself. Selection is by exchange rather than by prompt, so a one-word instruction answered with substantial work is kept.</p>
-<p style="margin:0">Generated 2026-08-30 · 257 entries from 2,407 transcript records.</p>
+<p style="margin:0">Generated 2026-08-30 · 269 entries from 2,484 transcript records.</p>
 </div></footer>
 </body></html>
