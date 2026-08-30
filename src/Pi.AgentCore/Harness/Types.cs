@@ -547,7 +547,7 @@ public delegate ValueTask<TContext?> AgentHarnessToolContextSource<TContext>() w
 
 /// <summary>Tagged error value used for exhaustive error matching.</summary>
 [SuppressMessage("Naming", "CA1710", Justification = "This is a tagged value object represented as an exception for C# result interop.")]
-public sealed class TaggedErrorValue : Exception
+public class TaggedErrorValue : Exception
 {
     private readonly IReadOnlyDictionary<string, object?> _properties;
 
