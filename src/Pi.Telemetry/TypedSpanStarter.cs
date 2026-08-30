@@ -207,7 +207,7 @@ public sealed class TypedSpanStarter
 
     private static bool IsArrayOf(object value, Func<object?, bool> itemPredicate)
     {
-        if (value is string or not IEnumerable enumerable)
+        if (value is string || value is not IEnumerable enumerable)
         {
             return false;
         }
