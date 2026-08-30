@@ -56,8 +56,8 @@ footer{border-top:1px solid var(--line);background:var(--panel);padding:26px 0 4
 <div class="meta">
 <div>Dates<b>29–30 August 2026</b></div>
 <div>Project<b>C:\MyProjects\PiCSharp</b></div>
-<div>Exchanges<b>39</b></div>
-<div>Responses<b>61</b></div>
+<div>Exchanges<b>42</b></div>
+<div>Responses<b>67</b></div>
 <div>Model<b>Claude Opus 5</b></div>
 </div></div></header>
 <div class="shell">
@@ -92,15 +92,18 @@ footer{border-top:1px solid var(--line);background:var(--panel);padding:26px 0 4
 <a href="#p28"><span class="n">28</span>For ClaudeSession.html, remove those intermediate actions such as "proce…</a>
 <a href="#p29"><span class="n">29</span>much better now!</a>
 <a href="#p30"><span class="n">30</span>H3 is done, committed and pushed</a>
-<a href="#p31"><span class="n">31</span>write H4</a>
+<a href="#p31"><span class="n">31</span>write H4 — The prompt</a>
 <a href="#p32"><span class="n">32</span>H4 is done by Codex.</a>
 <a href="#p33"><span class="n">33</span>write prompt for Codex</a>
 <a href="#p34"><span class="n">34</span>Update ClaudeSession.html and push</a>
 <a href="#p35"><span class="n">35</span>T5.4 finished. What is next step?</a>
-<a href="#p36"><span class="n">36</span>done</a>
-<a href="#p37"><span class="n">37</span>yes, all</a>
-<a href="#p38"><span class="n">38</span>R3 is done</a>
-<a href="#p39"><span class="n">39</span>yes, please</a>
+<a href="#p36"><span class="n">36</span>done — 1. T5.3a landed well, but with a skipped test that breaks …</a>
+<a href="#p37"><span class="n">37</span>yes, all — 1. The parity gate hole — fixed</a>
+<a href="#p38"><span class="n">38</span>R3 is done — One standing observation</a>
+<a href="#p39"><span class="n">39</span>yes, please — The prompt</a>
+<a href="#p40"><span class="n">40</span>Update ClaudeSession.html and push</a>
+<a href="#p41"><span class="n">41</span>T5.6 is done.</a>
+<a href="#p42"><span class="n">42</span>1 — Why this packet is now unblocked</a>
 </nav>
 <main>
 <section class="turn user" id="p1">
@@ -1072,11 +1075,78 @@ AgentHarness.cs    1,300 lines   untracked</code></pre>
 <p>The editor still needs <code>terminal.ts</code> + <code>tui.ts</code> (1,816 LOC, 48 cases) and <code>select-list.ts</code>. That path runs through <code>terminal-image.ts</code> — Kitty and iTerm protocols, which <code>tui-strategy.md</code> rates <strong>C, not delegable as a single packet</strong>.</p>
 <p>Worth deciding before then whether <code>tui.ts</code> can be ported with image support behind an interface, or whether T5.5 has to land first. That's the one remaining sequencing question in wave 5.</p></div>
 </section>
+<section class="turn user" id="p40">
+  <div class="who"><span class="badge u">Exchange 40</span><time>2026-08-30 09:53:01</time></div>
+  <div class="bubble"><p>Update ClaudeSession.html and push</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Pushed as <code>ca32d6e</code>. Working tree clean, <code>main</code> in sync.</p>
+<div class="tw"><table><thead><tr><th></th><th>Previous</th><th>Now</th></tr></thead><tbody><tr><td>Exchanges</td><td>33</td><td><strong>39</strong></td></tr><tr><td>Responses</td><td>53</td><td><strong>61</strong></td></tr><tr><td>Narration dropped</td><td>221</td><td><strong>247</strong></td></tr><tr><td>Size</td><td>131 KB</td><td><strong>153 KB</strong></td></tr></tbody></table></div>
+<p>Verified: <strong>10</strong> <code>codex</code> delegation prompts, 28 tables, zero tool blocks, zero broken anchors, zero relative references. The auto-locating source picked the live transcript correctly.</p>
+<p>Now covers the H4 close-out, T5.4 and T5.3a, both gate holes and the <code>ci.yml</code> NUL byte, R2/R3, and the T5.6 handoff.</p>
+<h4>Where things stand</h4>
+<p><strong><code>pi-agent-core</code> is complete</strong> — 109% test parity, 160% implementation, nothing orphaned.</p>
+<p><strong><code>Pi.Tui</code> is the remaining work</strong>: 27% test parity, 35% implementation. T5.6 is with Codex now; after it the editor needs <code>terminal.ts</code> + <code>tui.ts</code> + <code>select-list.ts</code>, and that path runs through <code>terminal-image.ts</code> — the one piece <code>tui-strategy.md</code> rates as not delegable in a single packet.</p>
+<p><strong>Both CI gates are now honest.</strong> The parity ratchet catches implementation outgrowing tests; the skip audit sees multi-line attributes. Both had holes that let real problems through, and both were found only because something downstream looked wrong rather than because CI said so.</p></div>
+</section>
+<section class="turn user" id="p41">
+  <div class="who"><span class="badge u">Exchange 41</span><time>2026-08-30 10:25:39</time></div>
+  <div class="bubble"><p>T5.6 is done.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>T5.6 verified and pushed as <code>5628c3e</code>. Clean delivery.</p>
+<div class="tw"><table><thead><tr><th></th><th>Before</th><th>After</th></tr></thead><tbody><tr><td>Suite total</td><td>851</td><td><strong>893</strong></td></tr><tr><td>Tui parity</td><td>27%</td><td><strong>32%</strong></td></tr><tr><td>Tui completeness</td><td>35%</td><td><strong>42%</strong></td></tr></tbody></table></div>
+<p>Frozen paths respected, CI green.</p>
+<h4>The extension-API hazard was handled properly</h4>
+<p>This was the packet's real point, and it landed:</p>
+<ul><li><code>IAutocompleteProvider</code> mirrors upstream with <code>TriggerCharacters</code> and <code>ShouldTriggerFileCompletion</code> as <strong>default interface implementations</strong> — so an extension omitting them still compiles</li><li>The null-vs-empty distinction is documented on <code>GetSuggestions</code></li><li><code>ExtensionProvider_CanWrapBuiltInProvider</code> builds an <code>AutocompleteProviderFactory</code> over a delegating provider and wraps the built-in one — the exact contract wave 7 depends on</li></ul>
+<p><strong>That retires <code>AutocompleteProviderFactory</code> from the residual-risk list</strong> in <code>extension-api.md §7</code>, where it had sat unverified since the D1 acceptance rounds. Two surfaces remain untested there: <code>registerMarkdownTransformer</code> and <code>onTerminalInput</code> standalone.</p>
+<p>Nice touch on the <code>fd</code> hazard: rather than depending on <code>fd</code> being installed, it built a <strong>fake <code>fd</code> executable</strong> as a test helper project, and covered the absent-<code>fd</code> fallback separately — which is the path that actually runs on Windows.</p>
+<h4>Wave 5 remaining</h4>
+<p><code>editor.ts</code> (2,363 LOC, 185 cases) now needs only:</p>
+<div class="tw"><table><thead><tr><th></th><th>LOC</th><th>Cases</th><th>Blocked by</th></tr></thead><tbody><tr><td><code>terminal.ts</code> + <code>tui.ts</code></td><td>1,816</td><td>48</td><td><code>terminal-image.ts</code></td></tr><tr><td><code>select-list.ts</code></td><td>229</td><td>5</td><td><code>tui.ts</code></td></tr></tbody></table></div>
+<p>Which brings us to the sequencing question I flagged earlier and which is now unavoidable: <strong><code>tui.ts</code> imports <code>terminal-image.ts</code></strong>, and <code>tui-strategy.md</code> rates that <strong>C — Kitty and iTerm protocols, not delegable as a single packet</strong>.</p>
+<p>Two options:</p>
+<ol><li><strong>Port <code>tui.ts</code> with image support behind an interface</strong>, stubbed, and land T5.5 separately later. Keeps the editor path moving; risks the interface being wrong for real image rendering.</li><li><strong>Do T5.5 first</strong> with an engineer owning the protocol work and Codex doing the surrounding code, as the strategy doc suggests.</li></ol>
+<p>I'd lean to (1) — the image surface <code>tui.ts</code> actually consumes is likely narrow, and I can check exactly how narrow before committing. Want me to look, then write whichever packet the answer supports?</p></div>
+</section>
+<section class="turn user" id="p42">
+  <div class="who"><span class="badge u">Exchange 42</span><time>2026-08-30 10:38:26</time></div>
+  <div class="bubble"><p>1</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>The regression is exactly on point — and it makes the stub the <em>dangerous</em> path:</p>
+<p>&gt; <strong>Bug:</strong> <code>isImageLine()</code> used <code>startsWith()</code>; when the terminal <strong>doesn't support images</strong> it returned false for lines containing image escapes, crashing the TUI with "Rendered line exceeds terminal width".</p>
+<p>That's precisely the stubbed case. Let me size the remaining two symbols.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Both seams are narrow, and the tests confirm it: <code>normalizeNativeShiftEnterInput(data, isShiftPressed)</code> takes shift state as a <strong>parameter</strong> — native detection is one boolean at one call site. Let me check the plan's numbering before naming the packet.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Complete picture. One correction that matters for this packet: T5.3a's packet claimed <code>Component.WantsKeyRelease</code> was "already in <code>Pi.Tui</code>" — it is not. The existing <code>IComponent</code> is a 2-member subset of upstream's 4-member <code>Component</code>, so completing it is part of this work.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Pushed as <code>afdd19a</code>. Here's the prompt for Codex:</p>
+<pre class="code" data-lang="bash"><code>codex "Read ÍmplementationKit/packets/T5.2b-terminal-and-tui-core.md and implement it. Port terminal.ts (553 LOC) and tui.ts (1263 LOC) with all 48 upstream cases from terminal.test.ts and tui-render.test.ts, names preserved verbatim. Two seams are deliberately stubbed - the image seam and native modifier detection - but isImageLine must be ported for real, including its regression test. Tests ship in the same PR. Name in the PR anything you do not deliver or any instruction you override."</code></pre>
+<p><strong>Why this packet is now unblocked.</strong> <code>tui-strategy.md</code> rated T5.2 "not delegable" — but the rating's stated reason is the differential renderer, and that half already shipped. What's left is literally the "delegate the surrounding code" clause of the same paragraph.</p>
+<p>The assumed blocker was <code>terminal-image.ts</code>. Measured, it isn't one:</p>
+<div class="tw"><table><thead><tr><th></th><th>imports from <code>terminal-image.ts</code></th></tr></thead><tbody><tr><td><code>tui.ts</code></td><td>3 symbols, <strong>1</strong> used in the body</td></tr><tr><td><code>terminal.ts</code></td><td><strong>0</strong></td></tr></tbody></table></div>
+<p>The second seam is better still: <code>native-modifiers.ts</code> returns <code>false</code> on <em>every</em> failure path — bad arch, bad platform, failed require, helper throws. A C# port that can't load a Node addon lands on upstream's own documented fallback rather than an invented one. And <code>normalizeNativeShiftEnterInput</code> takes shift state as a <strong>parameter</strong>, so its 4 tests need no native code at all.</p>
+<p><strong>The one thing that must not be stubbed.</strong> <code>isImageLine</code> had a <code>startsWith</code> → <code>includes</code> bug fixed upstream, and its crash mode (<code>Rendered line exceeds terminal width</code>) fires <em>when the terminal reports no image support</em> — which is exactly the stubbed configuration. A naive stub reproduces the bug instead of avoiding it. The packet calls this out as hazard 1 and requires the regression test alongside.</p>
+<p><strong>One correction to the record.</strong> T5.3a's packet claimed <code>Component.WantsKeyRelease</code> was "already in <code>Pi.Tui</code>". It wasn't, and isn't — <code>IComponent</code> is a two-member subset of upstream's four-member <code>Component</code>, missing both optional members. They arrive in T5.2b with <code>tui.ts</code>, their only consumer. I've struck the claim in T5.3a and made completing the interface an acceptance criterion here.</p>
+<p>Also worth knowing for sequencing: the 5 cases in <code>tui-cell-size-input</code>, <code>tui-overlay-style-leak</code> and <code>tui-shrink</code> target <code>tui-main-screen.ts</code> (654 LOC), a separate file — so scope stays at exactly 48. After this lands, <code>select-list.ts</code> (229 LOC, 5 cases) unblocks, and then T5.3b <code>components/editor.ts</code> — the 2,363-LOC, 185-case file this whole chain has been clearing the way for.</p></div>
+</section>
 
 </main></div>
 <footer><div class="wrap">
 <p style="margin:0 0 6px"><b>Session transcript exported from Claude Code.</b> Prompts and responses only — tool calls, tool results and internal reasoning are excluded as intermediate working detail.</p>
 <p style="margin:0 0 6px">This is a curated record, not a complete one. Bare continuations such as “proceed” are folded into the preceding exchange, keeping the work they triggered without the empty prompt. Short progress narration between tool calls is dropped. A further 5 exchanges were omitted as routine housekeeping.</p>
-<p style="margin:0">Generated 2026-08-30 · 100 entries from 2,404 transcript records.</p>
+<p style="margin:0">Generated 2026-08-30 · 109 entries from 2,596 transcript records.</p>
 </div></footer>
 </body></html>
