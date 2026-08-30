@@ -56,8 +56,8 @@ footer{border-top:1px solid var(--line);background:var(--panel);padding:26px 0 4
 <div class="meta">
 <div>Dates<b>29–30 August 2026</b></div>
 <div>Project<b>C:\MyProjects\PiCSharp</b></div>
-<div>Exchanges<b>33</b></div>
-<div>Responses<b>53</b></div>
+<div>Exchanges<b>39</b></div>
+<div>Responses<b>61</b></div>
 <div>Model<b>Claude Opus 5</b></div>
 </div></div></header>
 <div class="shell">
@@ -95,6 +95,12 @@ footer{border-top:1px solid var(--line);background:var(--panel);padding:26px 0 4
 <a href="#p31"><span class="n">31</span>write H4</a>
 <a href="#p32"><span class="n">32</span>H4 is done by Codex.</a>
 <a href="#p33"><span class="n">33</span>write prompt for Codex</a>
+<a href="#p34"><span class="n">34</span>Update ClaudeSession.html and push</a>
+<a href="#p35"><span class="n">35</span>T5.4 finished. What is next step?</a>
+<a href="#p36"><span class="n">36</span>done</a>
+<a href="#p37"><span class="n">37</span>yes, all</a>
+<a href="#p38"><span class="n">38</span>R3 is done</a>
+<a href="#p39"><span class="n">39</span>yes, please</a>
 </nav>
 <main>
 <section class="turn user" id="p1">
@@ -918,11 +924,159 @@ AgentHarness.cs    1,300 lines   untracked</code></pre>
 <p>The packet warns that replacing the placeholder <strong>may break existing <code>Pi.Tui</code> tests</strong>, and frames that correctly: those tests were written against a naive width model, so the test changes to match upstream — not the reverse.</p>
 <p>It also folds in <code>proxy.ts</code> and <code>harness/system-prompt.ts</code> — 404 lines, 4 cases, never assigned to any packet and the last of <code>pi-agent-core</code>. Fenced off as a clearly separate objective so it doesn't muddy the TUI work.</p></div>
 </section>
+<section class="turn user" id="p34">
+  <div class="who"><span class="badge u">Exchange 34</span><time>2026-08-30 05:55:50</time></div>
+  <div class="bubble"><p>Update ClaudeSession.html and push</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Pushed as <code>7f9355a</code>, and I caught a real bug doing it.</p>
+<h4>The export had gone stale without failing</h4>
+<p>The exporter hard-coded a transcript id. <strong>The session forked on a resume</strong>, and since 30 Aug 10:42 it had been regenerating from a file that stopped growing. Three consecutive runs produced byte-identical output — 27 exchanges, 47 responses, 113 KB every time — while the session kept going.</p>
+<p>Missing from the last three commits: the H3 verification, the H4 delivery, and the T5.4 packet.</p>
+<p>I only noticed because the counts didn't move after several substantial exchanges. A silent no-op is the worst failure mode for something like this — it looks like it worked.</p>
+<p><strong>Fixed properly</strong> rather than swapping the path: the exporter now scans the project directory, keeps only transcripts still containing the original brief, and takes the most recently modified. A fork that retains history is followed automatically, and it prints the source filename so the input is visible on every run.</p>
+<h4>Now current</h4>
+<div class="tw"><table><thead><tr><th></th><th>Stale</th><th>Actual</th></tr></thead><tbody><tr><td>Exchanges</td><td>27</td><td><strong>33</strong></td></tr><tr><td>Responses</td><td>47</td><td><strong>53</strong></td></tr><tr><td>Narration dropped</td><td>200</td><td><strong>221</strong></td></tr><tr><td>Size</td><td>113 KB</td><td><strong>131 KB</strong></td></tr></tbody></table></div>
+<p>Verified present: all <strong>six</strong> <code>codex</code> delegation prompts, the H3 and H4 deliveries, the T5.4 packet, and the <code>string.Length</code> width finding. 25 tables, zero tool blocks, zero broken anchors, zero relative references.</p>
+<p>Worth noting for anything else that reads these transcripts: three other <code>.jsonl</code> files exist in that project directory from earlier forks. The live one is <code>35451919…</code>.</p></div>
+</section>
+<section class="turn user" id="p35">
+  <div class="who"><span class="badge u">Exchange 35</span><time>2026-08-30 06:45:17</time></div>
+  <div class="bubble"><p>T5.4 finished. What is next step?</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>T5.4 landed the TUI work well. <strong>709 tests</strong>, Tui parity 2% → 11%, implementation 10% → 22%, placeholder removed.</p>
+<p>The regression tests are in and asserting the right thing — <code>VisibleWidth("🇨") == 2</code> for a partial flag, plus CJK grapheme boundaries. And the predicted "finding not regression" happened exactly as flagged: <code>LayoutTests</code> changed because <code>TruncatedText</code> now emits SGR reset codes around its ellipsis, and the test helper moved from naive marker-stripping to <code>StripTerminalSequences</code>. Test updated to match upstream, not the reverse. That's the right call.</p>
+<h4>But the second objective was silently dropped</h4>
+<p><code>proxy.ts</code> and <code>harness/system-prompt.ts</code> — 404 LOC, 4 cases — weren't ported, and the commit message doesn't mention it.</p>
+<p><strong>That's the third unreported deviation</strong> (after H1's <code>[JsonExtensionData]</code> and H3's <code>YamlDotNet</code>). The pattern is now unambiguous, and the fix isn't to ask more firmly — I've asked in every packet and it hasn't worked once.</p>
+<p>The real lesson is mine: <strong>I bundled an unrelated objective into a packet, and it vanished.</strong> Inside a "done" packet an omission is invisible; as its own packet it would show up as simply not delivered. I won't bundle again.</p>
+<h4>Next step</h4>
+<p><strong>T5.3a — the editor's prerequisites.</strong> <code>editor.ts</code> is the largest single file in wave 5 (2,363 LOC, <strong>185 test cases</strong>), and it can't start until its dependencies exist:</p>
+<div class="tw"><table><thead><tr><th></th><th>LOC</th><th>Cases</th><th>Status</th></tr></thead><tbody><tr><td><code>keys.ts</code></td><td>1,401</td><td>60</td><td>not ported</td></tr><tr><td><code>autocomplete.ts</code></td><td>826</td><td>27</td><td>not ported</td></tr><tr><td><code>stdin-buffer.ts</code></td><td>444</td><td>59</td><td>not ported</td></tr><tr><td><code>keybindings.ts</code></td><td>320</td><td>7</td><td>not ported</td></tr><tr><td><code>kill-ring.ts</code></td><td>46</td><td>—</td><td>not ported</td></tr><tr><td><code>undo-stack.ts</code></td><td>28</td><td>—</td><td>not ported</td></tr><tr><td><code>word-navigation.ts</code></td><td>117</td><td>19</td><td>✅ T5.4</td></tr><tr><td><code>utils.ts</code></td><td>—</td><td>—</td><td>✅ T5.4</td></tr></tbody></table></div>
+<p>That's ~3,065 LOC and <strong>153 cases</strong> — a substantial packet on its own, and it unblocks the 185-case editor. <code>tui.ts</code> and <code>select-list.ts</code> are the remaining editor deps and would follow.</p>
+<p>I'd write two packets rather than one:</p>
+<ul><li><strong>T5.3a</strong> — input plumbing: keys, keybindings, kill-ring, undo-stack, stdin-buffer (2,239 LOC, 126 cases)</li><li><strong>T5.6</strong> — autocomplete + fuzzy (963 LOC, 27 cases), rated A and independent</li></ul>
+<p>Then <strong>T5.3b</strong> for the editor itself once both land.</p>
+<p>And <code>proxy.ts</code> + <code>system-prompt.ts</code> as their own tiny packet, so it's visibly done or not.</p>
+<p>Want me to write T5.3a?</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Two packets written and pushed as <code>68774a5</code>.</p>
+<h4>Next prompts</h4>
+<p><strong>T5.3a</strong> — the main line of work:</p>
+<pre class="code" data-lang="bash"><code>codex "Complete the task in ÍmplementationKit/packets/T5.3a-tui-input-layer.md. Read AGENTS.md and docs/translation-patterns.md first, especially §2.2 on type-level inference. The TypeScript in reference/pi is the specification and is read-only. src/Pi.Tui/Text is frozen. Anything in the packet you do not deliver must be named in the PR. The upstream tests ship in the same PR as the implementation."</code></pre>
+<p><strong>R2</strong> — small, independent, can run first or in parallel:</p>
+<pre class="code" data-lang="bash"><code>codex "Complete the task in ÍmplementationKit/packets/R2-agent-core-remainder.md. Read AGENTS.md first. The TypeScript in reference/pi is the specification and is read-only. Everything outside the two target files is frozen."</code></pre>
+<h4>T5.4's TUI work was good</h4>
+<p><strong>709 tests</strong>, Tui parity 2% → 11%, implementation 10% → 22%. The placeholder is gone and every call site rewired. Both regression tests are in, asserting <code>VisibleWidth("🇨") == 2</code>.</p>
+<p>The predicted "finding not regression" played out correctly: <code>TruncatedText</code> now emits SGR resets around its ellipsis and the test helper moved to <code>StripTerminalSequences</code> — the test was updated to match upstream behaviour rather than the implementation bent to match the test.</p>
+<h4>Why R2 is a separate packet</h4>
+<p>T5.4's second objective — <code>proxy.ts</code> and <code>system-prompt.ts</code> — wasn't delivered, and wasn't mentioned.</p>
+<p><strong>That's my error, not the implementer's.</strong> An unrelated objective bundled into a larger packet is invisible when omitted, because the packet still reads as done. Three unreported deviations now (H1's hazard, H3's dependency, T5.4's omission), and asking more firmly in prose hasn't worked once. The structural fix is to stop bundling: one packet, one coherent objective, so <em>done</em> and <em>delivered</em> mean the same thing.</p>
+<h4>What T5.3a covers</h4>
+<p>The input plumbing <code>editor.ts</code> needs before it can start — and <code>editor.ts</code> is the biggest file in wave 5 at 2,363 LOC with <strong>185 test cases</strong>.</p>
+<p><code>keys.ts</code>, <code>keybindings.ts</code>, <code>kill-ring.ts</code>, <code>undo-stack.ts</code>, <code>stdin-buffer.ts</code> — 2,239 LOC, <strong>127 cases</strong>.</p>
+<p>Four hazards worth flagging in advance:</p>
+<ul><li><strong><code>KeyId</code> is a template-literal type</strong> (<code>"ctrl+shift+p"</code> generated at the type level) — no C# equivalent, so §2.2 applies: validated strings, not an enum</li><li><strong><code>matchesKey</code> is public extension API</strong> — <code>modal-editor.ts</code> calls it directly, so it's part of the mirror contract</li><li><strong>Kitty protocol state is a mutable global</strong> that now spans threads in .NET, which wasn't true of upstream's event loop</li><li><strong>Bracketed paste buffers across reads</strong> — a paste boundary can split mid-sequence, which is why 444 lines carry 59 tests</li></ul></div>
+</section>
+<section class="turn user" id="p36">
+  <div class="who"><span class="badge u">Exchange 36</span><time>2026-08-30 08:36:09</time></div>
+  <div class="bubble"><p>done</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p><strong>CI is red on <code>6fbcaca</code></strong>, and there are two separate problems.</p>
+<h4>1. T5.3a landed well, but with a skipped test that breaks the budget</h4>
+<p>The TUI work is genuinely good — <strong>837 tests</strong>, Tui parity 11% → <strong>27%</strong>, implementation 22% → 35%. Keys, keybindings, kill-ring, undo-stack and stdin-buffer all in.</p>
+<p>But <code>EditorHistoryKeybindingsTests.cs</code> is skipped:</p>
+<p>&gt; <code>Skip = "Pi.Tui.Editor is T5.3b and is outside the T5.3a input-layer source scope."</code></p>
+<p><strong>The reasoning is correct.</strong> That upstream test exercises the editor, which genuinely doesn't exist yet — I listed it in T5.3a's source table by mistake, because it <em>sounds</em> like a keybindings test. My packet error, third of its kind (wrong hazard, wrong dependency, now wrong test attribution).</p>
+<p>But <code>.skip-budget</code> is 0, so CI fails. This is the gate working exactly as designed: a skip must be an explicit, justified budget change, not a silent one. It needed <code>.skip-budget</code> raised to 1 in the same commit with the reason — which the packet's own acceptance criteria asked for.</p>
+<h4>2. R2 shipped 1,212 lines of implementation and zero tests</h4>
+<p><code>Proxy.cs</code> (1,128 lines) and <code>SystemPrompt.cs</code> (84) landed. Agent test count: <strong>234 before, 234 after.</strong> None of the 4 upstream cases were ported, and the commit message is a single line that doesn't mention it.</p>
+<p>This is precisely the failure the parity gate exists to prevent — and <strong>the gate didn't catch it</strong>, because the floor is a minimum, not a ratio. Adding implementation without tests keeps you above the floor indefinitely. CI went green on <code>831da91</code>.</p>
+<p>That's a real hole in a tool I built, and it's the fourth unreported deviation.</p>
+<h4>What I'd do</h4>
+<p>Both are quick:</p>
+<ul><li><strong>Raise <code>.skip-budget</code> to 1</strong> with the justification, and correct T5.3a's source table — the skip is legitimate, the budget just needs to acknowledge it. That turns CI green.</li><li><strong>Re-issue R2's test half.</strong> The implementation is there; the 4 upstream cases plus the extra <code>proxy.ts</code> coverage the packet asked for are not.</li><li><strong>Fix the parity tool</strong> so implementation growth without test growth is itself a failure, not just a floor check.</li></ul>
+<p>Want me to do all three?</p></div>
+</section>
+<section class="turn user" id="p37">
+  <div class="who"><span class="badge u">Exchange 37</span><time>2026-08-30 08:42:41</time></div>
+  <div class="bubble"><p>yes, all</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>My conversion was wrong for two of them. Upstream's comment is explicit:</p>
+<pre class="code" data-lang="js"><code>await wait(20); // &gt; 10ms default escapeTimeout, &lt; 100ms configured escapeTimeout</code></pre>
+<p>That delay must land <em>between</em> two thresholds — nothing should flush during it. I converted it to "wait until something is emitted", which spins until the 100 ms timeout fires and breaks the test. Let me re-examine all seven.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p><strong>CI green</strong> — all three jobs, on <code>3cfae80</code>. All three tasks done, plus two more problems found on the way.</p>
+<h4>1. The parity gate hole — fixed</h4>
+<p><code>tools/test-parity.sh</code> enforced only a <em>floor</em>. Shipping implementation with zero tests stays above a floor indefinitely, which is exactly how R2 landed <strong>1,212 lines with 234 agent cases before and 234 after</strong>, and CI went green.</p>
+<p>It now records implementation LOC alongside the floor and fails when implementation grows &gt;200 lines with no new tests. Verified by simulation:</p>
+<pre class="code"><code>agent  Pi.AgentCore  226  234  234  FAIL (+1000 impl lines, no new tests)</code></pre>
+<h4>2. The skip audit — fixed</h4>
+<p>It couldn't see multi-line attributes. T5.3a's skip has <code>Skip =</code> on the <em>third</em> line of a <code>[Fact(...)]</code>, so the single-line grep reported <strong>zero skips while one existed</strong>. Now counts the <code>Skip =</code> line itself.</p>
+<p>The skip is legitimate: <code>editor-history-keybindings.test.ts</code> exercises <code>components/editor.ts</code>, which is T5.3b. <strong>I listed it in T5.3a's table in error</strong> — the filename reads like a keybindings test. Budget raised to 1, <code>.skip-budget.md</code> records the reason and what clears it, T5.3a corrected to 126 cases.</p>
+<h4>3. R3 written — R2's missing tests</h4>
+<p>The 4 upstream cases plus branch coverage for <code>Proxy.cs</code>, with <code>src/</code> <strong>frozen</strong> so a failing ported test gets reported rather than worked around.</p>
+<pre class="code" data-lang="bash"><code>codex "Complete the task in ÍmplementationKit/packets/R3-proxy-tests.md. Read AGENTS.md first. src/ is frozen for this packet — if a ported test fails, report it in the PR rather than changing the implementation."</code></pre>
+<h4>Two things I broke and fixed</h4>
+<p><strong>A flaky test.</strong> CI was actually red for a fourth reason: <code>StdinBufferTests</code> used sleep-based synchronisation that races the thread pool. Six emission waits are now condition polls. One case I converted <strong>wrongly</strong> — upstream's own comment shows it must land between the 10 ms default and 100 ms configured escape timeouts so nothing flushes; polling for an emission defeated that. Restored as a fixed 25 ms wait with the reasoning in a comment. Five consecutive full runs now pass.</p>
+<p><strong>A NUL byte in <code>ci.yml</code>.</strong> My skip-audit edit embedded a literal NUL, making the workflow unparseable — the run failed with <strong>zero jobs</strong>, so build, format, tests and both audits never executed. Worse than the red build it was meant to fix, and invisible from the run summary. Rewritten to need no NUL-separated grep, and verified locally before pushing this time.</p></div>
+</section>
+<section class="turn user" id="p38">
+  <div class="who"><span class="badge u">Exchange 38</span><time>2026-08-30 09:44:25</time></div>
+  <div class="bubble"><p>R3 is done</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>R3 landed clean. <strong>851 tests</strong>, agent parity 103% → <strong>109%</strong>, <code>src/</code> untouched exactly as required.</p>
+<p>It ported <strong>14 cases against upstream's 4</strong> — 3 for <code>SystemPrompt</code> (all of upstream's) and 11 for <code>Proxy</code> (upstream's 1 plus 10 branch-coverage cases). That's precisely what the packet asked for, since 370 lines with a single upstream test means the upstream suite under-specifies it.</p>
+<p><code>pi-agent-core</code> is now genuinely finished: 109% test parity, 160% implementation, nothing orphaned.</p>
+<h4>One standing observation</h4>
+<p>The packet asked it to "state which behaviours you covered beyond upstream." The commit message is one line: <em>"Add proxy and system prompt tests."</em></p>
+<p><strong>That's the fifth time reporting was requested and not provided</strong> — H1's hazard override, H3's dependency decision, T5.4's omission, R2's missing tests, now this. I've asked in progressively firmer language every time and it hasn't changed once.</p>
+<p>I'd stop treating it as an oversight. It's a stable characteristic of the tool, and the practical answer is what I've been doing anyway: verify by diffing, which takes a few minutes per packet and has caught everything. Worth you knowing so you don't rely on Codex's own account of what it did.</p>
+<h4>Next: T5.6, then two more before the editor</h4>
+<p><code>editor.ts</code> is the prize — 2,363 LOC, <strong>185 test cases</strong>, the largest single file in wave 5. Three prerequisites remain:</p>
+<div class="tw"><table><thead><tr><th></th><th>LOC</th><th>Cases</th><th>Needs</th></tr></thead><tbody><tr><td><code>fuzzy.ts</code> + <code>autocomplete.ts</code></td><td>963</td><td>41</td><td>nothing — <strong>ready now</strong></td></tr><tr><td><code>terminal.ts</code> + <code>tui.ts</code></td><td>1,816</td><td>48</td><td><code>terminal-image.ts</code> (T5.5, rated C)</td></tr><tr><td><code>select-list.ts</code></td><td>229</td><td>5</td><td><code>tui.ts</code></td></tr></tbody></table></div>
+<p><strong>T5.6 (fuzzy + autocomplete) is the only one ready</strong> — self-contained, rated A, 41 cases.</p>
+<p>One thing surfaced worth flagging: <code>tui.ts</code> imports <code>terminal-image.ts</code>, which <code>tui-strategy.md</code> rates <strong>C — Kitty and iTerm image protocols, not delegable as a single packet</strong>. So the editor's path runs through the hardest remaining piece. Worth deciding early whether <code>tui.ts</code> can be ported with image support stubbed behind an interface, or whether T5.5 has to land first.</p>
+<p>Want me to write T5.6?</p></div>
+</section>
+<section class="turn user" id="p39">
+  <div class="who"><span class="badge u">Exchange 39</span><time>2026-08-30 09:50:59</time></div>
+  <div class="bubble"><p>yes, please</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>T5.6 written and pushed as <code>9eed84a</code>.</p>
+<h4>The prompt</h4>
+<pre class="code" data-lang="bash"><code>codex "Complete the task in ÍmplementationKit/packets/T5.6-tui-autocomplete.md. Read AGENTS.md and docs/translation-patterns.md first. The TypeScript in reference/pi is the specification and is read-only. src/Pi.Tui/Text and src/Pi.Tui/Input are frozen. AutocompleteProvider is public extension API — if it cannot be mirrored cleanly, that is a finding about docs/extension-api.md and belongs in the PR. The upstream tests ship in the same PR as the implementation."</code></pre>
+<h4>Why this one matters more than its size suggests</h4>
+<p>963 LOC and 41 cases looks routine. But <strong><code>AutocompleteProvider</code> is public extension API</strong>, not an internal interface:</p>
+<pre class="code" data-lang="ts"><code>export type AutocompleteProviderFactory = (current: AutocompleteProvider) =&gt; AutocompleteProvider;</code></pre>
+<p>Extensions <em>implement</em> it and wrap the built-in provider. So the C# shape chosen here becomes part of the contract wave 7 must honour when porting the 85 bundled extensions.</p>
+<p><code>extension-api.md §7</code> has listed <code>AutocompleteProviderFactory</code> as <strong>untested residual risk</strong> since the D1 acceptance rounds — one of three surfaces the spikes never reached. This packet is the first chance to retire it, so I've asked for a test proving an extension-style provider can wrap the built-in one, and flagged that a mirroring failure is a finding about D1 rather than about this file.</p>
+<p>Three other hazards worth having in advance:</p>
+<ul><li><strong><code>getArgumentCompletions</code> returns <code>Awaitable&lt;T&gt;</code></strong> — TypeScript's <code>T | Promise&lt;T&gt;</code> union. <code>ValueTask</code> is the faithful equivalent; a synchronous implementation returns a completed one without allocating.</li><li><strong><code>commands</code> is <code>(SlashCommand | AutocompleteItem)[]</code></strong> — an overlap, not an inheritance relationship. Forcing a common base class would invent structure upstream doesn't have.</li><li><strong>Path completion shells out to <code>fd</code></strong>, which will usually be absent on Windows. The fallback path is the one that actually runs here.</li></ul>
+<h4>After this</h4>
+<p>The editor still needs <code>terminal.ts</code> + <code>tui.ts</code> (1,816 LOC, 48 cases) and <code>select-list.ts</code>. That path runs through <code>terminal-image.ts</code> — Kitty and iTerm protocols, which <code>tui-strategy.md</code> rates <strong>C, not delegable as a single packet</strong>.</p>
+<p>Worth deciding before then whether <code>tui.ts</code> can be ported with image support behind an interface, or whether T5.5 has to land first. That's the one remaining sequencing question in wave 5.</p></div>
+</section>
 
 </main></div>
 <footer><div class="wrap">
 <p style="margin:0 0 6px"><b>Session transcript exported from Claude Code.</b> Prompts and responses only — tool calls, tool results and internal reasoning are excluded as intermediate working detail.</p>
 <p style="margin:0 0 6px">This is a curated record, not a complete one. Bare continuations such as “proceed” are folded into the preceding exchange, keeping the work they triggered without the empty prompt. Short progress narration between tool calls is dropped. A further 5 exchanges were omitted as routine housekeeping.</p>
-<p style="margin:0">Generated 2026-08-30 · 86 entries from 2,039 transcript records.</p>
+<p style="margin:0">Generated 2026-08-30 · 100 entries from 2,404 transcript records.</p>
 </div></footer>
 </body></html>
