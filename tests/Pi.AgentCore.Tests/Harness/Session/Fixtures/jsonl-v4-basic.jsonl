@@ -1,0 +1,6 @@
+{"kind":"header","version":4,"id":"fixture","createdAt":1700000000000,"cwd":"/workspace/project","parentSessionId":"parent","metadata":{"owner":"agent","nested":{"enabled":true},"values":[1,null,"two"]}}
+{"kind":"entry","lane":"main","type":"custom","id":"entry-1","customType":"note","data":{"text":"hello"},"parentId":null,"seq":1,"timestamp":100}
+{"kind":"lane","seq":2,"lane":"thread","leafId":"entry-1"}
+{"kind":"fact","seq":3,"fact":"name","name":"Example"}
+{"kind":"fact","seq":4,"fact":"name"}
+{"kind":"record","type":"operation_started","id":"run-1","lane":"thread","sourceLeafId":null,"intent":{"kind":"run","originalPrompt":[],"initialMessages":[]},"seq":5,"timestamp":100}
