@@ -73,10 +73,10 @@ if [ "$UPDATE" = "1" ]; then
   {
     echo "# Test-parity floors. Ported C# test cases may not fall below these."
     echo "# Regenerate with: tools/test-parity.sh --update"
-    echo "# Format: <upstream-package> <csharp-project> <floor> <upstream-cases-at-record-time>"
+    echo "# Format: <upstream-package> <csharp-project> <test-floor> <upstream-cases> <impl-loc-at-record>"
     for pair in $PAIRS; do
       pkg="${pair%%:*}"; proj="${pair##*:}"
-      echo "$pkg $proj $(count_ported "$proj") $(count_upstream "$pkg")"
+      echo "$pkg $proj $(count_ported "$proj") $(count_upstream "$pkg") $(loc_ported "$proj")"
     done
   } > "$BUDGET"
   echo "wrote $BUDGET"
@@ -87,15 +87,24 @@ fail=0
 printf '%-12s %-16s %8s %8s %8s   %s\n' PACKAGE PROJECT UPSTREAM PORTED FLOOR STATUS
 printf '%s\n' "----------------------------------------------------------------------------"
 
-while read -r pkg proj floor _recorded; do
+while read -r pkg proj floor _recorded recorded_loc; do
   case "$pkg" in ""|\#*) continue;; esac
   up=$(count_upstream "$pkg")
   got=$(count_ported "$proj")
+  now_loc=$(loc_ported "$proj")
+  recorded_loc=${recorded_loc:-0}
   pct=0
   [ "$up" -gt 0 ] && pct=$(( got * 100 / up ))
 
+  # Implementation may not outgrow its tests. A floor alone cannot catch this:
+  # shipping code with no tests stays above the floor indefinitely, which is
+  # exactly how 1,212 untested lines landed green in commit 831da91.
+  grown=$(( now_loc - recorded_loc ))
   if [ "$got" -lt "$floor" ]; then
     status="FAIL (below floor $floor)"
+    fail=1
+  elif [ "$grown" -gt 200 ] && [ "$got" -le "$floor" ]; then
+    status="FAIL (+${grown} impl lines, no new tests)"
     fail=1
   else
     status="ok  ${pct}% of upstream"
@@ -105,9 +114,10 @@ done < "$BUDGET"
 
 if [ "$fail" = "1" ]; then
   echo ""
-  echo "::error::Ported test count fell below a recorded floor in $BUDGET."
-  echo "Tests may not be removed to make a change pass. If a floor is genuinely wrong,"
-  echo "change it in the same commit with a justification in the PR description."
+  echo "::error::Test-parity ratchet failed."
+  echo "Either the ported test count fell below its floor, or implementation grew by more"
+  echo "than 200 lines without a single new test. Tests ship in the same PR as the code."
+  echo "If a floor is genuinely wrong, change it in the same commit with a written justification."
   exit 1
 fi
 

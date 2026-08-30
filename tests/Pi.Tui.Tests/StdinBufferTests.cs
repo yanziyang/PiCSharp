@@ -126,7 +126,7 @@ public sealed class StdinBufferTests : IDisposable
         ProcessInput("\x1b[<35");
         Assert.Empty(_emittedSequences);
 
-        await Task.Delay(50, TestContext.Current.CancellationToken);
+        await WaitUntilAsync(() => _emittedSequences.Count >= 1, TestContext.Current.CancellationToken);
 
         Assert.Equal(["\x1b[<35"], _emittedSequences);
     }
@@ -135,7 +135,7 @@ public sealed class StdinBufferTests : IDisposable
     public async Task Flushes_lone_escape_before_late_carriage_return()
     {
         ProcessInput("\x1b");
-        await Task.Delay(50, TestContext.Current.CancellationToken);
+        await WaitUntilAsync(() => _emittedSequences.Count >= 1, TestContext.Current.CancellationToken);
         ProcessInput("\r");
 
         Assert.Equal(["\x1b", "\r"], _emittedSequences);
@@ -147,7 +147,10 @@ public sealed class StdinBufferTests : IDisposable
     {
         ReplaceBuffer(new StdinBufferOptions { EscapeTimeout = 100 });
         ProcessInput("\x1b");
-        await Task.Delay(50, TestContext.Current.CancellationToken);
+        // Interval wait, not an emission wait: this must land after the 10ms default escape
+        // timeout but before the 100ms configured one, so that nothing flushes and the CR merges.
+        // Upstream uses 20ms with the same thresholds.
+        await Task.Delay(25, TestContext.Current.CancellationToken);
         ProcessInput("\r");
 
         Assert.Equal(["\x1b\r"], _emittedSequences);
@@ -159,7 +162,7 @@ public sealed class StdinBufferTests : IDisposable
     {
         ReplaceBuffer(new StdinBufferOptions { Timeout = 100 });
         ProcessInput("\x1b");
-        await Task.Delay(50, TestContext.Current.CancellationToken);
+        await WaitUntilAsync(() => _emittedSequences.Count >= 1, TestContext.Current.CancellationToken);
         ProcessInput("\r");
 
         Assert.Equal(["\x1b", "\r"], _emittedSequences);
@@ -392,7 +395,7 @@ public sealed class StdinBufferTests : IDisposable
         ProcessInput("\x1b");
         Assert.Empty(_emittedSequences);
 
-        await Task.Delay(50, TestContext.Current.CancellationToken);
+        await WaitUntilAsync(() => _emittedSequences.Count >= 1, TestContext.Current.CancellationToken);
 
         Assert.Equal(["\x1b"], _emittedSequences);
     }
@@ -405,7 +408,7 @@ public sealed class StdinBufferTests : IDisposable
         defaultBuffer.Data += sequence => defaultSequences.Add(sequence);
 
         defaultBuffer.Process("\x1b");
-        await Task.Delay(100, TestContext.Current.CancellationToken);
+        await WaitUntilAsync(() => defaultSequences.Count >= 1, TestContext.Current.CancellationToken);
         Assert.Equal(["\x1b"], defaultSequences);
         defaultBuffer.Destroy();
     }
@@ -457,7 +460,7 @@ public sealed class StdinBufferTests : IDisposable
         ProcessInput("\x1b[<35");
         Assert.Empty(_emittedSequences);
 
-        await Task.Delay(50, TestContext.Current.CancellationToken);
+        await WaitUntilAsync(() => _emittedSequences.Count >= 1, TestContext.Current.CancellationToken);
 
         Assert.Equal(["\x1b[<35"], _emittedSequences);
     }
@@ -566,5 +569,20 @@ public sealed class StdinBufferTests : IDisposable
         _emittedSequences = [];
         _emittedPaste = [];
         _buffer = CreateBuffer(options);
+    }
+
+    /// <summary>
+    /// Waits for a condition instead of sleeping a fixed interval. The buffer flushes on an
+    /// internal timer, so a fixed sleep races the thread pool: "should emit flushed data via
+    /// timeout" failed intermittently under load. Cases that assert an emission poll for it;
+    /// cases that assert *absence* still sleep, since absence cannot be polled for.
+    /// </summary>
+    private static async Task WaitUntilAsync(Func<bool> ready, CancellationToken cancellationToken, int timeoutMs = 2000)
+    {
+        var deadline = Environment.TickCount64 + timeoutMs;
+        while (!ready() && Environment.TickCount64 < deadline)
+        {
+            await Task.Delay(2, cancellationToken).ConfigureAwait(false);
+        }
     }
 }

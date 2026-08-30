@@ -1,10 +1,10 @@
 # Test-parity floors. Ported C# test cases may not fall below these.
 # Regenerate with: tools/test-parity.sh --update
-# Format: <upstream-package> <csharp-project> <floor> <upstream-cases-at-record-time>
-protocol Pi.Protocol 51 33
-telemetry Pi.Telemetry 15 7
-ai Pi.Ai 99 1360
-agent Pi.AgentCore 234 226
-client Pi.Client 7 36
-server Pi.Server 9 50
-tui Pi.Tui 99 838
+# Format: <upstream-package> <csharp-project> <test-floor> <upstream-cases> <impl-loc-at-record>
+protocol Pi.Protocol 51 33 3493
+telemetry Pi.Telemetry 15 7 974
+ai Pi.Ai 99 1360 16989
+agent Pi.AgentCore 234 226 20234
+client Pi.Client 7 36 1533
+server Pi.Server 9 50 2086
+tui Pi.Tui 227 838 6044

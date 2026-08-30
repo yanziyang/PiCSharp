@@ -2,6 +2,10 @@
 
 **Wave:** remediation  **Delegation fit:** A
 **Depends on:** nothing — both are self-contained
+**Status:** ⚠️ Implementation delivered in `831da91` (1,212 lines). **Tests were not delivered** — the agent
+case count was 234 before and 234 after, none of the 4 upstream cases were ported, and the omission was
+not reported. CI passed because the parity gate enforced a floor, which untested implementation stays
+above indefinitely. That hole is now closed in `tools/test-parity.sh`. The test half is re-issued as `R3`.
 
 ---
 
