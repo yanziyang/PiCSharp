@@ -56,8 +56,8 @@ footer{border-top:1px solid var(--line);background:var(--panel);padding:26px 0 4
 <div class="meta">
 <div>Dates<b>29–30 August 2026</b></div>
 <div>Project<b>C:\MyProjects\PiCSharp</b></div>
-<div>Exchanges<b>27</b></div>
-<div>Responses<b>47</b></div>
+<div>Exchanges<b>33</b></div>
+<div>Responses<b>53</b></div>
 <div>Model<b>Claude Opus 5</b></div>
 </div></div></header>
 <div class="shell">
@@ -89,6 +89,12 @@ footer{border-top:1px solid var(--line);background:var(--panel);padding:26px 0 4
 <a href="#p25"><span class="n">25</span>I have doubt, why no longer follow original implementationKit? The work-…</a>
 <a href="#p26"><span class="n">26</span>After H3 finished, I think better back to the tasks in work-breakdown.md…</a>
 <a href="#p27"><span class="n">27</span>Update ClaudeSession.html, and push.</a>
+<a href="#p28"><span class="n">28</span>For ClaudeSession.html, remove those intermediate actions such as "proce…</a>
+<a href="#p29"><span class="n">29</span>much better now!</a>
+<a href="#p30"><span class="n">30</span>H3 is done, committed and pushed</a>
+<a href="#p31"><span class="n">31</span>write H4</a>
+<a href="#p32"><span class="n">32</span>H4 is done by Codex.</a>
+<a href="#p33"><span class="n">33</span>write prompt for Codex</a>
 </nav>
 <main>
 <section class="turn user" id="p1">
@@ -795,11 +801,128 @@ Harness/Telemetry.cs          415 lines   10:37:06</code></pre>
 <p><strong>I left them untracked and committed only the transcript.</strong> Committing another agent's in-flight work would bury it in an unrelated commit and make the H3 delivery hard to review as a unit. When Codex finishes it'll commit them itself — and if it stalled instead, they're still sitting there to pick up.</p>
 <p>Worth knowing if you're running Codex concurrently: my <code>git add</code> was path-scoped to the HTML for exactly this reason, but a broader <code>git add -A</code> from either side could tangle the two streams.</p></div>
 </section>
+<section class="turn user" id="p28">
+  <div class="who"><span class="badge u">Exchange 28</span><time>2026-08-30 02:42:57</time></div>
+  <div class="bubble"><p>For ClaudeSession.html, remove those intermediate actions such as "proceed", "Documents are coherent. Verifying cross-references and committing.", "All four pinned. Building the scaffold now.". What I want to keep is how to work with coding agent and key response from coding agent.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Pushed as <code>e067ebf</code>. The diff tells the story: <strong>86 insertions, 858 deletions</strong>.</p>
+<div class="tw"><table><thead><tr><th></th><th>Before</th><th>After</th></tr></thead><tbody><tr><td>Exchanges</td><td>29</td><td><strong>27</strong></td></tr><tr><td>Responses</td><td>240</td><td><strong>47</strong></td></tr><tr><td>Size</td><td>161 KB</td><td><strong>113 KB</strong></td></tr></tbody></table></div>
+<h4>Two filters, matching your three examples</h4>
+<p><strong>Bare continuations are folded into the preceding exchange.</strong> <code>proceed</code>, <code>continue</code>, <code>go ahead</code> carry no instruction — but the work they trigger is often the most substantial in the session. So the empty prompt bubble goes and the replies stay, attached to the instruction that actually set the direction. Two exchanges merged this way.</p>
+<p><strong>Short unstructured narration between tool calls is dropped.</strong> Your other two examples were exactly this shape. The rule: a block is narration if it's under 240 characters, has no heading/table/list/code, <em>and</em> isn't the last block of its exchange. The final block is always kept however short, because that's the answer rather than a step toward it.</p>
+<p><strong>200 narration blocks removed.</strong> That it was 200 of 240 is itself telling — most of what I emit between tool calls is progress commentary, useful live and worthless in a record.</p>
+<h4>Verified the substance survived</h4>
+<p>Rather than trust the counts, I checked the content directly:</p>
+<ul><li>All <strong>four</strong> <code>codex "Complete the task in …"</code> prompt blocks — the how-to-delegate material you wanted kept</li><li>The feasibility verdict ("mutually exclusive")</li><li>The code-quality assessment ("The code is good")</li><li>"Seven ported tests failed." — the R1 result</li><li>The 10,065-line harness finding, and the plan reconciliation</li><li>21 tables, 12 code blocks, zero broken anchors</li></ul>
+<p>And confirmed gone: "Building the scaffold now", "Documents are coherent", "All four pinned", plus any bare <code>proceed</code> prompt bubble.</p>
+<p>The document now reads as the instructions given to a coding agent and what came back, which is what you were after.</p></div>
+</section>
+<section class="turn user" id="p29">
+  <div class="who"><span class="badge u">Exchange 29</span><time>2026-08-30 02:46:13</time></div>
+  <div class="bubble"><p>much better now!</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Glad it landed right — dropping the narration was the bigger win of the two filters. 200 of 240 blocks being process commentary was more than I expected going in.</p>
+<p>Worth knowing: <strong>Codex has finished writing all four H3 files</strong> since we last looked, but hasn't committed them:</p>
+<pre class="code"><code>Telemetry.cs         416 lines   untracked
+GitIgnoreMatcher.cs  196 lines   untracked
+Skills.cs            677 lines   untracked
+AgentHarness.cs    1,300 lines   untracked</code></pre>
+<p>That's the full H3 implementation surface — 2,589 lines. No tests visible yet, and nothing committed, so it's either still mid-run or stopped before the test phase.</p>
+<p>I've left them untracked, as before. When it commits, I'll verify H3 the same way as H1 and H2 — gates, scope compliance, and whether the two prescribed hazards were honoured: the runtime schema validation from <code>translation-patterns §2.2</code>, and <code>GitIgnoreMatcher</code> handling negation and directory-only rules rather than taking a dependency.</p>
+<p>Just say the word when it's pushed.</p></div>
+</section>
+<section class="turn user" id="p30">
+  <div class="who"><span class="badge u">Exchange 30</span><time>2026-08-30 03:28:47</time></div>
+  <div class="bubble"><p>H3 is done, committed and pushed</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>H3 verified. CI green would have caught anything structural — and the <code>b213921</code> fix commit shows the gate did its job mid-run.</p>
+<h4>H3 landed well</h4>
+<div class="tw"><table><thead><tr><th></th><th>Before</th><th>After</th></tr></thead><tbody><tr><td>Suite total</td><td>536</td><td><strong>559</strong></td></tr><tr><td>Agent parity</td><td>64%</td><td><strong>72%</strong></td></tr><tr><td>Agent completeness</td><td>95%</td><td><strong>118%</strong></td></tr><tr><td>Telemetry parity</td><td>157%</td><td><strong>214%</strong></td></tr></tbody></table></div>
+<p>Both prescribed hazards were honoured properly:</p>
+<ul><li><strong>Runtime schema validation</strong> implemented and <em>tested</em> — <code>ArgumentException</code> on unknown span names, missing required attributes and wrong types, across five assertions. That's <code>translation-patterns §2.2</code> executed as written, and it closes the <code>Pi.Telemetry</code> gap left by T1.1.</li><li><strong><code>GitIgnoreMatcher</code></strong> handles negation (<code>!</code>) and directory-only rules, with two dedicated test cases covering exactly those, plus layered <code>.gitignore</code>/<code>.ignore</code>/<code>.fdignore</code>.</li></ul>
+<h4>One deviation — and Codex was right</h4>
+<p><strong>It did not add YamlDotNet.</strong> It wrote <code>ParseYamlFrontmatter</code> instead, and <code>Directory.Packages.props</code> is untouched. My packet explicitly told it to add the dependency.</p>
+<p>I checked whether that's a fidelity risk, and it isn't. Upstream's <code>SkillFrontmatter</code> reads exactly three fields — <code>name</code>, <code>description</code>, <code>disable-model-invocation</code> — all scalars. Pulling in a full YAML engine to extract three top-level keys would have contradicted <code>dependencies.md</code> Policy 4 ("prefer the base class library, every avoided dependency is avoided supply-chain surface") and Policy 5. The hand-rolled parser handles comments, block scalars, quoting and booleans, which covers the real surface.</p>
+<p><strong>So my packet was wrong again</strong> — same category as the H1 <code>[JsonExtensionData]</code> hazard. I read "upstream imports <code>yaml</code>" and prescribed a dependency without checking how much of YAML was actually used.</p>
+<p>The one legitimate criticism: <strong>it didn't report the deviation.</strong> <code>AGENTS.md</code> says to say so in the PR when the packet and the source disagree, and the packet's acceptance criteria asked for the §6 steps in the description. Silence here means I only found it by diffing. That's worth reinforcing in H4.</p>
+<h4>Wave 3 is complete except H4</h4>
+<p><code>agent-harness.ts</code> now exists, so <strong>wave 6 is unblocked</strong>. Remaining: <code>env/</code>, <code>tools/</code>, <code>utils/</code> — H4, whose <code>env/nodejs.ts</code> supplies the concrete <code>ExecutionEnv</code> that <code>create-harness.ts</code> needs.</p>
+<p>Want me to write H4, or update the packets with H3's status first?</p></div>
+</section>
+<section class="turn user" id="p31">
+  <div class="who"><span class="badge u">Exchange 31</span><time>2026-08-30 03:33:17</time></div>
+  <div class="bubble"><p>write H4</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>H4 written and pushed as <code>6af4abf</code>.</p>
+<h4>The prompt</h4>
+<pre class="code" data-lang="bash"><code>codex "Complete the task in ÍmplementationKit/packets/H4-harness-env-tools-utils.md. Read AGENTS.md and docs/translation-patterns.md first. The TypeScript in reference/pi is the specification and is read-only. The frozen paths listed in the packet must not be modified — stop and report instead. If you override any instruction in the packet, say so in the PR. The upstream tests ship in the same PR as the implementation."</code></pre>
+<h4>H3 verified first</h4>
+<p><strong>559 tests</strong>, agent at 72% parity / 118% completeness, telemetry up to 214%. Both prescribed hazards honoured — runtime schema validation throws and is tested, <code>GitIgnoreMatcher</code> covers negation and directory-only rules.</p>
+<p><strong>And my YamlDotNet instruction was wrong.</strong> Upstream's <code>SkillFrontmatter</code> reads three scalar fields. Adding a full YAML engine to extract three top-level keys contradicts the dependency policy's own preference for the BCL. Codex hand-rolled the parser and left <code>Directory.Packages.props</code> untouched — the better call. I'd prescribed from seeing <code>import { parse } from "yaml"</code> without checking how much was consumed. Same failure mode as H1's <code>[JsonExtensionData]</code>.</p>
+<p>That's twice now, so in H4 I deliberately <strong>did not prescribe</strong> the diff dependency. <code>edit-diff.ts</code> uses only <code>diffLines</code> and <code>createTwoFilesPatch</code>. I've split the risk instead: the line diff is the safe half where DiffPlex may fit, the unified-patch <em>formatting</em> is the risky half because that output is user-visible — and hand-writing a well-specified text format is likely easier than bending a library's formatter. Either way it needs a golden test against the TypeScript output.</p>
+<h4>Two other things in H4</h4>
+<p><strong>A sanctioned rename.</strong> <code>NodeExecutionEnv</code> → <code>SystemExecutionEnv</code>. There's no Node here and the name would mislead. <code>AGENTS.md</code> says mirror upstream naming, so this is called out as the packet's one deliberate deviation.</p>
+<p><strong>A process note.</strong> Both wrong hazards were correctly overridden — and both times <em>silently</em>, found only by diffing. H4 asks explicitly for deviations to be stated in the PR.</p>
+<h4>After H4</h4>
+<p>Wave 3 is complete and the <code>H</code>-series ends. Work resumes on the numbered plan: <strong>wave 5 (<code>Pi.Tui</code>)</strong>, at 10% implementation and 2% test parity — the largest remaining gap, and the one whose T5.2 diff renderer <code>tui-strategy.md</code> rates as <em>not delegable as a single packet</em>.</p></div>
+</section>
+<section class="turn user" id="p32">
+  <div class="who"><span class="badge u">Exchange 32</span><time>2026-08-30 05:30:06</time></div>
+  <div class="bubble"><p>H4 is done by Codex.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>H4 delivered, and <strong>wave 3 is essentially complete</strong>.</p>
+<div class="tw"><table><thead><tr><th></th><th>Before</th><th>After</th></tr></thead><tbody><tr><td>Suite total</td><td>559</td><td><strong>629</strong></td></tr><tr><td>Agent parity</td><td>72%</td><td><strong>103%</strong></td></tr><tr><td>Agent completeness</td><td>118%</td><td><strong>150%</strong></td></tr></tbody></table></div>
+<h4>All four hazards clean</h4>
+<ul><li><strong>Diff dependency</strong> — no package added; hand-written, with a <strong>real golden test</strong> covering exactly the scenarios I specified: pure insertion, pure deletion, adjacent hunks merged at <code>context = 4</code>. It took the route I flagged as likely easier for the formatting half, and proved it rather than asserting it.</li><li><strong><code>SystemExecutionEnv</code></strong> — the rename was honoured, and it's <strong>118 <code>Result&lt;&gt;</code> returns with zero bare throws</strong>. The result-not-exception contract matters because every caller's control flow depends on it.</li><li><strong>Truncation constants</strong> — 2000 / 50×1024 / 500, exact.</li><li><strong>CRLF and BOM</strong> — explicitly tested.</li></ul>
+<h4>It also caught an omission in my packet</h4>
+<p><code>Utils/PromptTemplates.cs</code> isn't in my source list — but <code>harness/prompt-templates.ts</code> <strong>does exist upstream</strong> and I missed it. Codex found and ported it, along with its 5 test cases. That's the third defect in my packets, though the mildest: an incomplete inventory rather than a wrong instruction.</p>
+<h4>Two genuinely unported pieces remain</h4>
+<p>Not H4's fault — neither was ever assigned to any packet:</p>
+<div class="tw"><table><thead><tr><th></th><th>LOC</th><th>Tests</th></tr></thead><tbody><tr><td><code>proxy.ts</code></td><td>370</td><td>1</td></tr><tr><td><code>harness/system-prompt.ts</code></td><td>34</td><td>3</td></tr></tbody></table></div>
+<p><code>search/</code> is covered (<code>Session/Search.cs</code>). So ~404 LOC and 4 cases outstanding — small enough to fold into the next packet rather than justify an H5.</p>
+<h4>Where that leaves things</h4>
+<p><code>pi-agent-core</code> is done to a genuinely high standard: 103% test parity against upstream's own suite, every hazard verified. Wave 6 has a complete foundation — <code>AgentHarness</code>, <code>SystemExecutionEnv</code>, session, compaction, reducer, skills, tools.</p>
+<p>The <code>H</code>-series ends here, as planned. Next is <strong>wave 5 (<code>Pi.Tui</code>)</strong> at 10% implementation and 2% parity — the largest remaining gap, and the one where <code>tui-strategy.md</code> rates T5.2 (the differential renderer) as <em>not delegable as a single packet</em>.</p>
+<p>Want me to write the wave 5 packets, with the <code>proxy.ts</code> and <code>system-prompt.ts</code> remainder folded in as a small first item?</p></div>
+</section>
+<section class="turn user" id="p33">
+  <div class="who"><span class="badge u">Exchange 33</span><time>2026-08-30 05:52:12</time></div>
+  <div class="bubble"><p>write prompt for Codex</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>T5.4 written and pushed as <code>bbf9942</code>.</p>
+<h4>The prompt</h4>
+<pre class="code" data-lang="bash"><code>codex "Complete the task in ÍmplementationKit/packets/T5.4-tui-text-measurement.md. Read AGENTS.md and docs/translation-patterns.md first. The TypeScript in reference/pi is the specification and is read-only. Replacing the width placeholder may break existing Pi.Tui tests — that is a finding, not a regression: fix the test to match upstream, not the implementation to match the test, and explain each one in the PR. If you override any packet instruction, say so. The upstream tests ship in the same PR as the implementation."</code></pre>
+<h4>H4 closed out wave 3 cleanly</h4>
+<p>Agent parity <strong>72% → 103%</strong> of upstream's own suite, completeness 118% → 150%, 629 tests, zero skips. All four hazards honoured — no diff dependency added, with a real golden test covering insertion, deletion and adjacent hunks at context four; <code>SystemExecutionEnv</code> with <strong>118 <code>Result&lt;&gt;</code> returns and zero bare throws</strong>; exact truncation constants; CRLF and BOM tested.</p>
+<p>It also ported <code>harness/prompt-templates.ts</code>, which <strong>my source list omitted</strong>. Third packet defect on my side, mildest kind.</p>
+<h4>T5.4 isn't really a port</h4>
+<p>Investigating it turned up something worth knowing. <code>Pi.Tui</code>'s existing 1,723 lines of layout and differential renderer are built on this:</p>
+<pre class="code" data-lang="csharp"><code>internal static int VisibleWidth(string line) =&gt;
+    line.Replace(TuiConstants.CursorMarker, "", StringComparison.Ordinal).Length;</code></pre>
+<p><code>string.Length</code> — UTF-16 code units. No ANSI stripping, no grapheme segmentation, no East-Asian width. <code>Pi.Tui</code> contains no <code>StringInfo</code>, <code>Rune</code> or <code>TextElement</code> anywhere. Since essentially all of Pi's output is styled, <strong>escape sequences are being counted as visible characters</strong> on nearly every real line.</p>
+<p>So every layout decision made so far rests on a placeholder. That's why measurement precedes the editor, images and the rest of wave 5.</p>
+<p>Upstream states the consequence precisely, in a regression test:</p>
+<p>&gt; During streaming, "🇨🇳" often appears as an intermediate "🇨" first. If "🇨" is measured as width 1 while the terminal renders it as width 2, differential rendering can drift and leave stale characters on screen.</p>
+<p>The packet warns that replacing the placeholder <strong>may break existing <code>Pi.Tui</code> tests</strong>, and frames that correctly: those tests were written against a naive width model, so the test changes to match upstream — not the reverse.</p>
+<p>It also folds in <code>proxy.ts</code> and <code>harness/system-prompt.ts</code> — 404 lines, 4 cases, never assigned to any packet and the last of <code>pi-agent-core</code>. Fenced off as a clearly separate objective so it doesn't muddy the TUI work.</p></div>
+</section>
 
 </main></div>
 <footer><div class="wrap">
 <p style="margin:0 0 6px"><b>Session transcript exported from Claude Code.</b> Prompts and responses only — tool calls, tool results and internal reasoning are excluded as intermediate working detail.</p>
-<p style="margin:0 0 6px">This is a curated record, not a complete one. Bare continuations such as “proceed” are folded into the preceding exchange, keeping the work they triggered without the empty prompt. Short progress narration between tool calls is dropped. A further 6 exchanges were omitted as routine housekeeping.</p>
-<p style="margin:0">Generated 2026-08-30 · 74 entries from 2,515 transcript records.</p>
+<p style="margin:0 0 6px">This is a curated record, not a complete one. Bare continuations such as “proceed” are folded into the preceding exchange, keeping the work they triggered without the empty prompt. Short progress narration between tool calls is dropped. A further 5 exchanges were omitted as routine housekeeping.</p>
+<p style="margin:0">Generated 2026-08-30 · 86 entries from 2,039 transcript records.</p>
 </div></footer>
 </body></html>
