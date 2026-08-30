@@ -56,8 +56,8 @@ footer{border-top:1px solid var(--line);background:var(--panel);padding:26px 0 4
 <div class="meta">
 <div>Dates<b>29–30 August 2026</b></div>
 <div>Project<b>C:\MyProjects\PiCSharp</b></div>
-<div>Exchanges<b>42</b></div>
-<div>Responses<b>67</b></div>
+<div>Exchanges<b>45</b></div>
+<div>Responses<b>72</b></div>
 <div>Model<b>Claude Opus 5</b></div>
 </div></div></header>
 <div class="shell">
@@ -104,6 +104,9 @@ footer{border-top:1px solid var(--line);background:var(--panel);padding:26px 0 4
 <a href="#p40"><span class="n">40</span>Update ClaudeSession.html and push</a>
 <a href="#p41"><span class="n">41</span>T5.6 is done.</a>
 <a href="#p42"><span class="n">42</span>1 — Why this packet is now unblocked</a>
+<a href="#p43"><span class="n">43</span>Update ClaudeSession.html and push</a>
+<a href="#p44"><span class="n">44</span>T5.2b is done.</a>
+<a href="#p45"><span class="n">45</span>yes, proceed — Why this file, and why now</a>
 </nav>
 <main>
 <section class="turn user" id="p1">
@@ -1142,11 +1145,70 @@ AgentHarness.cs    1,300 lines   untracked</code></pre>
 <p><strong>One correction to the record.</strong> T5.3a's packet claimed <code>Component.WantsKeyRelease</code> was "already in <code>Pi.Tui</code>". It wasn't, and isn't — <code>IComponent</code> is a two-member subset of upstream's four-member <code>Component</code>, missing both optional members. They arrive in T5.2b with <code>tui.ts</code>, their only consumer. I've struck the claim in T5.3a and made completing the interface an acceptance criterion here.</p>
 <p>Also worth knowing for sequencing: the 5 cases in <code>tui-cell-size-input</code>, <code>tui-overlay-style-leak</code> and <code>tui-shrink</code> target <code>tui-main-screen.ts</code> (654 LOC), a separate file — so scope stays at exactly 48. After this lands, <code>select-list.ts</code> (229 LOC, 5 cases) unblocks, and then T5.3b <code>components/editor.ts</code> — the 2,363-LOC, 185-case file this whole chain has been clearing the way for.</p></div>
 </section>
+<section class="turn user" id="p43">
+  <div class="who"><span class="badge u">Exchange 43</span><time>2026-08-30 10:53:59</time></div>
+  <div class="bubble"><p>Update ClaudeSession.html and push</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Pushed as <code>516ee86</code>. <strong>42 exchanges, 67 responses, 163 KB.</strong></p>
+<p>The update surfaced a real defect in the exporter rather than just adding new turns. This session was continued twice — once after a usage limit, once after a context limit — and both times the harness inserts a message that looks like a user prompt. The exporter treated them as such, which inverted the record:</p>
+<div class="tw"><table><thead><tr><th></th><th>before</th><th>after</th></tr></thead><tbody><tr><td>41</td><td><em>"I hit my usage limit…"</em></td><td><strong>T5.6 is done.</strong></td></tr><tr><td>42</td><td><em>"This session is being continued…"</em></td><td><strong>1 — Why this packet is now unblocked</strong></td></tr></tbody></table></div>
+<p>So the T5.6 verification and the entire T5.2b investigation were filed under text you never wrote, while your actual prompts were discarded — <code>"T5.6 is done."</code> and <code>"1"</code> got dropped as insubstantive precisely <em>because</em> the usage limit had truncated their replies, leaving the work stranded under the resumption message that followed.</p>
+<p>Both harness messages now fold into the preceding exchange the way <code>"proceed"</code> already did, carrying their replies with them. That's the same fix shape as the bare-continuation rule, applied to a case I hadn't anticipated.</p>
+<p>One smaller thing: a prompt like <code>"1"</code> is useless in the contents list on its own, so short prompts now borrow the reply's first heading or bold lead-in. Hence <code>1 — Why this packet is now unblocked</code>.</p>
+<p>The export also shrank slightly despite gaining content — the continuation summary was several KB of text being dumped verbatim into the page as a prompt bubble.</p>
+<p>Worth noting for next time: the transcript auto-location logic held up. This session forked to a new <code>.jsonl</code>, but the fork retained full history, so picking the most recent file containing the original brief followed it correctly — I verified that by probing for markers from both ends of the session before running the export, rather than trusting it.</p></div>
+</section>
+<section class="turn user" id="p44">
+  <div class="who"><span class="badge u">Exchange 44</span><time>2026-08-30 11:44:46</time></div>
+  <div class="bubble"><p>T5.2b is done.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Upstream's <code>waitForRender</code> is itself a fixed 20 ms — reliable there only because Node is single-threaded. But <code>Expected: 0, Actual: 1</code> means a full redraw actually happened, which a slow wait wouldn't cause. Let me check how Termux is detected.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p><strong>My packet was wrong.</strong> All 27 cases in <code>tui-render.test.ts</code> instantiate <code>TuiMainScreen</code> — from <code>src/tui-main-screen.ts</code>, which I explicitly declared out of scope. That single error explains everything I've found. Let me check the other flake before deciding the remedy.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>T5.2b is in, but it needed real repair. <strong>958 tests, 0 failed, 9 skipped</strong>; tui parity 32% → 38%, completeness 42% → 58%.</p>
+<h4>The root cause was my packet, not the delivery</h4>
+<p>All 27 cases in <code>tui-render.test.ts</code> construct <code>TuiMainScreen</code> from <code>src/tui-main-screen.ts</code> — the file I explicitly declared <strong>out of scope</strong>. <code>tui.ts</code> has no upstream suite of its own; it's exercised <em>through</em> <code>TuiMainScreen</code>. Demanding "all 48 cases" while forbidding the file under test was contradictory, and every problem below follows from it:</p>
+<ul><li>20 cases were ported against <code>TestTui</code>, a <code>TuiBase</code> subclass <strong>living in the test project</strong> that reimplements <code>tui-main-screen.ts</code> behaviour. Real coverage of the render loop, but nothing in <code>src/</code> yet provides a concrete TUI.</li><li>The 7 Kitty image cases were dropped — genuinely unportable against a stubbed seam.</li><li>One case asserted <code>TestTui</code>'s own copy of <code>isTermuxSession()</code>, i.e. a test double, not shipped code.</li></ul>
+<h4>Two flakes, found by running the suite twelve times</h4>
+<p>The first full run failed; four reruns passed. That pattern is worth chasing rather than shrugging at — <strong>two of five</strong> runs failed once I looked properly.</p>
+<div class="tw"><table><thead><tr><th>Flake</th><th>Cause</th></tr></thead><tbody><tr><td><code>skips full re-render…in Termux</code></td><td>Asserts a <em>negative</em> while <code>DoRender</code> reads <code>TERMUX_VERSION</code> from the render thread and the test thread mutates it</td></tr><tr><td>29 × <code>WaitForRenderAsync</code></td><td>Fixed 200 ms sleep; cold-start frames land late</td></tr></tbody></table></div>
+<p>Upstream's own helper is a fixed 20 ms — reliable there only because Node renders on a single-threaded event loop. In .NET that assumption doesn't survive, so I replaced it with a wait that returns once writes stop arriving and extends itself under load. Twelve consecutive clean runs now.</p>
+<h4>A gate was contradicting itself</h4>
+<p><code>tools/test-parity.sh</code> counted <code>[Fact]</code> attributes regardless of <code>Skip</code>. So adding an empty skipped stub <em>raised</em> the parity score while the skip audit <em>penalised</em> it — and my own fix for the missing Kitty cases would have inflated tui by 7 phantom cases. Skips no longer count as coverage; tui drops from an inflated 334 to a real 325.</p>
+<p>Also fixed: the parity floor wasn't raised (an explicit criterion). Verified clean: frozen paths, no P/Invoke, both seams, the <code>IComponent</code> completion, and <code>IsImageLine</code> — all exactly as specified.</p>
+<p>Two things I did <strong>not</strong> fix. <code>Merges_escape_and_carriage_return_within_larger_timeout</code> (T5.3a) needs a wait strictly between 10 ms and 100 ms and fails rarely under load; a faithful fix means injecting a time source into <code>StdinBuffer</code>, which deserves its own packet. And three unrelated commits arrived with this work — README polish and two SVGs — outside the packet entirely; harmless, but nobody asked for them.</p>
+<p>Seven packets running, the PR text has still never named an omission or override. The diff has caught every one.</p>
+<p>The next packet is now clearly determined: <strong><code>tui-main-screen.ts</code></strong> (654 LOC), which re-points the 20 <code>TestTui</code> cases at a real class, reclaims the Termux case, and gives <code>src/</code> its first concrete TUI. Want me to write it?</p></div>
+</section>
+<section class="turn user" id="p45">
+  <div class="who"><span class="badge u">Exchange 45</span><time>2026-08-30 12:09:48</time></div>
+  <div class="bubble"><p>yes, proceed</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Pushed as <code>62757e9</code>. Here's the prompt for Codex:</p>
+<pre class="code" data-lang="bash"><code>codex "Read ÍmplementationKit/packets/T5.2c-tui-main-screen.md and implement it. Port tui-main-screen.ts (654 LOC) and get all 99 cases passing. Twenty tui-render cases already exist against TestTui in the test project - re-point them at the real class rather than duplicating, and strip TestTui of product logic. Sixty-nine are overlay cases that will test tui.ts overlay code for the first time; treat any failure there as a T5.2b defect, report it, and fix it in a separate commit. Run the full suite at least three times. Name in the PR anything you do not deliver or any instruction you override."</code></pre>
+<p><strong>Why this file, and why now.</strong> <code>src/</code> still has no concrete TUI — <code>TuiBase.DoRender</code> is abstract and the only subclass in the repo is <code>TestTui</code>, sitting in the test project. That's the direct fallout from T5.2b's mis-scope, and it stays broken until this lands.</p>
+<p>It's also the highest-leverage file left in wave 5. Twelve upstream test files construct <code>TuiMainScreen</code>, ~380 cases in total. This packet claims 99:</p>
+<div class="tw"><table><thead><tr><th>Source</th><th>Cases</th></tr></thead><tbody><tr><td><code>tui-render</code> (20 re-pointed, 1 un-skipped, 7 left for T5.5)</td><td>21</td></tr><tr><td><code>overlay-non-capturing</code> + <code>overlay-options</code> + <code>overlay-short-content</code></td><td>69</td></tr><tr><td><code>tab-width</code>, <code>cell-size-input</code>, <code>overlay-style-leak</code>, <code>shrink</code></td><td>9</td></tr></tbody></table></div>
+<p><strong>The overlay cases are the real prize.</strong> <code>tui.ts</code>'s overlay implementation — anchors, margins, percentage sizing, <code>OverlayHandle</code> — shipped in T5.2b with <em>zero</em> upstream coverage, because everything that covers it goes through the main screen. So I've told Codex to expect failures there and treat them as T5.2b defects: report with the upstream expectation, fix in a separate commit. That's the difference between finding a bug and papering over one.</p>
+<p>Two things I verified rather than assumed, having been burned once. The 7 Kitty cases genuinely need <code>renderImage</code> from <code>components/image.ts</code> — the protocol encoder — so they correctly stay with T5.5. But <code>deleteKittyImage</code>, which <code>tui-main-screen.ts</code> does need, is a one-line escape string and needs none of it. And every candidate test file except <code>terminal-colors</code> (which imports the package barrel) depends only on already-ported code plus this one file — that's what made a 99-case packet possible instead of a 25-case one.</p>
+<p>I also carried forward the two process lessons: don't re-read <code>TERMUX_VERSION</code> per render from the render thread (second flake in this package traced to Node's single-threaded assumptions), and <strong>run the suite three times</strong> — a single green run doesn't establish stability, which is exactly how both flakes got in.</p></div>
+</section>
 
 </main></div>
 <footer><div class="wrap">
 <p style="margin:0 0 6px"><b>Session transcript exported from Claude Code.</b> Prompts and responses only — tool calls, tool results and internal reasoning are excluded as intermediate working detail.</p>
 <p style="margin:0 0 6px">This is a curated record, not a complete one. Bare continuations such as “proceed” are folded into the preceding exchange, keeping the work they triggered without the empty prompt. Short progress narration between tool calls is dropped. A further 5 exchanges were omitted as routine housekeeping.</p>
-<p style="margin:0">Generated 2026-08-30 · 109 entries from 2,596 transcript records.</p>
+<p style="margin:0">Generated 2026-08-30 · 117 entries from 3,035 transcript records.</p>
 </div></footer>
 </body></html>
