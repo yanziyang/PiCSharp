@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="460" viewBox="0 0 1600 460" role="img" aria-labelledby="title desc">
+  <title id="title">PiCSharp</title>
+  <desc id="desc">A native .NET 10 port of the Pi Coding Agent</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b1020"/>
+      <stop offset="0.55" stop-color="#111b36"/>
+      <stop offset="1" stop-color="#152d49"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#6ee7f9"/>
+      <stop offset="1" stop-color="#8b7cff"/>
+    </linearGradient>
+    <linearGradient id="terminal" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#182642"/>
+      <stop offset="1" stop-color="#0b1428"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <pattern id="grid" width="36" height="36" patternUnits="userSpaceOnUse">
+      <path d="M 36 0 L 0 0 0 36" fill="none" stroke="#7dd3fc" stroke-opacity="0.055" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <rect width="1600" height="460" rx="28" fill="url(#background)"/>
+  <rect x="1" y="1" width="1598" height="458" rx="27" fill="url(#grid)" stroke="#6ee7f9" stroke-opacity="0.18"/>
+
+  <circle cx="1300" cy="-30" r="270" fill="#6ee7f9" fill-opacity="0.06"/>
+  <circle cx="1470" cy="410" r="250" fill="#8b7cff" fill-opacity="0.07"/>
+  <path d="M 1020 40 C 1190 120, 1260 20, 1435 110 S 1650 200, 1710 140" fill="none" stroke="#6ee7f9" stroke-opacity="0.13" stroke-width="2"/>
+  <path d="M 1080 390 C 1230 300, 1300 420, 1460 335 S 1640 290, 1690 340" fill="none" stroke="#8b7cff" stroke-opacity="0.14" stroke-width="2"/>
+
+  <g transform="translate(105 92)">
+    <rect width="238" height="34" rx="17" fill="#6ee7f9" fill-opacity="0.11" stroke="#6ee7f9" stroke-opacity="0.42"/>
+    <circle cx="23" cy="17" r="5" fill="#6ee7f9" filter="url(#glow)"/>
+    <text x="40" y="22" fill="#b9f5ff" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="14" font-weight="700" letter-spacing="2">NATIVE .NET 10 PORT</text>
+  </g>
+
+  <text x="100" y="222" fill="#f7fbff" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="84" font-weight="750" letter-spacing="-3">PiCSharp</text>
+  <rect x="105" y="248" width="365" height="5" rx="2.5" fill="url(#accent)"/>
+  <text x="105" y="300" fill="#b8c8df" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="24" font-weight="400">A compatibility-first port of the Pi Coding Agent</text>
+  <text x="105" y="342" fill="#7f96b5" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="17" letter-spacing="1.2">PROTOCOL  ·  AGENT RUNTIME  ·  AI PROVIDERS  ·  TERMINAL UI</text>
+
+  <g transform="translate(900 80)">
+    <rect x="0" y="0" width="570" height="300" rx="18" fill="#07101f" fill-opacity="0.82" stroke="#6ee7f9" stroke-opacity="0.28"/>
+    <rect x="0" y="0" width="570" height="48" rx="18" fill="url(#terminal)"/>
+    <path d="M 0 48 H 570" stroke="#6ee7f9" stroke-opacity="0.16"/>
+    <circle cx="28" cy="24" r="6" fill="#ff7d8f"/>
+    <circle cx="50" cy="24" r="6" fill="#ffd166"/>
+    <circle cx="72" cy="24" r="6" fill="#65e6a5"/>
+    <text x="105" y="29" fill="#7890ad" font-family="Consolas, Menlo, monospace" font-size="14">pi-csharp / terminal</text>
+
+    <g font-family="Consolas, Menlo, monospace" font-size="17">
+      <text x="34" y="92" fill="#6ee7f9">$</text>
+      <text x="55" y="92" fill="#e6efff">dotnet run --project src/Pi.Cli</text>
+      <text x="34" y="132" fill="#8b7cff">&gt;</text>
+      <text x="55" y="132" fill="#c9d6e9">agent loop ready</text>
+      <text x="34" y="172" fill="#65e6a5">✓</text>
+      <text x="55" y="172" fill="#c9d6e9">wire protocol connected</text>
+      <text x="34" y="212" fill="#ffd166">·</text>
+      <text x="55" y="212" fill="#c9d6e9">native terminal UI</text>
+      <rect x="55" y="248" width="11" height="22" rx="2" fill="#6ee7f9" opacity="0.9"/>
+    </g>
+  </g>
+
+  <g transform="translate(770 226)" fill="none" stroke="url(#accent)" stroke-width="2" opacity="0.82">
+    <circle cx="0" cy="0" r="8" fill="#6ee7f9" stroke="none" filter="url(#glow)"/>
+    <path d="M 10 0 H 112"/>
+    <path d="M 103 -7 L 114 0 L 103 7"/>
+  </g>
+</svg>

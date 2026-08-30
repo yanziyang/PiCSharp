@@ -1,58 +1,60 @@
 # PiCSharp
 
-PiCSharp is a native C# / .NET 10 port of the [Pi Coding Agent](https://pi.dev/). It targets
-near-complete compatibility with the upstream Pi ecosystem, including its protocol, agent runtime,
-AI provider adapters, terminal UI contracts, and—once the port is complete—its extension surface.
+![PiCSharp — a native .NET 10 port of the Pi Coding Agent](docs/pi-csharp-banner.svg)
 
-This repository is an active port and is not feature-complete. The `pi` executable is currently a
-scaffold; the implementation is being delivered in compatibility-focused milestones. The
-TypeScript source under [`reference/pi`](reference/pi) is the read-only behavioral specification.
+PiCSharp is a compatibility-first, native C# / .NET 10 port of the [Pi Coding Agent](https://pi.dev/).
+It is designed to bring Pi's protocol, agent runtime, provider integrations, terminal UI, and
+eventual extension model to the .NET ecosystem without introducing a Node.js runtime dependency.
+
+> **Status:** active migration, pinned to upstream Pi **v0.84.4**. The compatibility surface is
+> delivered in focused milestones; the `pi` executable and several high-level features are still
+> under construction.
+
+## What is here
+
+The repository currently contains the following delivered foundations:
+
+- **Wire-compatible protocol** — schemas, CBOR framing, client/server messaging, and session leases.
+- **Agent runtime** — stateful agent-loop orchestration with deterministic faux-provider support.
+- **AI provider layer** — shared abstractions plus authentication, HTTP/SSE transport, and adapters
+  for Anthropic, OpenAI, Google Generative AI, Mistral, and Amazon Bedrock.
+- **Terminal UI foundation** — layout/container contracts, text measurement, key input, autocomplete,
+  bounded terminal output, and differential rendering.
+- **Compatibility documentation** — translation patterns, dependency decisions, session format,
+  extension API boundaries, and delegation packets for the remaining work.
+
+The remaining high-risk areas include the complete coding-agent tool surface, interactive editor and
+CLI modes, terminal images, and the redesigned extension host. Treat the milestone status and tests
+as the source of truth for what is usable today.
+
+## Architecture at a glance
+
+```text
+Pi CLI / Coding Agent
+          |
+          v
+     Pi.AgentCore  <---- Pi.Ai ---->  Provider adapters
+          |
+          +-------- Pi.Protocol --------+
+          |                             |
+       Pi.Client                    Pi.Server
+          |
+          v
+       Pi.Tui  ---->  terminal output / input
+```
+
+The TypeScript source in [`reference/pi`](reference/pi) is the pinned, read-only behavioral
+specification. C# names follow .NET conventions, while serialized names, protocol bytes, defaults,
+ordering, and observable behavior remain compatible with upstream.
 
 ## Upstream reference
 
 - Home page: [pi.dev](https://pi.dev/)
 - Source repository: [earendil-works/pi](https://github.com/earendil-works/pi)
-- Pinned upstream release: **v0.84.4**
+- Pinned release: **v0.84.4**
 - Pinned commit: [`b79e4cc834970cca69daebffab7df1da7d1e52c4`](reference/PINNED)
 
-The pinned reference is a Git submodule. Do not update it as part of an ordinary port milestone.
-
-## Current implementation status
-
-The following compatibility layers are currently implemented and covered by deterministic tests:
-
-- `Pi.Protocol` — protocol schemas, CBOR framing, and wire-compatible message handling.
-- `Pi.Telemetry` — runtime telemetry and memory recording.
-- `Pi.Ai.Abstractions` — provider-neutral model, request, response, and event contracts.
-- `Pi.Ai.Testing` — deterministic faux provider for tests without API calls or token spend.
-- `Pi.Ai` — authentication, model/runtime helpers, HTTP/SSE transport, and adapters for Anthropic,
-  OpenAI Chat Completions, OpenAI Responses, Google Generative AI, Mistral, and Amazon Bedrock.
-- `Pi.AgentCore` — agent-loop orchestration and stateful runtime behavior.
-- `Pi.Client` — protocol client and session leases.
-- `Pi.Server` — protocol server, live-session dispatch, ownership, and attachment behavior.
-- `Pi.Tui` — layout/container contracts, viewport geometry, bounded terminal output, and the first
-  differential-renderer core.
-
-The remaining high-risk work includes the complete terminal adapter, editor and keybinding surface,
-grapheme/East-Asian width handling, terminal images, autocomplete/search, the coding-agent tools and
-interactive UI, CLI modes, and the redesigned extension host. Compatibility should therefore be
-judged against the implemented milestone rather than assumed from the project name.
-
-## Repository layout
-
-| Path | Purpose |
-| --- | --- |
-| `src/Pi.Protocol` | Wire protocol and framing |
-| `src/Pi.Ai*` | AI contracts, providers, and deterministic test support |
-| `src/Pi.AgentCore` | Agent runtime |
-| `src/Pi.Client` / `src/Pi.Server` | Protocol client/server surfaces |
-| `src/Pi.Tui` | Terminal UI foundations and renderer work |
-| `src/Pi.CodingAgent` | Coding-agent integration target |
-| `src/Pi.Cli` | `pi` executable target; currently scaffolded |
-| `tests` | Ported and conformance-oriented xUnit tests |
-| `reference/pi` | Pinned, read-only TypeScript specification |
-| `docs` | Architecture, compatibility, dependency, and testing decisions |
-| `ÍmplementationKit` | Delegation packets and implementation guidance |
+The upstream reference is a Git submodule. Do not update it as part of an ordinary port milestone.
 
 ## Requirements
 
@@ -60,54 +62,80 @@ judged against the implemented milestone rather than assumed from the project na
 - .NET SDK `10.0.303` or a compatible later feature-band SDK
 - Git with submodule support
 
-## Build and test
+## Quick start
 
-Clone the repository with its upstream specification:
+Clone the repository together with its upstream specification:
 
-```text
+```bash
 git clone --recurse-submodules https://github.com/yanziyang/PiCSharp.git
 cd PiCSharp
 ```
 
 Build the solution:
 
-```text
+```bash
 dotnet build PiCSharp.slnx
 ```
 
-Run the complete non-E2E suite:
+Run the non-E2E test suite:
 
-```text
+```bash
 dotnet test PiCSharp.slnx -- --filter-not-trait "Category=E2E"
 ```
 
-Run one project:
+Run the TUI tests only:
 
-```text
+```bash
 dotnet test tests/Pi.Tui.Tests
 ```
 
-Verify formatting:
+Verify formatting before submitting a change:
 
-```text
+```bash
 dotnet format PiCSharp.slnx --verify-no-changes
 ```
 
 E2E tests that require provider credentials are intentionally excluded from the normal verification
-command. The test suite uses the faux provider for agent-loop coverage and never calls real provider
-APIs.
+command. Agent-loop tests use the deterministic faux provider and never call real provider APIs or
+spend tokens.
 
-## Porting rules
+## Repository map
 
-Porting is deliberately behavior-first:
+| Path | Responsibility |
+| --- | --- |
+| `src/Pi.Protocol` | Protocol schemas, CBOR framing, and wire compatibility |
+| `src/Pi.Ai.Abstractions` | Provider-neutral model, request, response, and event contracts |
+| `src/Pi.Ai` / `src/Pi.Ai.Testing` | Provider integrations and deterministic test support |
+| `src/Pi.AgentCore` | Stateful agent-loop runtime |
+| `src/Pi.Client` / `src/Pi.Server` | Protocol client/server surfaces and session ownership |
+| `src/Pi.Tui` | Terminal UI primitives, input, layout, and rendering |
+| `src/Pi.CodingAgent` | Coding-agent integration target |
+| `src/Pi.Cli` | `pi` executable target; currently scaffolded |
+| `tests` | Ported upstream and conformance-oriented xUnit tests |
+| `reference/pi` | Pinned, read-only TypeScript specification |
+| `docs` | Architecture, compatibility, dependency, and testing decisions |
+| `ÍmplementationKit` | Delegation packets and implementation guidance |
 
-1. Read the matching TypeScript source and upstream tests before changing C# code.
-2. Preserve wire names, defaults, ordering, error behavior, and JavaScript-visible semantics.
-3. Keep the TypeScript reference read-only and do not introduce Node.js into the shipping product.
-4. Keep changes within the packet's target paths and commit each milestone independently.
+## Porting principles
+
+PiCSharp follows a behavior-first migration model:
+
+1. Read the matching upstream TypeScript source and tests before changing C# code.
+2. Preserve protocol bytes, wire names, defaults, ordering, and error behavior.
+3. Keep the reference submodule read-only and keep Node.js out of the shipping product.
+4. Port upstream tests with their implementation; use golden or differential tests for observable
+   terminal, stream, and wire output where appropriate.
+5. Keep each milestone within its packet scope and document any deliberate compatibility seam or
+   behavior that cannot be reproduced faithfully.
 
 See [`AGENTS.md`](AGENTS.md), [`docs/translation-patterns.md`](docs/translation-patterns.md), and
-the design documents under [`docs`](docs) for the detailed contribution contract.
+the design documents under [`docs`](docs) for the complete contribution contract.
+
+## Contributing
+
+Before starting a milestone, read its packet in `ÍmplementationKit/packets/` and confirm the target
+paths and frozen paths. Keep commits focused, run the required build, tests, and formatting checks,
+and describe any upstream behavior that remains intentionally deferred.
 
 ## License
 
