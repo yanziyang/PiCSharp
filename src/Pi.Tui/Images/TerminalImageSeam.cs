@@ -31,6 +31,15 @@ public interface ITerminalImageSeam
 
     /// <summary>Stores the pixel dimensions reported for one terminal cell.</summary>
     void SetCellDimensions(CellDimensions dimensions);
+
+    /// <summary>Returns the last terminal cell dimensions supplied to the seam.</summary>
+    CellDimensions GetCellDimensions();
+
+    /// <summary>Clears cached terminal capabilities.</summary>
+    void ResetCapabilitiesCache();
+
+    /// <summary>Overrides cached terminal capabilities for deterministic tests.</summary>
+    void SetCapabilities(TerminalCapabilities capabilities);
 }
 
 /// <summary>Default T5.2b image seam with image support deliberately disabled.</summary>
@@ -38,18 +47,20 @@ public sealed class NoImageTerminalImageSeam : ITerminalImageSeam
 {
     private readonly object _gate = new();
     private CellDimensions _cellDimensions = new(9, 18);
+    private TerminalCapabilities? _capabilities;
 
     /// <inheritdoc />
-    public TerminalCapabilities GetCapabilities() => new(null, false, false);
+    public TerminalCapabilities GetCapabilities()
+    {
+        lock (_gate)
+        {
+            return _capabilities ?? new TerminalCapabilities(null, false, false);
+        }
+    }
 
     /// <inheritdoc />
     public void SetCellDimensions(CellDimensions dimensions)
     {
-        if (dimensions.WidthPx <= 0 || dimensions.HeightPx <= 0)
-        {
-            return;
-        }
-
         lock (_gate)
         {
             _cellDimensions = dimensions;
@@ -64,6 +75,24 @@ public sealed class NoImageTerminalImageSeam : ITerminalImageSeam
             return _cellDimensions;
         }
     }
+
+    /// <inheritdoc />
+    public void ResetCapabilitiesCache()
+    {
+        lock (_gate)
+        {
+            _capabilities = null;
+        }
+    }
+
+    /// <inheritdoc />
+    public void SetCapabilities(TerminalCapabilities capabilities)
+    {
+        lock (_gate)
+        {
+            _capabilities = capabilities;
+        }
+    }
 }
 
 /// <summary>Image-escape helpers required by the TUI without implementing image protocols.</summary>
@@ -74,6 +103,9 @@ public static class TerminalImage
 
     /// <summary>iTerm2 inline-image OSC prefix.</summary>
     public const string Iterm2Prefix = "\x1b]1337;File=";
+
+    /// <summary>Deletes one Kitty image and frees its stored image data.</summary>
+    public static string DeleteKittyImage(uint imageId) => $"\x1b_Ga=d,d=I,i={imageId},q=2\x1b\\";
 
     /// <summary>
     /// Returns true when a line contains a Kitty or iTerm2 image escape, including when text or a

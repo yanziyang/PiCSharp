@@ -131,10 +131,18 @@ public sealed class TuiCoreTests
 
     private sealed class TestImageSeam : ITerminalImageSeam
     {
+        private TerminalCapabilities _capabilities = new(ImageProtocol.Kitty, true, true);
+
         public CellDimensions Dimensions { get; private set; } = new(9, 18);
 
-        public TerminalCapabilities GetCapabilities() => new(ImageProtocol.Kitty, true, true);
+        public TerminalCapabilities GetCapabilities() => _capabilities;
 
         public void SetCellDimensions(CellDimensions dimensions) => Dimensions = dimensions;
+
+        public CellDimensions GetCellDimensions() => Dimensions;
+
+        public void ResetCapabilitiesCache() => _capabilities = new(null, false, false);
+
+        public void SetCapabilities(TerminalCapabilities capabilities) => _capabilities = capabilities;
     }
 }

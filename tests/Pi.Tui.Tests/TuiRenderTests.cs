@@ -13,7 +13,7 @@ public sealed class TuiRenderTests
     public async Task Renders_keyboard_input_without_waiting_for_a_throttled_frame()
     {
         var terminal = new MemoryTerminal(40, 10);
-        using var tui = new TestTui(terminal);
+        using var tui = new TuiMainScreen(terminal);
         var component = new InputComponent { Lines = ["initial"] };
         tui.AddChild(component);
         tui.SetFocus(component);
@@ -41,7 +41,7 @@ public sealed class TuiRenderTests
         {
             Environment.SetEnvironmentVariable("PI_DEBUG_REDRAW", "1");
             var terminal = new MemoryTerminal(40, 10);
-            using var tui = new TestTui(terminal, logDirectory: logDirectory.FullName);
+            using var tui = new TuiMainScreen(terminal, logDirectory: logDirectory.FullName);
             var component = new TestComponent { Lines = ["test"] };
             tui.AddChild(component);
             tui.Start();
@@ -62,7 +62,7 @@ public sealed class TuiRenderTests
     public void Splits_a_large_full_render_without_changing_its_output()
     {
         var terminal = new BoundedWriteTerminal();
-        using var tui = new TestTui(terminal);
+        using var tui = new TuiMainScreen(terminal);
         var component = new TestComponent();
         var kittyLine = $"\x1b_Ga=T,f=100;{new string('A', 1_200_000)}\x1b\\";
         component.Lines = [kittyLine, kittyLine];
@@ -80,7 +80,7 @@ public sealed class TuiRenderTests
     public void Splits_large_differential_updates_without_a_full_redraw()
     {
         var terminal = new BoundedWriteTerminal();
-        using var tui = new TestTui(terminal);
+        using var tui = new TuiMainScreen(terminal);
         var component = new TestComponent { Lines = ["before"] };
         tui.AddChild(component);
         tui.RenderNow();
@@ -104,7 +104,7 @@ public sealed class TuiRenderTests
         await WithEnvironmentAsync("TERMUX_VERSION", null, async () =>
         {
             var terminal = new MemoryTerminal(40, 10);
-            using var tui = new TestTui(terminal);
+            using var tui = new TuiMainScreen(terminal);
             var component = new TestComponent { Lines = ["Line 0", "Line 1", "Line 2"] };
             tui.AddChild(component);
             tui.Start();
@@ -118,21 +118,13 @@ public sealed class TuiRenderTests
         });
     }
 
-    // isTermuxSession() lives in tui-main-screen.ts, which T5.2b does not port, so the behaviour
-    // under test here exists only in TestTui - the case asserts a test double, not shipped code.
-    // It is also the one case that mutates TERMUX_VERSION to a non-null value: TestTui.DoRender
-    // reads that process-global from the render thread while the test thread sets and restores it,
-    // which made this fail intermittently under parallel runs. Both problems clear together when
-    // tui-main-screen.ts is ported and this points at the real class.
-    [Fact(
-        DisplayName = "skips full re-render on height changes in Termux",
-        Skip = "isTermuxSession() belongs to tui-main-screen.ts, which is a later packet.")]
+    [Fact(DisplayName = "skips full re-render on height changes in Termux")]
     public async Task Skips_full_re_render_on_height_changes_in_termux()
     {
         await WithEnvironmentAsync("TERMUX_VERSION", "1", async () =>
         {
             var terminal = new MemoryTerminal(40, 10);
-            using var tui = new TestTui(terminal);
+            using var tui = new TuiMainScreen(terminal);
             var component = new TestComponent
             {
                 Lines = Enumerable.Range(0, 20).Select(index => $"Line {index}").ToArray(),
@@ -160,7 +152,7 @@ public sealed class TuiRenderTests
     public async Task Triggers_full_re_render_when_terminal_width_changes()
     {
         var terminal = new MemoryTerminal(40, 10);
-        using var tui = new TestTui(terminal);
+        using var tui = new TuiMainScreen(terminal);
         var component = new TestComponent { Lines = ["Line 0", "Line 1", "Line 2"] };
         tui.AddChild(component);
         tui.Start();
@@ -177,7 +169,7 @@ public sealed class TuiRenderTests
     public async Task Clears_empty_rows_when_content_shrinks_significantly()
     {
         var terminal = new MemoryTerminal(40, 10);
-        using var tui = new TestTui(terminal);
+        using var tui = new TuiMainScreen(terminal);
         tui.SetClearOnShrink(true);
         var component = new TestComponent
         {
@@ -203,7 +195,7 @@ public sealed class TuiRenderTests
     public async Task Handles_shrink_to_single_line()
     {
         var terminal = new MemoryTerminal(40, 10);
-        using var tui = new TestTui(terminal);
+        using var tui = new TuiMainScreen(terminal);
         tui.SetClearOnShrink(true);
         var component = new TestComponent { Lines = ["Line 0", "Line 1", "Line 2", "Line 3"] };
         tui.AddChild(component);
@@ -223,7 +215,7 @@ public sealed class TuiRenderTests
     public async Task Handles_shrink_to_empty()
     {
         var terminal = new MemoryTerminal(40, 10);
-        using var tui = new TestTui(terminal);
+        using var tui = new TuiMainScreen(terminal);
         tui.SetClearOnShrink(true);
         var component = new TestComponent { Lines = ["Line 0", "Line 1", "Line 2"] };
         tui.AddChild(component);
@@ -241,7 +233,7 @@ public sealed class TuiRenderTests
     public async Task Tracks_cursor_correctly_when_content_shrinks_with_unchanged_remaining_lines()
     {
         var terminal = new MemoryTerminal(40, 10);
-        using var tui = new TestTui(terminal);
+        using var tui = new TuiMainScreen(terminal);
         var component = new TestComponent
         {
             Lines = ["Line 0", "Line 1", "Line 2", "Line 3", "Line 4"],
@@ -264,7 +256,7 @@ public sealed class TuiRenderTests
     public async Task Renders_correctly_when_only_a_middle_line_changes_spinner_case()
     {
         var terminal = new MemoryTerminal(40, 10);
-        using var tui = new TestTui(terminal);
+        using var tui = new TuiMainScreen(terminal);
         var component = new TestComponent { Lines = ["Header", "Working...", "Footer"] };
         tui.AddChild(component);
         tui.Start();
@@ -286,7 +278,7 @@ public sealed class TuiRenderTests
     public async Task Resets_styles_after_each_rendered_line()
     {
         var terminal = new MemoryTerminal(20, 6);
-        using var tui = new TestTui(terminal);
+        using var tui = new TuiMainScreen(terminal);
         var component = new TestComponent { Lines = ["\x1b[3mItalic", "Plain"] };
         tui.AddChild(component);
         tui.Start();
@@ -299,7 +291,7 @@ public sealed class TuiRenderTests
     public async Task Renders_correctly_when_first_line_changes_but_rest_stays_same()
     {
         var terminal = new MemoryTerminal(40, 10);
-        using var tui = new TestTui(terminal);
+        using var tui = new TuiMainScreen(terminal);
         var component = new TestComponent { Lines = ["Line 0", "Line 1", "Line 2", "Line 3"] };
         tui.AddChild(component);
         tui.Start();
@@ -319,7 +311,7 @@ public sealed class TuiRenderTests
     public async Task Renders_correctly_when_last_line_changes_but_rest_stays_same()
     {
         var terminal = new MemoryTerminal(40, 10);
-        using var tui = new TestTui(terminal);
+        using var tui = new TuiMainScreen(terminal);
         var component = new TestComponent { Lines = ["Line 0", "Line 1", "Line 2", "Line 3"] };
         tui.AddChild(component);
         tui.Start();
@@ -339,7 +331,7 @@ public sealed class TuiRenderTests
     public async Task Renders_correctly_when_multiple_non_adjacent_lines_change()
     {
         var terminal = new MemoryTerminal(40, 10);
-        using var tui = new TestTui(terminal);
+        using var tui = new TuiMainScreen(terminal);
         var component = new TestComponent { Lines = ["Line 0", "Line 1", "Line 2", "Line 3", "Line 4"] };
         tui.AddChild(component);
         tui.Start();
@@ -360,7 +352,7 @@ public sealed class TuiRenderTests
     public async Task Handles_transition_from_content_to_empty_and_back_to_content()
     {
         var terminal = new MemoryTerminal(40, 10);
-        using var tui = new TestTui(terminal);
+        using var tui = new TuiMainScreen(terminal);
         var component = new TestComponent { Lines = ["Line 0", "Line 1", "Line 2"] };
         tui.AddChild(component);
         tui.Start();
@@ -383,7 +375,7 @@ public sealed class TuiRenderTests
     public async Task Full_re_renders_when_deleted_lines_move_the_viewport_upward()
     {
         var terminal = new MemoryTerminal(20, 5);
-        using var tui = new TestTui(terminal);
+        using var tui = new TuiMainScreen(terminal);
         var component = new TestComponent
         {
             Lines = Enumerable.Range(0, 12).Select(index => $"Line {index}").ToArray(),
@@ -405,7 +397,7 @@ public sealed class TuiRenderTests
     public async Task Appends_after_a_shrink_without_another_full_redraw_once_the_viewport_is_reset()
     {
         var terminal = new MemoryTerminal(20, 5);
-        using var tui = new TestTui(terminal);
+        using var tui = new TuiMainScreen(terminal);
         var component = new TestComponent
         {
             Lines = Enumerable.Range(0, 8).Select(index => $"Line {index}").ToArray(),
@@ -432,7 +424,7 @@ public sealed class TuiRenderTests
     public async Task Clears_stale_content_when_max_lines_rendered_was_inflated_by_a_transient_component()
     {
         var terminal = new MemoryTerminal(40, 10);
-        using var tui = new TestTui(terminal);
+        using var tui = new TuiMainScreen(terminal);
         var chat = new TestComponent();
         var editor = new TestComponent();
         tui.AddChild(chat);

@@ -4,37 +4,14 @@ using Xunit;
 
 namespace Pi.Tui.Tests;
 
-internal sealed class TestTui : TuiBase
+internal sealed class TestTui : TuiMainScreen
 {
-    private int _lastWidth;
-    private int _lastHeight;
-    private bool _hasRendered;
-
     public TestTui(
         ITerminal terminal,
         bool? showHardwareCursor = null,
         string? logDirectory = null,
         ITerminalImageSeam? imageSeam = null)
         : base(terminal, showHardwareCursor, logDirectory, imageSeam) { }
-
-    public override TuiMode Mode => TuiMode.Regular;
-
-    protected override void DoRender()
-    {
-        if (_hasRendered &&
-            Environment.GetEnvironmentVariable("TERMUX_VERSION") is not null &&
-            Terminal.Columns == _lastWidth &&
-            Terminal.Rows != _lastHeight)
-        {
-            _lastHeight = Terminal.Rows;
-            return;
-        }
-
-        RenderFrame(RenderMountedChildren());
-        _lastWidth = Terminal.Columns;
-        _lastHeight = Terminal.Rows;
-        _hasRendered = true;
-    }
 }
 
 internal class TestComponent : IComponent
@@ -176,7 +153,13 @@ internal sealed class MemoryTerminal : ITerminal
         _resizeHandler?.Invoke();
     }
 
-    public IReadOnlyList<string> GetViewport() => _screen.Select(row => new string(row.Select(cell => cell.Character).ToArray()).TrimEnd()).ToArray();
+    public IReadOnlyList<string> GetViewport() => _screen.Select(static row =>
+    {
+        var lastWritten = Array.FindLastIndex(row, static cell => cell.Written);
+        return lastWritten < 0
+            ? string.Empty
+            : new string(row.Take(lastWritten + 1).Select(static cell => cell.Character).ToArray());
+    }).ToArray();
 
     public bool GetCellItalic(int row, int column) => _screen[row][column].Italic;
 
@@ -378,7 +361,7 @@ internal sealed class MemoryTerminal : ITerminal
             AdvanceLine();
         }
 
-        _screen[_cursorRow][_cursorColumn] = new Cell(value, _italic);
+        _screen[_cursorRow][_cursorColumn] = new Cell(value, _italic, true);
         _cursorColumn++;
     }
 
@@ -434,5 +417,5 @@ internal sealed class MemoryTerminal : ITerminal
         }
     }
 
-    private sealed record Cell(char Character = ' ', bool Italic = false);
+    private sealed record Cell(char Character = ' ', bool Italic = false, bool Written = false);
 }
