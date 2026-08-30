@@ -29,19 +29,7 @@ as the source of truth for what is usable today.
 
 ## Architecture at a glance
 
-```text
-Pi CLI / Coding Agent
-          |
-          v
-     Pi.AgentCore  <---- Pi.Ai ---->  Provider adapters
-          |
-          +-------- Pi.Protocol --------+
-          |                             |
-       Pi.Client                    Pi.Server
-          |
-          v
-       Pi.Tui  ---->  terminal output / input
-```
+![PiCSharp architecture](docs/pi-csharp-architecture.svg)
 
 The TypeScript source in [`reference/pi`](reference/pi) is the pinned, read-only behavioral
 specification. C# names follow .NET conventions, while serialized names, protocol bytes, defaults,
