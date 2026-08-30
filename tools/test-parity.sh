@@ -65,8 +65,17 @@ count_ported() {
   local dir="tests/${proj}.Tests"
   [ -d "$dir" ] || { echo 0; return; }
   # ProjectReferenceTests.cs is scaffold wiring, not a ported upstream test.
-  find "$dir" -name '*.cs' ! -name 'ProjectReferenceTests.cs' \
-    -exec grep -hoE '\[(Fact|Theory)[]( ]' {} + 2>/dev/null | wc -l | tr -d ' '
+  local attrs skips
+  attrs=$(find "$dir" -name '*.cs' ! -name 'ProjectReferenceTests.cs' \
+    -exec grep -hoE '\[(Fact|Theory)[]( ]' {} + 2>/dev/null | wc -l | tr -d ' ')
+  # Skipped tests do not count as ported coverage. Without this the two gates
+  # contradict each other: the skip audit penalises a skip while parity rewards
+  # it, so a packet could raise its parity score by adding empty skipped stubs.
+  # A Skip= can sit on a later line of a multi-line attribute, so match the
+  # Skip= line itself, exactly as .github/workflows/ci.yml does.
+  skips=$(find "$dir" -name '*.cs' ! -name 'ProjectReferenceTests.cs' \
+    -exec grep -hcE 'Skip[[:space:]]*=' {} + 2>/dev/null | awk '{s+=$1} END {print s+0}')
+  echo $(( attrs - skips ))
 }
 
 if [ "$UPDATE" = "1" ]; then

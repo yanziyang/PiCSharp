@@ -182,10 +182,40 @@ internal sealed class MemoryTerminal : ITerminal
 
     public void ClearWrites() => Writes.Clear();
 
-    public static async Task WaitForRenderAsync()
+    /// <summary>
+    /// Waits for a render to reach this terminal and settle.
+    /// </summary>
+    /// <remarks>
+    /// Renders are throttled to a 16 ms minimum interval and a single frame can arrive as several
+    /// writes, so this waits for output to stop arriving rather than for a fixed interval: under
+    /// load the wait extends itself instead of expiring early. The fixed 200 ms delay this replaced
+    /// failed intermittently on cold-start runs, where the first frame after a build lands late.
+    /// <see cref="List{T}.Count"/> is an atomic int read, so polling it from the test thread while
+    /// the render thread appends is safe.
+    /// </remarks>
+    public async Task WaitForRenderAsync(int timeoutMs = 5000, int quietMs = 60)
     {
         await Task.Yield();
-        await Task.Delay(200, TestContext.Current.CancellationToken);
+
+        var deadline = Environment.TickCount64 + timeoutMs;
+        var seen = -1;
+        var quietUntil = Environment.TickCount64 + quietMs;
+
+        while (Environment.TickCount64 < deadline)
+        {
+            var count = Writes.Count;
+            if (count != seen)
+            {
+                seen = count;
+                quietUntil = Environment.TickCount64 + quietMs;
+            }
+            else if (Environment.TickCount64 >= quietUntil)
+            {
+                return;
+            }
+
+            await Task.Delay(2, TestContext.Current.CancellationToken);
+        }
     }
 
     private static List<Cell[]> CreateScreen(int columns, int rows) =>
