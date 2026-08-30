@@ -2,6 +2,11 @@
 
 **Wave:** harness (completes wave 3)  **Delegation fit:** B
 **Depends on:** `H1` (`0bf2b36`), `H2` (`5b766f7`), `H3` (`430801d`)
+**Status:** ✅ Delivered in `91529f5`. 5,786 lines. Agent parity 72% → **103%**, completeness 118% → 150%.
+All four hazards honoured: no diff dependency added and the unified-patch golden test covers insertion,
+deletion and adjacent hunks at context four; `SystemExecutionEnv` has 118 `Result<>` returns and zero
+bare throws; truncation constants exact; CRLF and BOM round-trips tested. It also ported
+`harness/prompt-templates.ts`, which my source list omitted.
 
 ---
 
