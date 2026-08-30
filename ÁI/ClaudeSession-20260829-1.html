@@ -56,8 +56,8 @@ footer{border-top:1px solid var(--line);background:var(--panel);padding:26px 0 4
 <div class="meta">
 <div>Dates<b>29–30 August 2026</b></div>
 <div>Project<b>C:\MyProjects\PiCSharp</b></div>
-<div>Exchanges<b>22</b></div>
-<div>Responses<b>211</b></div>
+<div>Exchanges<b>24</b></div>
+<div>Responses<b>221</b></div>
 <div>Model<b>Claude Opus 5</b></div>
 </div></div></header>
 <div class="shell">
@@ -84,6 +84,8 @@ footer{border-top:1px solid var(--line);background:var(--panel);padding:26px 0 4
 <a href="#p20"><span class="n">20</span>Now what is your view of the code quality of Codex code?</a>
 <a href="#p21"><span class="n">21</span>add to ClaudeSession-20260829-1.html. Also only keep important prompt an…</a>
 <a href="#p22"><span class="n">22</span>I will transfer implement back to codex. What shall be the prompt?</a>
+<a href="#p23"><span class="n">23</span>Update ClaudeSession-20260829-1.html, commit and push</a>
+<a href="#p24"><span class="n">24</span>task in ÍmplementationKit/packets/H1-harness-session.md is done, committ…</a>
 </nav>
 <main>
 <section class="turn user" id="p1">
@@ -1348,11 +1350,79 @@ ai           7%   tui 2%</code></pre>
 <h4>After H1</h4>
 <p>The remaining harness packets, roughly in dependency order: <code>compaction/</code> (1,260 LOC), <code>reducer.ts</code> (667), <code>skills.ts</code> (386), <code>agent-harness.ts</code> (508), then <code>env/</code> and <code>tools/</code>. I'd write each one only when its predecessor lands — the H1 result will tell you whether the parity gate actually changed behaviour, and that should inform how much specification the next packet needs.</p></div>
 </section>
+<section class="turn user" id="p23">
+  <div class="who"><span class="badge u">Exchange 23</span><time>2026-08-29 16:13:59</time></div>
+  <div class="bubble"><p>Update ClaudeSession-20260829-1.html, commit and push</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>22 exchanges kept, 6 omitted. Let me verify rendering before committing.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Updated and pushed as <code>6760ad8</code>. <code>main</code> in sync, working tree clean.</p>
+<div class="tw"><table><thead><tr><th></th><th></th></tr></thead><tbody><tr><td>Exchanges kept</td><td><strong>22</strong> (was 20)</td></tr><tr><td>Omitted as routine</td><td><strong>6</strong></td></tr><tr><td>Responses</td><td>211</td></tr><tr><td>Size</td><td>136 KB</td></tr></tbody></table></div>
+<p>Verified: zero tool blocks, zero relative references, zero broken anchors, 14 tables rendering. Now runs from the original feasibility brief through the code-quality assessment and the H1 handoff.</p>
+<p>The two newly-dropped exchanges were both <code>commit and push</code> housekeeping — including this one, which the filter classified correctly on its own.</p>
+<p>One thing the filter did that's worth knowing: it <strong>kept</strong> the exchange where you asked me to curate this file, because my answer contained the table of what was dropped and why. That reads as reasonable — a reader of a curated transcript benefits from seeing the curation rule stated inside it rather than only in the footer.</p>
+<p>Everything is committed. The next move is Codex on <code>H1-harness-session.md</code>.</p></div>
+</section>
+<section class="turn user" id="p24">
+  <div class="who"><span class="badge u">Exchange 24</span><time>2026-08-30 01:16:05</time></div>
+  <div class="bubble"><p>task in ÍmplementationKit/packets/H1-harness-session.md is done, committed and pushed. What is next prompt for Codex?</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>H1 was the first packet under the new parity gate — its result should shape how much specification the next one needs. Let me verify it before writing anything.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Tests shipped <strong>in the same commit</strong> this time, plus the conformance suite and byte-identity fixtures. Let me verify the gates.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Substantial improvement. Agent went <strong>18% → 65% implemented</strong>, tests <strong>38 → 97 cases</strong>, all passing, zero skips. The gate worked. Let me spot-check the hazards I flagged.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Format correct, conformance runs against both backends. Two things need checking — unknown-field preservation, and whether <code>JsonNode</code> leaked beyond the metadata bag.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Upstream parses strictly with no passthrough bag — so C# matching that is <strong>faithful, and my packet's hazard was wrong</strong>. Let me confirm what's still missing before picking the next packet.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Clean dependency picture. Let me verify compaction's prerequisites before grouping the packet.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Good sizing. Let me correct the wrong hazard in H1 and write the next packet.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>H1 verified and the next packet is committed at <code>ÍmplementationKit/packets/H2-harness-reducer-compaction.md</code> (<code>3c72275</code>).</p>
+<h4>The prompt</h4>
+<pre class="code" data-lang="bash"><code>codex "Complete the task in ÍmplementationKit/packets/H2-harness-reducer-compaction.md. Read AGENTS.md and docs/translation-patterns.md first. The TypeScript in reference/pi is the specification and is read-only. Harness/Session is frozen — if you need to change it, stop and report rather than doing it. The upstream tests ship in the same PR as the implementation."</code></pre>
+<h4>H1 was a marked improvement</h4>
+<div class="tw"><table><thead><tr><th></th><th>Before</th><th>After</th></tr></thead><tbody><tr><td>Agent test parity</td><td>16%</td><td><strong>42%</strong></td></tr><tr><td>Agent completeness</td><td>18%</td><td><strong>65%</strong></td></tr><tr><td>Suite total</td><td>324</td><td><strong>383</strong></td></tr></tbody></table></div>
+<p>Build clean, format clean, zero skips. And critically — <strong>8,106 lines in one commit: 5,897 implementation and 2,203 tests, together</strong>. The conformance suite was ported as a <em>reusable</em> suite running against both the JSONL and in-memory backends, with byte-identity fixtures committed.</p>
+<p>That's the behaviour waves 2–5 lacked. The parity gate plus an explicit "tests ship with the code" instruction changed the outcome.</p>
+<h4>One finding, and it's against me</h4>
+<p>I flagged a hazard requiring <code>[JsonExtensionData]</code> unknown-field preservation. <strong>That was wrong.</strong> Upstream's harness codec parses strictly via <code>requireString</code>/<code>requireSequence</code> and throws on unrecognised types — no passthrough bag. I'd carried the requirement over from <code>docs/session-format.md</code>, which documents the <em>coding-agent</em> v1 format.</p>
+<p>Which is precisely the two-format conflation that packet's own first hazard warns about. I wrote the warning and then committed the error.</p>
+<p>Codex followed upstream over my instruction — exactly what <code>AGENTS.md</code> demands when they disagree. Hazard withdrawn and annotated.</p>
+<p>I also ratcheted the parity floors; H1 left them at pre-delivery counts.</p>
+<h4>Why H2 is scoped this way</h4>
+<p><code>agent-harness.ts</code> is the last thing between here and wave 6, and it imports compaction, telemetry and types. H2 takes what sits directly on session — the shared contracts, then <code>reducer.ts</code> (depends only on <code>session/types</code>, now delivered) and <code>compaction/</code>. About 2,575 upstream LOC, 38 cases.</p>
+<p><code>skills.ts</code> and <code>agent-harness.ts</code> are held for H3, once their dependencies exist.</p>
+<p>Two things I added beyond the upstream suite: <strong>reducer determinism</strong> (replaying a prefix then the remainder must equal replaying the whole — the property the fold exists to guarantee, which upstream's cases only sample) and <strong>compaction boundary assertions</strong>. Compaction is lossy by design; an off-by-one at <code>firstKeptEntryId</code> silently deletes conversation, and nothing catches it unless you assert the boundary directly.</p></div>
+</section>
 
 </main></div>
 <footer><div class="wrap">
 <p style="margin:0 0 6px"><b>Session transcript exported from Claude Code.</b> Prompts and responses only — tool calls, tool results and internal reasoning are excluded as intermediate working detail.</p>
 <p style="margin:0 0 6px">A further 6 exchanges were omitted as routine: commit-and-push confirmations, file renames, a commit-history question, and requests about this transcript itself. Selection is by exchange rather than by prompt, so a one-word instruction answered with substantial work is kept.</p>
-<p style="margin:0">Generated 2026-08-29 · 233 entries from 2,184 transcript records.</p>
+<p style="margin:0">Generated 2026-08-30 · 245 entries from 2,295 transcript records.</p>
 </div></footer>
 </body></html>
