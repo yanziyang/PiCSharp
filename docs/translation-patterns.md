@@ -92,6 +92,31 @@ without notice, and a record set would silently drop fields that `JsonNode` carr
 
 ---
 
+## 2.2 Type-level inference has no C# equivalent — validate at runtime instead
+
+Upstream uses conditional and mapped types to derive one type from another at compile time.
+`pi-telemetry` is the clearest case: `InferStartAttributes<T>`, `ExactTelemetryAttributes<Schema, Name>`
+and `TelemetrySchemaSpanStartAttributes<Schema, Name>` derive an exact attribute shape from a schema
+*value*. C# generics cannot express this, and no amount of cleverness will make them.
+
+**Resolution, applied consistently:**
+
+1. **Port the schema as data.** The schema definitions are runtime values and port directly.
+2. **Port the functions with loose signatures.** Take the span name and an attribute dictionary.
+   Check what the TypeScript actually does at runtime before agonising: `startAiSpan` is a
+   passthrough to `startSpan` plus a cast. The entire generic apparatus is compile-time only, so the
+   runtime port is trivial.
+3. **Recover the guarantee at runtime.** Validate attributes against the schema definition and throw
+   on an unknown name, a missing required attribute or a wrong value type. Then test that validation.
+
+This trades a compile-time guarantee for a runtime one. That is a real loss, and it is the honest
+cost of the language difference — do not paper over it by loosening the schema instead. The
+validation must be strict enough that a wrong attribute fails a test rather than reaching a provider.
+
+**Do not** attempt source generators for this. A generator that reproduces the inference would be far
+more machinery than the guarantee is worth, and it would have to be maintained against upstream
+schema changes.
+
 ## 3. Naming and the wire
 
 C# members are PascalCase; the wire is camelCase. The wire always wins.

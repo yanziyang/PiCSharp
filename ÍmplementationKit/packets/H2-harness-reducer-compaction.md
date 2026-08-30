@@ -2,6 +2,7 @@
 
 **Wave:** harness (unblocks wave 6)  **Delegation fit:** B
 **Depends on:** `H1` (harness session subsystem, delivered in `0bf2b36`)
+**Status:** ✅ Delivered in `5b766f7`. 6,378 lines: 2,779 implementation, 3,599 tests. Agent parity 42% → 64%, completeness 65% → 95%. Frozen paths respected.
 
 ---
 
