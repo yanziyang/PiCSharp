@@ -6,6 +6,12 @@ public interface IComponent
     /// <summary>Renders the component into terminal lines for the requested width.</summary>
     IReadOnlyList<string> Render(int width);
 
+    /// <summary>Handles input when this component owns focus.</summary>
+    void HandleInput(string data) { }
+
+    /// <summary>Whether Kitty key-release events should be delivered.</summary>
+    bool WantsKeyRelease => false;
+
     /// <summary>Invalidates cached rendering state.</summary>
     void Invalidate();
 }
