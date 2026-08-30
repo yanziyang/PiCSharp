@@ -7,4 +7,4 @@ ai Pi.Ai 99 1360
 agent Pi.AgentCore 234 226
 client Pi.Client 7 36
 server Pi.Server 9 50
-tui Pi.Tui 19 838
+tui Pi.Tui 99 838
