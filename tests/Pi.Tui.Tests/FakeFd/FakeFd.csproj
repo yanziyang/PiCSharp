@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>FakeFd</AssemblyName>
+    <RootNamespace>Pi.Tui.Tests.FakeFd</RootNamespace>
+    <NuGetAudit>false</NuGetAudit>
+    <IsTestProject>false</IsTestProject>
+    <TestingPlatformDotnetTestSupport>false</TestingPlatformDotnetTestSupport>
+    <UseMicrosoftTestingPlatformRunner>false</UseMicrosoftTestingPlatformRunner>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Remove="xunit.v3" />
+  </ItemGroup>
+
+</Project>

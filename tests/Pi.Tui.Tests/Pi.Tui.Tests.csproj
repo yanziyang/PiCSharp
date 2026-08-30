@@ -2,6 +2,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Pi.Tui\Pi.Tui.csproj" />
+    <ProjectReference Include="FakeFd\FakeFd.csproj" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="FakeFd\**" />
+    <EmbeddedResource Remove="FakeFd\**" />
+    <None Remove="FakeFd\**" />
   </ItemGroup>
 
 </Project>
