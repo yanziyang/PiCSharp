@@ -65,6 +65,11 @@ codex "Complete the task in ÍmplementationKit/packets/T1.2-pi-protocol.md. Read
 --------------------------------------------------
 Prompt:
 
+I will transfer implement back to codex. What shall be the prompt?
+
+--------------------------------------------------
+Prompt:
+
 Proceed until finish. commit and push for each milestone. I will be away for several hours.
 
 ==================================================
