@@ -56,8 +56,8 @@ footer{border-top:1px solid var(--line);background:var(--panel);padding:26px 0 4
 <div class="meta">
 <div>Dates<b>29–30 August 2026</b></div>
 <div>Project<b>C:\MyProjects\PiCSharp</b></div>
-<div>Exchanges<b>52</b></div>
-<div>Responses<b>81</b></div>
+<div>Exchanges<b>55</b></div>
+<div>Responses<b>86</b></div>
 <div>Model<b>Claude Opus 5</b></div>
 </div></div></header>
 <div class="shell">
@@ -114,6 +114,9 @@ footer{border-top:1px solid var(--line);background:var(--panel);padding:26px 0 4
 <a href="#p50"><span class="n">50</span>please delete it.</a>
 <a href="#p51"><span class="n">51</span>T5.3b is done.</a>
 <a href="#p52"><span class="n">52</span>Write prompt for Codex.</a>
+<a href="#p53"><span class="n">53</span>Update ClaudeSession.html and push</a>
+<a href="#p54"><span class="n">54</span>T5.3b and T5.5 are done.</a>
+<a href="#p55"><span class="n">55</span>Write prompt for Codex.</a>
 </nav>
 <main>
 <section class="turn user" id="p1">
@@ -1321,11 +1324,63 @@ AgentHarness.cs    1,300 lines   untracked</code></pre>
 <p><strong>One trap I named in the packet in advance.</strong> Those seven skipped stubs I wrote during T5.2b have upstream's names but <em>empty bodies</em>. Deleting seven <code>Skip =</code> attributes would take the budget to zero and turn every gate green while testing nothing at all — the worst available outcome, and the easiest one to reach by accident. The criteria require the bodies implemented; if one can't be, leave it skipped and say why.</p>
 <p>This packet also takes <code>.skip-budget</code> to <strong>0</strong> for the first time in the project, and empties <code>.skip-budget.md</code>'s table.</p></div>
 </section>
+<section class="turn user" id="p53">
+  <div class="who"><span class="badge u">Exchange 53</span><time>2026-08-31 12:15:38</time></div>
+  <div class="bubble"><p>Update ClaudeSession.html and push</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Same trap, caught this time by verifying instead of trusting the exit code. Codex created <code>codex/t5.5-terminal-image</code> mid-export, so my commit landed there and <code>push origin main</code> pushed the stale ref. Let me check whether a fast-forward is still clean.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Pushed — <code>main</code> and <code>origin/main</code> both at <code>52a400c</code>. <strong>52 exchanges, 81 responses, 193 KB</strong>, sections balance 133/133.</p>
+<p>The branch trap caught me again, but this time verification caught it. I checked the branch at the start of the turn and it <em>was</em> <code>main</code> — Codex created and checked out <code>codex/t5.5-terminal-image</code> while the export was running, so my commit landed there and <code>git push origin main</code> pushed the stale <code>main</code> ref while exiting 0.</p>
+<p>Resolved the same way as last time: the branch held only my one-file export commit with nothing in flight, so <code>main</code> fast-forwarded to it rather than needing a cherry-pick, and I put the checkout back on <code>codex/t5.5-terminal-image</code> so Codex resumes undisturbed — now with the export as its base.</p>
+<p>The real lesson is that checking the branch <em>before</em> a multi-step task isn't sufficient, because Codex can switch it mid-task. Verifying <code>origin/main</code> actually moved <em>after</em> the push is the check that works, so I'll keep doing that.</p>
+<p>Current state:</p>
+<div class="tw"><table><thead><tr><th></th><th></th></tr></thead><tbody><tr><td>Tests</td><td>1,227 passing, 7 skipped</td></tr><tr><td>Tui parity</td><td>71% (596 executing cases)</td></tr><tr><td>Tui completeness</td><td>79%</td></tr><tr><td>In flight</td><td><code>T5.5</code> — terminal images, 71 cases, takes skips to 0</td></tr></tbody></table></div></div>
+</section>
+<section class="turn user" id="p54">
+  <div class="who"><span class="badge u">Exchange 54</span><time>2026-08-31 13:26:36</time></div>
+  <div class="bubble"><p>T5.3b and T5.5 are done.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>T5.5 verified and pushed as <code>4f5232f</code>. <strong>The project now has zero skipped tests for the first time.</strong></p>
+<div class="tw"><table><thead><tr><th></th><th></th></tr></thead><tbody><tr><td>Tests</td><td><strong>1,292 passing, 0 failed, 0 skipped</strong> (3 runs)</td></tr><tr><td>Tui parity</td><td>71% → <strong>79%</strong> (596 → 668 cases)</td></tr><tr><td>Tui completeness</td><td>79% → <strong>86%</strong></td></tr><tr><td>Skip budget</td><td>7 → <strong>0</strong>, table empty</td></tr></tbody></table></div>
+<p>T5.3b was already verified and recorded at <code>9bef120</code> — nothing new landed there, so this was T5.5 alone.</p>
+<p><strong>The trap I named in the packet was avoided</strong>, and that was the thing worth checking. Those seven stubs had upstream's names and empty bodies; deleting seven <code>Skip =</code> attributes would have driven the budget to zero with every gate green while testing nothing. Instead the file went 54 → 220 lines with no <code>Skip</code> and no empty body remaining, and the cases assert real placement geometry — the row-reservation case checks the exact cursor-up/cursor-down sequence wrapping the image escape.</p>
+<p>Three other things I verified rather than assumed:</p>
+<ul><li><strong>Hazard 4 held precisely</strong> — <code>BinaryPrimitives</code> 11 uses, <code>BitConverter</code> <strong>zero</strong>. That one mattered: <code>BitConverter</code> follows platform endianness and would have silently produced wrong dimensions on x86 while every test written against it still passed.</li><li><strong>The seam's member set is untouched.</strong> The only edits to <code>TerminalImageSeam.cs</code> are a doc comment and <code>static</code> → <code>static partial</code> — mechanical, not the quiet redesign the packet warned against.</li><li><strong>One case beyond upstream</strong>: <em>"tmux probe falls back to false when the command is absent"</em> — exactly the absent-path coverage hazard 3 asked for, which matters on Windows where <code>tmux</code> never exists.</li></ul>
+<p>The C → B re-rating held. That's now twice (T5.2b, T5.5) that a "not delegable" rating turned out to have been assigned without measuring the file.</p>
+<p>What's left in wave 5: <code>components/markdown.ts</code> (1,015 LOC, 81 cases) — now unblocked and the obvious next packet — then <code>tui-alt-screen.ts</code> (45 cases, but it needs five more components), <code>latex.ts</code> (19 cases, self-contained), and <code>terminal-colors</code> (9). After that, wave 6's <code>Pi.CodingAgent</code> at 60,960 LOC is the bulk of what remains in the project.</p></div>
+</section>
+<section class="turn user" id="p55">
+  <div class="who"><span class="badge u">Exchange 55</span><time>2026-08-31 13:34:28</time></div>
+  <div class="bubble"><p>Write prompt for Codex.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Both findings confirmed. <code>latex.ts</code> is genuinely self-contained (only <code>visibleWidth</code>), while <code>markdown.ts</code> <strong>subclasses <code>marked</code>'s <code>Tokenizer</code></strong> and registers custom tokenizer extensions — that's a real dependency decision, not a port. Let me size latex properly.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Pushed as <code>730be36</code>. Here's the prompt for Codex:</p>
+<pre class="code" data-lang="bash"><code>codex "Read ÍmplementationKit/packets/T5.7-latex.md and implement it. Port latex.ts (1,380 LOC) with all 19 upstream cases, names verbatim, then add branch coverage beyond upstream - 19 cases do not specify 1,380 lines, and the second objective is the half that makes it trustworthy. renderLatex returns null, not empty string, for unsupported commands. Use visibleWidth from Pi.Tui.Text; do not write a second width implementation. Skip budget must stay 0. Run the full suite at least three times. Name in the PR anything you do not deliver or any instruction you override."</code></pre>
+<p><strong>I changed the target from markdown, and you should know why.</strong> <code>components/markdown.ts</code> looked like the obvious next packet — 81 cases, unblocked by T5.5. It isn't delegable:</p>
+<pre class="code" data-lang="ts"><code>import { Marked, Tokenizer, type TokenizerExtension } from "marked";
+class StrictStrikethroughTokenizer extends Tokenizer { ... }</code></pre>
+<p>It doesn't <em>call</em> a Markdown parser — it <strong>subclasses <code>marked</code>'s tokenizer</strong> and registers custom tokenizer extensions. That's the first genuine third-party dependency in the TUI port, and picking a C# counterpart is an architectural decision rather than a translation. Every packet so far has said "stop and report if a dependency is needed"; this is that moment, and it's a decision for you, not for Codex. <strong>I'll lay out the options when you want to make it</strong> — roughly: adopt Markdig and re-express the custom rules in its extension model, or hand-write a tokenizer matching <code>marked</code>'s token output.</p>
+<p><code>latex.ts</code> is on markdown's critical path either way — markdown imports <code>renderLatex</code> and references it 20 times — and it's clean where markdown isn't: 1,380 LOC behind exactly <strong>two exports</strong>, one import, no state, no I/O, a deterministic string→string transformer. Delegation fit A.</p>
+<p><strong>The packet carries two objectives</strong>, because 19 cases don't specify 1,380 lines of branching over LaTeX commands, environments and delimiters. The second is branch coverage beyond upstream, on the R3 pattern — with R3's caveat carried forward: a test written by reading the C# certifies whatever bug is in it, so expectations come from the TypeScript. I named T5.4's silently-dropped second objective as the specific failure mode here, since that one had to be re-issued as R2.</p>
+<p>One trap worth flagging: <code>renderLatex</code> returns <code>string | undefined</code>, and two upstream cases exist to prove it. Returning <code>""</code> for unsupported commands would pass a careless test and be wrong — "not renderable" and "renders to nothing" are different answers.</p></div>
+</section>
 
 </main></div>
 <footer><div class="wrap">
 <p style="margin:0 0 6px"><b>Session transcript exported from Claude Code.</b> Prompts and responses only — tool calls, tool results and internal reasoning are excluded as intermediate working detail.</p>
 <p style="margin:0 0 6px">This is a curated record, not a complete one. Bare continuations such as “proceed” are folded into the preceding exchange, keeping the work they triggered without the empty prompt. Short progress narration between tool calls is dropped. A further 6 exchanges were omitted as routine housekeeping.</p>
-<p style="margin:0">Generated 2026-08-31 · 133 entries from 3,433 transcript records.</p>
+<p style="margin:0">Generated 2026-08-31 · 141 entries from 3,575 transcript records.</p>
 </div></footer>
 </body></html>
