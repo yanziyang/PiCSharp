@@ -345,6 +345,17 @@ The spike also disproved this document's original tier-2 risk claim — see §5.
 > built-in one through the factory. The mirror holds. `registerMarkdownTransformer` and
 > `onTerminalInput` standalone remain untested.
 
+> **Amendment D is now proven.** `T5.3b` (`cc8aad0`) ported `Editor` as a public, non-sealed class
+> with `Render`, `HandleInput` and `Invalidate` virtual, and the test
+> `Extension_subclass_overrides_editor_hooks_and_calls_base_implementations` defines a subclass that
+> overrides all three, calls `base.` on each, and decorates the rendered lines the way
+> `border-status-editor.ts` does. Subclass-and-`super` survives the translation.
+>
+> This mattered more than the other amendments because C# does not forgive it: a member that is not
+> `virtual` can never be overridden, and nothing diagnoses it at the point of failure — the extension
+> simply cannot be written. Round 2 validated D by reading two TypeScript extensions and judging them
+> portable; it is now demonstrated in the port itself.
+
 **D1 passes both rounds.** Five amendments, no redesign.
 
 Still untested and deferred to implementation as low-risk: `AutocompleteProviderFactory`,
