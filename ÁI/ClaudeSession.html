@@ -56,8 +56,8 @@ footer{border-top:1px solid var(--line);background:var(--panel);padding:26px 0 4
 <div class="meta">
 <div>Dates<b>29–30 August 2026</b></div>
 <div>Project<b>C:\MyProjects\PiCSharp</b></div>
-<div>Exchanges<b>55</b></div>
-<div>Responses<b>86</b></div>
+<div>Exchanges<b>58</b></div>
+<div>Responses<b>90</b></div>
 <div>Model<b>Claude Opus 5</b></div>
 </div></div></header>
 <div class="shell">
@@ -117,6 +117,9 @@ footer{border-top:1px solid var(--line);background:var(--panel);padding:26px 0 4
 <a href="#p53"><span class="n">53</span>Update ClaudeSession.html and push</a>
 <a href="#p54"><span class="n">54</span>T5.3b and T5.5 are done.</a>
 <a href="#p55"><span class="n">55</span>Write prompt for Codex.</a>
+<a href="#p56"><span class="n">56</span>Update ClaudeSession.html and push</a>
+<a href="#p57"><span class="n">57</span>elaborate the open decision waiting for me: "what marked becomes in C#".</a>
+<a href="#p58"><span class="n">58</span>Follow your recommendation B</a>
 </nav>
 <main>
 <section class="turn user" id="p1">
@@ -1376,11 +1379,71 @@ class StrictStrikethroughTokenizer extends Tokenizer { ... }</code></pre>
 <p><strong>The packet carries two objectives</strong>, because 19 cases don't specify 1,380 lines of branching over LaTeX commands, environments and delimiters. The second is branch coverage beyond upstream, on the R3 pattern — with R3's caveat carried forward: a test written by reading the C# certifies whatever bug is in it, so expectations come from the TypeScript. I named T5.4's silently-dropped second objective as the specific failure mode here, since that one had to be re-issued as R2.</p>
 <p>One trap worth flagging: <code>renderLatex</code> returns <code>string | undefined</code>, and two upstream cases exist to prove it. Returning <code>""</code> for unsupported commands would pass a careless test and be wrong — "not renderable" and "renders to nothing" are different answers.</p></div>
 </section>
+<section class="turn user" id="p56">
+  <div class="who"><span class="badge u">Exchange 56</span><time>2026-08-31 13:37:42</time></div>
+  <div class="bubble"><p>Update ClaudeSession.html and push</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Pushed as <code>cc18b48</code> — HEAD and <code>origin/main</code> in sync, on <code>main</code>, tree clean.</p>
+<p><strong>55 exchanges, 86 responses, 202 KB</strong>, sections balance 141/141. The new material is the T5.5 verification (zero skipped tests for the first time) and the T5.7 handoff with the <code>marked</code> blocker recorded.</p>
+<p>Current state:</p>
+<div class="tw"><table><thead><tr><th></th><th></th></tr></thead><tbody><tr><td>Tests</td><td>1,292 passing, <strong>0 skipped</strong></td></tr><tr><td>Tui parity</td><td>79% (668 executing cases)</td></tr><tr><td>Tui completeness</td><td>86%</td></tr><tr><td>In flight</td><td><code>T5.7</code> — latex, 19 cases + branch coverage</td></tr></tbody></table></div>
+<p>One open decision waiting on you: <strong>what <code>marked</code> becomes in C#</strong>. <code>components/markdown.ts</code> (81 cases) is blocked on it and won't be delegable until it's settled. Nothing else in wave 5 depends on that answer, so T5.7 and <code>tui-alt-screen</code> can proceed either way — but markdown is the largest remaining piece of the wave, so it's worth deciding before the runway in front of Codex runs short.</p></div>
+</section>
+<section class="turn user" id="p57">
+  <div class="who"><span class="badge u">Exchange 57</span><time>2026-08-31 13:39:33</time></div>
+  <div class="bubble"><p>elaborate the open decision waiting for me: "what marked becomes in C#".</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Decisive:</p>
+<pre class="code" data-lang="ts"><code>export type MarkdownTransformer = (markdown: string, context: MarkdownTransformContext) =&gt; string;</code></pre>
+<p>Extensions transform <strong>source text, not tokens</strong> — so marked never reaches the extension contract. Let me check the project's existing dependency posture before recommending.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Correction pushed as <code>1e5db90</code>. Now to your question — and the short version is that the <em>dependency</em> choice was never open. I mis-flagged it without checking my own register.</p>
+<h4>What's actually settled</h4>
+<p><code>docs/dependencies.md §3</code> already approves <strong>Markdig</strong> (BSD-2-Clause) to replace <code>marked</code> for <code>Pi.Tui</code> and <code>Pi.CodingAgent</code>, and <code>Directory.Packages.props</code> has it queued: <em>"Add the PackageVersion when the consuming wave starts, not before."</em></p>
+<p>That approval carried one condition — <em>"must support the transformer hook <code>registerMarkdownTransformer</code> needs"</em> — and I verified it holds:</p>
+<pre class="code" data-lang="ts"><code>export type MarkdownTransformer = (markdown: string, context: MarkdownTransformContext) =&gt; string;</code></pre>
+<p>Extensions transform <strong>source text</strong>, upstream of parsing. The parser is invisible to them. Combined with the tests being <strong>89 viewport assertions and zero on the token model</strong>, marked's token structure is a private implementation detail of one file.</p>
+<h4>So the real options</h4>
+<div class="tw"><table><thead><tr><th></th><th>Approach</th><th>Cost</th><th>Residual risk</th></tr></thead><tbody><tr><td><strong>A</strong></td><td>Markdig now, full port in one packet</td><td>Moderate</td><td>CommonMark divergence discovered <em>after</em> 1,015 LOC sits on it</td></tr><tr><td><strong>B</strong></td><td>Markdig, divergence spike first</td><td>+1 small packet</td><td>Measured before it's expensive</td></tr><tr><td><strong>C</strong></td><td>Port marked's tokenizer</td><td>Very high</td><td>None — faithful by construction</td></tr><tr><td><strong>D</strong></td><td>Hand-write a CommonMark subset</td><td>High</td><td>You inherit CommonMark's edge cases without the ecosystem's test suite</td></tr></tbody></table></div>
+<p>What the port must re-express either way is small and known: <code>StrictStrikethroughTokenizer.del()</code> is <strong>one overridden inline rule</strong>, and the LaTeX inline/block tokenizers are already hand-written logic that merely plugs into marked's extension point. The renderer's 19 token types are the standard CommonMark set. None of that is the hard part.</p>
+<p><strong>The hard part is CommonMark edge-case divergence between marked 18.0.5 and Markdig</strong>, and its magnitude is genuinely unknown until measured.</p>
+<h4>My recommendation: B</h4>
+<p>Not because A is wrong, but because <strong>this project already has a written precedent for exactly this situation</strong>, one line above Markdig in the same table:</p>
+<p>&gt; <code>DiffPlex</code> — <strong>Must produce upstream-identical hunks</strong>… Verify early; if it diverges, port <code>diff</code> instead.</p>
+<p>That's the B pattern, already adopted for a sibling dependency with the same shape of risk. Applying it to Markdig is consistency, not extra caution. And the spike is cheap: feed the upstream markdown inputs through Markdig and diff the rendered output against the 81 cases' expectations <em>before</em> building the renderer on it. If divergence is small, you've lost a couple of days and gained confidence. If it's large, you learn that before C becomes a rewrite instead of a choice.</p>
+<p>C and D I'd hold in reserve — both are the fallback the spike would trigger, not a starting position.</p>
+<p>One thing that fell out of this: the register lists <code>SkiaSharp (T5.5 — confirm actual need first)</code>. <strong>T5.5 shipped with zero dependencies</strong>, so that need is disproved for terminal images; SkiaSharp is now a wave-6 image-handling question only. Want me to narrow that entry while I'm in the file?</p></div>
+</section>
+<section class="turn user" id="p58">
+  <div class="who"><span class="badge u">Exchange 58</span><time>2026-08-31 13:43:32</time></div>
+  <div class="bubble"><p>Follow your recommendation B</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Following B, and I ran the first pass myself rather than just specifying it. Pushed as <code>7944de0</code>.</p>
+<pre class="code" data-lang="bash"><code>codex "Read ÍmplementationKit/packets/T5.8-markdig-spike.md and complete the spike. The harness is already in tools/spikes/markdig/ and runs. Harvest the markdown inputs the 81 cases in markdown.test.ts actually use and run them through both parsers, enumerate every divergence with its rendering consequence, close the escape and blockquote-softbreak questions, demonstrate strict strikethrough and the LaTeX tokens working in Markdig's extension model, and write the 19-type adapter mapping. Deliverable is docs/spikes/markdig-divergence.md plus a go/no-go recommendation - do NOT port markdown.ts. src/ stays untouched."</code></pre>
+<h4>What I found before writing it</h4>
+<p>I confirmed both halves of the harness work here (<code>marked@18.0.5</code> installs, Markdig 0.44.0 restores), then ran 15 constructs through both. <strong>Ten map cleanly. Four diverge:</strong></p>
+<div class="tw"><table><thead><tr><th></th><th>marked</th><th>Markdig</th></tr></thead><tbody><tr><td><code>~~x~~</code></td><td><code>del</code></td><td><code>EmphasisInline</code> + delimiter char</td></tr><tr><td><code>\*esc\*</code></td><td><code>escape</code> tokens</td><td>erased into literal text</td></tr><tr><td><code>&lt;http://e.com&gt;</code></td><td><code>link</code> + <code>text</code></td><td><code>AutolinkInline</code></td></tr><tr><td><code>&gt; a\n&gt; b</code></td><td>joined into one text</td><td><code>LineBreakInline</code> preserved</td></tr></tbody></table></div>
+<p>None is fatal, and there's no construct Markdig can't represent. The last one is the only divergence with direct visual consequences — the terminal renderer wraps to a width, so whether a soft break survives changes where lines land.</p>
+<p><strong>Two things closed along the way.</strong> The approval's one stated condition is satisfied: <code>registerMarkdownTransformer</code> is <code>(markdown: string, context) =&gt; string</code>, so it sits upstream of parsing and never sees a token — the parser is invisible to extensions. And both parsers treat <code>~single~</code> as strikethrough by default, which is <em>why</em> upstream overrides <code>Tokenizer.del</code>; the requirement transfers to Markdig unchanged, only its expression differs.</p>
+<h4>What I deliberately left for the packet</h4>
+<p>My 15 constructs were chosen from knowing where CommonMark implementations disagree. That's a reasonable smoke test and a bad sample — the inputs that matter are the ones the 81 cases actually use, and that's where the long tail lives. So the packet's first objective is to throw my inputs away and use the real ones.</p>
+<p>The packet says twice that the deliverable is findings, not a port. The failure mode for a spike is the inverse of the usual one: not silent omission but silent scope growth, and a spike that becomes an implementation loses the cheap chance to discover the approach is wrong.</p>
+<p>I also corrected T5.7's out-of-scope note, which still said markdown was "blocked on the dependency decision" — it's gated on this spike now, not on a decision.</p>
+<p>Your <code>SkiaSharp (T5.5 — confirm actual need first)</code> entry is still open in the register; T5.5 shipped with zero dependencies, so that need is disproved for terminal images. Say the word and I'll narrow it to wave 6.</p></div>
+</section>
 
 </main></div>
 <footer><div class="wrap">
 <p style="margin:0 0 6px"><b>Session transcript exported from Claude Code.</b> Prompts and responses only — tool calls, tool results and internal reasoning are excluded as intermediate working detail.</p>
 <p style="margin:0 0 6px">This is a curated record, not a complete one. Bare continuations such as “proceed” are folded into the preceding exchange, keeping the work they triggered without the empty prompt. Short progress narration between tool calls is dropped. A further 6 exchanges were omitted as routine housekeeping.</p>
-<p style="margin:0">Generated 2026-08-31 · 141 entries from 3,575 transcript records.</p>
+<p style="margin:0">Generated 2026-08-31 · 148 entries from 3,758 transcript records.</p>
 </div></footer>
 </body></html>
