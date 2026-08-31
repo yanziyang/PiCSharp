@@ -56,8 +56,8 @@ footer{border-top:1px solid var(--line);background:var(--panel);padding:26px 0 4
 <div class="meta">
 <div>Dates<b>29–30 August 2026</b></div>
 <div>Project<b>C:\MyProjects\PiCSharp</b></div>
-<div>Exchanges<b>48</b></div>
-<div>Responses<b>76</b></div>
+<div>Exchanges<b>52</b></div>
+<div>Responses<b>81</b></div>
 <div>Model<b>Claude Opus 5</b></div>
 </div></div></header>
 <div class="shell">
@@ -110,6 +110,10 @@ footer{border-top:1px solid var(--line);background:var(--panel);padding:26px 0 4
 <a href="#p46"><span class="n">46</span>Update ClaudeSession.html and push</a>
 <a href="#p47"><span class="n">47</span>Merged and pushed directly to `main`; no PR was created.</a>
 <a href="#p48"><span class="n">48</span>one packet — One packet is right here</a>
+<a href="#p49"><span class="n">49</span>Update ClaudeSession.html and push</a>
+<a href="#p50"><span class="n">50</span>please delete it.</a>
+<a href="#p51"><span class="n">51</span>T5.3b is done.</a>
+<a href="#p52"><span class="n">52</span>Write prompt for Codex.</a>
 </nav>
 <main>
 <section class="turn user" id="p1">
@@ -1257,11 +1261,71 @@ AgentHarness.cs    1,300 lines   untracked</code></pre>
 <p>Amendment D is currently validated <em>on paper</em> — I read two TypeScript extensions and judged them portable. That's weaker evidence than it looked. The packet requires a C# test proving a subclass can override both and call <code>base.</code>, which is the same move that let <code>AutocompleteProviderFactory</code> come off the residual-risk list in T5.6. If it passes, D1's riskiest commitment stops being an assumption.</p>
 <p>One smaller thing worth flagging: <code>wordWrapLine</code>'s optional pre-segmented parameter is easy to quietly drop in translation, and the CJK and emoji wrapping tests are exactly what it exists for.</p></div>
 </section>
+<section class="turn user" id="p49">
+  <div class="who"><span class="badge u">Exchange 49</span><time>2026-08-30 15:08:15</time></div>
+  <div class="bubble"><p>Update ClaudeSession.html and push</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Pushed as <code>7e30475</code> — verified: <code>HEAD</code> and <code>origin/main</code> both at <code>7e30475</code>, working tree clean, no divergence.</p>
+<p><strong>48 exchanges, 76 responses, 183 KB.</strong> The three new ones are the T5.2c verification (case-count correction, the parallelization attribute) and the T5.3b handoff. Sections balance 124/124.</p>
+<p>I checked the branch before running anything this time, and confirmed the push landed rather than trusting the exit code — <code>git push origin main</code> from a different branch exits 0 while doing nothing, which is how the export sat unpushed a few turns back.</p>
+<p>Current state:</p>
+<div class="tw"><table><thead><tr><th></th><th></th></tr></thead><tbody><tr><td>Tests</td><td>1,036 passing, 8 skipped</td></tr><tr><td>Tui parity</td><td>48% (404 executing cases)</td></tr><tr><td>Tui completeness</td><td>63%</td></tr><tr><td>Next</td><td><code>T5.3b</code> — editor + select list, 191 cases</td></tr></tbody></table></div>
+<p>The <code>codex/t5.2c-tui-main-screen</code> branch is still around at <code>9142ca5</code>, fully merged into <code>main</code>. Worth deleting when you next think of it, though it's harmless.</p></div>
+</section>
+<section class="turn user" id="p50">
+  <div class="who"><span class="badge u">Exchange 50</span><time>2026-08-30 15:12:32</time></div>
+  <div class="bubble"><p>please delete it.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p><code>codex/t5.2c-tui-main-screen</code> is deleted — local and origin both:</p>
+<pre class="code"><code>Deleted branch codex/t5.2c-tui-main-screen (was 9142ca5)
+ - [deleted]         codex/t5.2c-tui-main-screen</code></pre>
+<p>I confirmed <code>9142ca5</code> was an ancestor of <code>main</code> and that <code>main..codex/t5.2c-tui-main-screen</code> was empty before deleting, so nothing was lost.</p>
+<p>Worth knowing: Codex started T5.3b while I was doing this. It created <code>codex/t5.3b-editor-select-list</code>, checked it out, and is mid-work — <code>src/Pi.Tui/Components/</code> and <code>tests/Pi.Tui.Tests/SelectListTests.cs</code> are untracked in the tree right now. The branch is based on current <code>main</code> (<code>7e30475</code>), so it has the packet and the export.</p>
+<p>I've left that branch checked out rather than switching back to <code>main</code>, since yanking the working directory out from under an active run would be a bad idea. When T5.3b lands I'll verify from wherever the merge ends up, and delete that branch too once it's merged.</p></div>
+</section>
+<section class="turn user" id="p51">
+  <div class="who"><span class="badge u">Exchange 51</span><time>2026-08-31 12:02:14</time></div>
+  <div class="bubble"><p>T5.3b is done.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>T5.3b verified and pushed as <code>9bef120</code> (HEAD and <code>origin/main</code> both there). <strong>This is the cleanest delivery of the eight.</strong></p>
+<div class="tw"><table><thead><tr><th></th><th></th></tr></thead><tbody><tr><td>Tests</td><td>1,227 passing, 7 skipped, 3 consecutive runs</td></tr><tr><td>Tui parity</td><td>48% → <strong>71%</strong> (404 → 596 executing cases)</td></tr><tr><td>Tui completeness</td><td>63% → <strong>79%</strong></td></tr></tbody></table></div>
+<p>I diffed every case name against upstream rather than trusting counts: <strong>all 185</strong> of <code>editor.test.ts</code>, <strong>all 5</strong> of <code>select-list.test.ts</code>, and the <code>editor-history-keybindings</code> case that had been skipped since T5.3a — budget now 7. Zero missing, zero renamed. The 192nd test is the Amendment D proof.</p>
+<p><strong>Amendment D is now proven, and I've recorded that in <code>extension-api.md §7</code>.</strong> <code>Editor</code> is <code>public partial class Editor : IComponent, Focusable</code> with all three members <code>public virtual</code>, and the shipped test subclasses it, overrides <code>Render</code>/<code>HandleInput</code>/<code>Invalidate</code>, calls <code>base.</code> on each, and decorates the rendered lines exactly as <code>border-status-editor.ts</code> does. This was the one D1 commitment a reading couldn't settle — C# gives no diagnostic for a missing <code>virtual</code>; the extension just can't be written. It's now a passing test rather than an argument.</p>
+<p>Two details worth noting, since both were places the delivery could have quietly cut a corner:</p>
+<ul><li><code>wordWrapLine</code>'s pre-segmented parameter was <strong>honoured, not dropped</strong> — <code>Editor.cs:783</code> passes <code>Segment(line, SegmentMode.Grapheme)</code> through. That's the parameter the CJK and emoji wrapping tests exist for.</li><li>The three fixed delays are all legitimate, and one carries the comment convention I asked for: <em>"The debounce window is itself the behavior under test."</em> Emission waits use the <code>WaitAsync</code> condition helper. After two flakes shipped into this package, that distinction being got right matters.</li></ul>
+<p>The commit messages are bare one-liners again, but this time there was genuinely nothing to report — nothing was omitted or overridden.</p>
+<p><code>Pi.Tui</code> is now 71% test parity and 79% complete. What remains in wave 5: <code>markdown.ts</code> (81 cases), <code>tui-alt-screen.ts</code> (45), <strong>T5.5 <code>terminal-image.ts</code></strong> (64 cases, and it reclaims the 7 skipped Kitty cases), plus <code>latex.ts</code> and <code>terminal-colors</code> (9). After that, wave 6 — <code>Pi.CodingAgent</code> at 60,960 LOC — is the remaining bulk of the project.</p></div>
+</section>
+<section class="turn user" id="p52">
+  <div class="who"><span class="badge u">Exchange 52</span><time>2026-08-31 12:12:30</time></div>
+  <div class="bubble"><p>Write prompt for Codex.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Three useful facts: <code>terminal-image.ts</code> has <strong>zero</strong> local imports, <code>tui-alt-screen</code> needs six unported components, and both remaining big files depend on <code>terminal-image</code>. That makes T5.5 the keystone. Let me check whether its "C" rating holds up.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Packet pushed as <code>4fdf194</code> (HEAD and <code>origin/main</code> in sync). Here's the prompt for Codex:</p>
+<pre class="code" data-lang="bash"><code>codex "Read ÍmplementationKit/packets/T5.5-terminal-image.md and implement it. Port terminal-image.ts (700 LOC) and components/image.ts (127 LOC) with all 64 upstream cases, and fill the existing ITerminalImageSeam rather than redesigning it. The seven skipped stubs in tests/Pi.Tui.Tests/TuiRenderImageTests.cs have empty bodies - implement them from tui-render.test.ts, do not just delete the Skip attributes. Skip budget goes to 0. No NuGet, no image decoding library. Run the full suite at least three times. Name in the PR anything you do not deliver or any instruction you override."</code></pre>
+<p><strong>T5.5 is the keystone of what's left.</strong> Both remaining large files depend on it — <code>markdown.test.ts</code> (81 cases) needs <code>terminal-image</code>, and <code>tui-alt-screen.test.ts</code> (45) needs it plus <code>components/image</code> and five more components. Doing anything else first just defers this.</p>
+<p><strong>I re-rated it C → B, with evidence</strong>, the same way T5.2b went. The C rating was for "Kitty and iTerm protocols, sizing, GIF/JPEG/PNG probing", but measured:</p>
+<ul><li><code>terminal-image.ts</code> has <strong>zero local imports</strong> — self-contained</li><li>Probing is <strong>header parsing, not decoding</strong>: <code>getPngDimensions</code> checks magic bytes <code>89 50 4E 47</code> and does <code>readUInt32BE(16)</code>. No image library is involved in TypeScript either</li><li>Encoding is deterministic string building</li><li>64 upstream cases specify all of it</li></ul>
+<p>The only platform dependency is a <code>tmux</code> probe that falls back to <code>false</code> on any error — and T5.6 already set the precedent by shelling out to <code>fd</code> with a fake-executable test helper. I've recorded the re-rating in <code>tui-strategy.md</code>.</p>
+<p><strong>One trap I named in the packet in advance.</strong> Those seven skipped stubs I wrote during T5.2b have upstream's names but <em>empty bodies</em>. Deleting seven <code>Skip =</code> attributes would take the budget to zero and turn every gate green while testing nothing at all — the worst available outcome, and the easiest one to reach by accident. The criteria require the bodies implemented; if one can't be, leave it skipped and say why.</p>
+<p>This packet also takes <code>.skip-budget</code> to <strong>0</strong> for the first time in the project, and empties <code>.skip-budget.md</code>'s table.</p></div>
+</section>
 
 </main></div>
 <footer><div class="wrap">
 <p style="margin:0 0 6px"><b>Session transcript exported from Claude Code.</b> Prompts and responses only — tool calls, tool results and internal reasoning are excluded as intermediate working detail.</p>
 <p style="margin:0 0 6px">This is a curated record, not a complete one. Bare continuations such as “proceed” are folded into the preceding exchange, keeping the work they triggered without the empty prompt. Short progress narration between tool calls is dropped. A further 6 exchanges were omitted as routine housekeeping.</p>
-<p style="margin:0">Generated 2026-08-30 · 124 entries from 3,239 transcript records.</p>
+<p style="margin:0">Generated 2026-08-31 · 133 entries from 3,433 transcript records.</p>
 </div></footer>
 </body></html>
