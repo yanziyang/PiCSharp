@@ -6,7 +6,7 @@ namespace Pi.Tui;
 /// <summary>Options for rendering a LaTeX expression as terminal-friendly text.</summary>
 public sealed record RenderLatexOptions
 {
-    /// <summary>Stacks fractions and operator limits vertically for display math.</summary>
+    /// <summary>Stacks fractions and operator limits vertically for display math (default: false).</summary>
     public bool Display { get; init; }
 }
 
@@ -267,32 +267,127 @@ public static class Latex
 
     private static readonly IReadOnlyDictionary<string, string> _negatedSymbols = new Dictionary<string, string>(StringComparer.Ordinal)
     {
-        ["<"] = "≮", [">"] = "≯", ["="] = "≠", ["∈"] = "∉", ["∋"] = "∌", ["∣"] = "∤", ["∥"] = "∦", ["∼"] = "≁",
-        ["≃"] = "≄", ["≅"] = "≇", ["≈"] = "≉", ["≡"] = "≢", ["≤"] = "≰", ["≥"] = "≱", ["≺"] = "⊀", ["≻"] = "⊁",
-        ["⊂"] = "⊄", ["⊃"] = "⊅", ["⊆"] = "⊈", ["⊇"] = "⊉", ["⊢"] = "⊬", ["⊨"] = "⊭", ["↔"] = "↮", ["←"] = "↚",
-        ["→"] = "↛", ["⇒"] = "⇏", ["⇐"] = "⇍", ["⇔"] = "⇎", ["≼"] = "⋠", ["≽"] = "⋡",
+        ["<"] = "≮",
+        [">"] = "≯",
+        ["="] = "≠",
+        ["∈"] = "∉",
+        ["∋"] = "∌",
+        ["∣"] = "∤",
+        ["∥"] = "∦",
+        ["∼"] = "≁",
+        ["≃"] = "≄",
+        ["≅"] = "≇",
+        ["≈"] = "≉",
+        ["≡"] = "≢",
+        ["≤"] = "≰",
+        ["≥"] = "≱",
+        ["≺"] = "⊀",
+        ["≻"] = "⊁",
+        ["⊂"] = "⊄",
+        ["⊃"] = "⊅",
+        ["⊆"] = "⊈",
+        ["⊇"] = "⊉",
+        ["⊢"] = "⊬",
+        ["⊨"] = "⊭",
+        ["↔"] = "↮",
+        ["←"] = "↚",
+        ["→"] = "↛",
+        ["⇒"] = "⇏",
+        ["⇐"] = "⇍",
+        ["⇔"] = "⇎",
+        ["≼"] = "⋠",
+        ["≽"] = "⋡",
     };
 
     private static readonly IReadOnlyDictionary<string, string> _blackboard = new Dictionary<string, string>(StringComparer.Ordinal)
     {
-        ["C"] = "ℂ", ["H"] = "ℍ", ["N"] = "ℕ", ["P"] = "ℙ", ["Q"] = "ℚ", ["R"] = "ℝ", ["Z"] = "ℤ",
+        ["C"] = "ℂ",
+        ["H"] = "ℍ",
+        ["N"] = "ℕ",
+        ["P"] = "ℙ",
+        ["Q"] = "ℚ",
+        ["R"] = "ℝ",
+        ["Z"] = "ℤ",
     };
 
     private static readonly IReadOnlyDictionary<string, string> _superscripts = new Dictionary<string, string>(StringComparer.Ordinal)
     {
-        ["0"] = "⁰", ["1"] = "¹", ["2"] = "²", ["3"] = "³", ["4"] = "⁴", ["5"] = "⁵", ["6"] = "⁶", ["7"] = "⁷", ["8"] = "⁸", ["9"] = "⁹",
-        ["+"] = "⁺", ["-"] = "⁻", ["="] = "⁼", ["("] = "⁽", [")"] = "⁾", ["a"] = "ᵃ", ["b"] = "ᵇ", ["c"] = "ᶜ", ["d"] = "ᵈ",
-        ["e"] = "ᵉ", ["f"] = "ᶠ", ["g"] = "ᵍ", ["h"] = "ʰ", ["i"] = "ⁱ", ["j"] = "ʲ", ["k"] = "ᵏ", ["l"] = "ˡ", ["m"] = "ᵐ",
-        ["n"] = "ⁿ", ["o"] = "ᵒ", ["p"] = "ᵖ", ["r"] = "ʳ", ["s"] = "ˢ", ["t"] = "ᵗ", ["u"] = "ᵘ", ["v"] = "ᵛ", ["w"] = "ʷ",
-        ["x"] = "ˣ", ["y"] = "ʸ", ["z"] = "ᶻ",
+        ["0"] = "⁰",
+        ["1"] = "¹",
+        ["2"] = "²",
+        ["3"] = "³",
+        ["4"] = "⁴",
+        ["5"] = "⁵",
+        ["6"] = "⁶",
+        ["7"] = "⁷",
+        ["8"] = "⁸",
+        ["9"] = "⁹",
+        ["+"] = "⁺",
+        ["-"] = "⁻",
+        ["="] = "⁼",
+        ["("] = "⁽",
+        [")"] = "⁾",
+        ["a"] = "ᵃ",
+        ["b"] = "ᵇ",
+        ["c"] = "ᶜ",
+        ["d"] = "ᵈ",
+        ["e"] = "ᵉ",
+        ["f"] = "ᶠ",
+        ["g"] = "ᵍ",
+        ["h"] = "ʰ",
+        ["i"] = "ⁱ",
+        ["j"] = "ʲ",
+        ["k"] = "ᵏ",
+        ["l"] = "ˡ",
+        ["m"] = "ᵐ",
+        ["n"] = "ⁿ",
+        ["o"] = "ᵒ",
+        ["p"] = "ᵖ",
+        ["r"] = "ʳ",
+        ["s"] = "ˢ",
+        ["t"] = "ᵗ",
+        ["u"] = "ᵘ",
+        ["v"] = "ᵛ",
+        ["w"] = "ʷ",
+        ["x"] = "ˣ",
+        ["y"] = "ʸ",
+        ["z"] = "ᶻ",
     };
 
     private static readonly IReadOnlyDictionary<string, string> _subscripts = new Dictionary<string, string>(StringComparer.Ordinal)
     {
-        ["0"] = "₀", ["1"] = "₁", ["2"] = "₂", ["3"] = "₃", ["4"] = "₄", ["5"] = "₅", ["6"] = "₆", ["7"] = "₇", ["8"] = "₈", ["9"] = "₉",
-        ["+"] = "₊", ["-"] = "₋", ["="] = "₌", ["("] = "₍", [")"] = "₎", ["a"] = "ₐ", ["e"] = "ₑ", ["h"] = "ₕ", ["i"] = "ᵢ",
-        ["j"] = "ⱼ", ["k"] = "ₖ", ["l"] = "ₗ", ["m"] = "ₘ", ["n"] = "ₙ", ["o"] = "ₒ", ["p"] = "ₚ", ["r"] = "ᵣ", ["s"] = "ₛ",
-        ["t"] = "ₜ", ["u"] = "ᵤ", ["v"] = "ᵥ", ["x"] = "ₓ",
+        ["0"] = "₀",
+        ["1"] = "₁",
+        ["2"] = "₂",
+        ["3"] = "₃",
+        ["4"] = "₄",
+        ["5"] = "₅",
+        ["6"] = "₆",
+        ["7"] = "₇",
+        ["8"] = "₈",
+        ["9"] = "₉",
+        ["+"] = "₊",
+        ["-"] = "₋",
+        ["="] = "₌",
+        ["("] = "₍",
+        [")"] = "₎",
+        ["a"] = "ₐ",
+        ["e"] = "ₑ",
+        ["h"] = "ₕ",
+        ["i"] = "ᵢ",
+        ["j"] = "ⱼ",
+        ["k"] = "ₖ",
+        ["l"] = "ₗ",
+        ["m"] = "ₘ",
+        ["n"] = "ₙ",
+        ["o"] = "ₒ",
+        ["p"] = "ₚ",
+        ["r"] = "ᵣ",
+        ["s"] = "ₛ",
+        ["t"] = "ₜ",
+        ["u"] = "ᵤ",
+        ["v"] = "ᵥ",
+        ["x"] = "ₓ",
     };
 
     private static readonly HashSet<string> _spacingCommands =
@@ -315,18 +410,32 @@ public static class Latex
 
     private static readonly IReadOnlyDictionary<string, string> _accents = new Dictionary<string, string>(StringComparer.Ordinal)
     {
-        ["acute"] = "\u0301", ["bar"] = "\u0305", ["breve"] = "\u0306", ["check"] = "\u030c", ["ddot"] = "\u0308", ["dot"] = "\u0307",
-        ["grave"] = "\u0300", ["hat"] = "\u0302", ["mathring"] = "\u030a", ["overleftarrow"] = "\u20d6", ["overleftrightarrow"] = "\u20e1",
-        ["overline"] = "\u0305", ["overrightarrow"] = "\u20d7", ["tilde"] = "\u0303", ["underline"] = "\u0332", ["vec"] = "\u20d7",
-        ["widehat"] = "\u0302", ["widetilde"] = "\u0303",
+        ["acute"] = "\u0301",
+        ["bar"] = "\u0305",
+        ["breve"] = "\u0306",
+        ["check"] = "\u030c",
+        ["ddot"] = "\u0308",
+        ["dot"] = "\u0307",
+        ["grave"] = "\u0300",
+        ["hat"] = "\u0302",
+        ["mathring"] = "\u030a",
+        ["overleftarrow"] = "\u20d6",
+        ["overleftrightarrow"] = "\u20e1",
+        ["overline"] = "\u0305",
+        ["overrightarrow"] = "\u20d7",
+        ["tilde"] = "\u0303",
+        ["underline"] = "\u0332",
+        ["vec"] = "\u20d7",
+        ["widehat"] = "\u0302",
+        ["widetilde"] = "\u0303",
     };
 
-    private const string NamedOperatorStart = "\U000F0004";
-    private const string NamedOperatorEnd = "\U000F0005";
-    private const string LayoutMarkerStart = "\U000F0000";
-    private const string LayoutMarkerEnd = "\U000F0001";
-    private const string ProtectedSpace = "\U000F0002";
-    private const string NegativeSpace = "\0";
+    private const string _namedOperatorStart = "\U000F0004";
+    private const string _namedOperatorEnd = "\U000F0005";
+    private const string _layoutMarkerStart = "\U000F0000";
+    private const string _layoutMarkerEnd = "\U000F0001";
+    private const string _protectedSpace = "\U000F0002";
+    private const string _negativeSpace = "\0";
 
     private static readonly Regex _scriptSpacing = new(@"\s*([=+-])\s*", RegexOptions.CultureInvariant);
     private static readonly Regex _simpleText = new(@"^[\p{L}\p{N}.]+$", RegexOptions.CultureInvariant);
@@ -352,7 +461,7 @@ public static class Latex
 
         if (layoutNodes.Count == 0)
         {
-            return rendered.Replace(ProtectedSpace, " ", StringComparison.Ordinal);
+            return rendered.Replace(_protectedSpace, " ", StringComparison.Ordinal);
         }
 
         var lines = RenderLayout(rendered, layoutNodes).Lines;
@@ -360,19 +469,19 @@ public static class Latex
         var indentation = nonEmptyLines.Length == 0
             ? 0
             : nonEmptyLines.Min(static line => line.Length - line.TrimStart().Length);
-        return string.Join('\n', lines.Select(line => line[indentation..].TrimEnd()))
+        return string.Join('\n', lines.Select(line => (line.Length > indentation ? line[indentation..] : string.Empty).TrimEnd()))
             .TrimEnd()
-            .Replace(ProtectedSpace, " ", StringComparison.Ordinal);
+            .Replace(_protectedSpace, " ", StringComparison.Ordinal);
     }
 
-    private static string ReplaceCharacters(string value, IReadOnlyDictionary<string, string> replacements)
+    private static string? ReplaceCharacters(string value, IReadOnlyDictionary<string, string> replacements)
     {
         var result = new StringBuilder();
         foreach (var rune in value.EnumerateRunes())
         {
             if (!replacements.TryGetValue(rune.ToString(), out var replacement))
             {
-                return string.Empty;
+                return null;
             }
 
             result.Append(replacement);
@@ -387,7 +496,7 @@ public static class Latex
         var replacements = subscript ? _subscripts : _superscripts;
         var normalized = _scriptSpacing.Replace(value, "$1");
         var unicode = ReplaceCharacters(normalized, replacements);
-        if (unicode.Length > 0 || normalized.Length == 0)
+        if (unicode is not null)
         {
             return unicode;
         }
@@ -431,21 +540,21 @@ public static class Latex
         var result = new StringBuilder(value.Length);
         for (var index = 0; index < value.Length;)
         {
-            if (value.AsSpan(index).StartsWith(NamedOperatorStart, StringComparison.Ordinal))
+            if (value.AsSpan(index).StartsWith(_namedOperatorStart, StringComparison.Ordinal))
             {
-                if (result.Length > 0 && IsNamedOperatorLeftSpacingCharacter(result, value, index))
+                if (result.Length > 0 && IsNamedOperatorLeftSpacingCharacter(result))
                 {
                     result.Append(' ');
                 }
 
-                index += NamedOperatorStart.Length;
+                index += _namedOperatorStart.Length;
                 continue;
             }
 
-            if (value.AsSpan(index).StartsWith(NamedOperatorEnd, StringComparison.Ordinal))
+            if (value.AsSpan(index).StartsWith(_namedOperatorEnd, StringComparison.Ordinal))
             {
-                result.Append(NamedOperatorEnd);
-                index += NamedOperatorEnd.Length;
+                result.Append(_namedOperatorEnd);
+                index += _namedOperatorEnd.Length;
                 if (index < value.Length && IsNamedOperatorRightSpacingCharacter(value, index))
                 {
                     result.Append(' ');
@@ -458,11 +567,11 @@ public static class Latex
         }
 
         return result.ToString()
-            .Replace(NamedOperatorStart, string.Empty, StringComparison.Ordinal)
-            .Replace(NamedOperatorEnd, string.Empty, StringComparison.Ordinal);
+            .Replace(_namedOperatorStart, string.Empty, StringComparison.Ordinal)
+            .Replace(_namedOperatorEnd, string.Empty, StringComparison.Ordinal);
     }
 
-    private static bool IsNamedOperatorLeftSpacingCharacter(StringBuilder result, string value, int start)
+    private static bool IsNamedOperatorLeftSpacingCharacter(StringBuilder result)
     {
         if (result.Length == 0)
         {
@@ -470,7 +579,7 @@ public static class Latex
         }
 
         var last = result[^1];
-        if (char.IsLetterOrDigit(last) || last is ')' or ']' or '}' || result.ToString().EndsWith(LayoutMarkerEnd, StringComparison.Ordinal))
+        if (char.IsLetterOrDigit(last) || last is ')' or ']' or '}' || result.ToString().EndsWith(_layoutMarkerEnd, StringComparison.Ordinal))
         {
             return true;
         }
@@ -481,7 +590,7 @@ public static class Latex
     private static bool IsNamedOperatorRightSpacingCharacter(string value, int index)
     {
         var character = value[index];
-        return char.IsLetterOrDigit(character) || character == '√' || value.AsSpan(index).StartsWith(LayoutMarkerStart, StringComparison.Ordinal);
+        return char.IsLetterOrDigit(character) || character == '√' || value.AsSpan(index).StartsWith(_layoutMarkerStart, StringComparison.Ordinal);
     }
 
     private static Layout RenderLayout(string source, IReadOnlyList<LayoutNode> nodes)
@@ -588,24 +697,24 @@ public static class Latex
         var searchPosition = 0;
         while (searchPosition < value.Length)
         {
-            var start = value.IndexOf(LayoutMarkerStart, searchPosition, StringComparison.Ordinal);
+            var start = value.IndexOf(_layoutMarkerStart, searchPosition, StringComparison.Ordinal);
             if (start < 0)
             {
                 yield break;
             }
 
-            var numberStart = start + LayoutMarkerStart.Length;
+            var numberStart = start + _layoutMarkerStart.Length;
             var numberEnd = numberStart;
             while (numberEnd < value.Length && char.IsAsciiDigit(value[numberEnd]))
             {
                 numberEnd++;
             }
 
-            if (numberEnd > numberStart && value.AsSpan(numberEnd).StartsWith(LayoutMarkerEnd, StringComparison.Ordinal) &&
+            if (numberEnd > numberStart && value.AsSpan(numberEnd).StartsWith(_layoutMarkerEnd, StringComparison.Ordinal) &&
                 int.TryParse(value[numberStart..numberEnd], out var nodeIndex))
             {
-                yield return new LayoutMarker(start, numberEnd + LayoutMarkerEnd.Length, nodeIndex);
-                searchPosition = numberEnd + LayoutMarkerEnd.Length;
+                yield return new LayoutMarker(start, numberEnd + _layoutMarkerEnd.Length, nodeIndex);
+                searchPosition = numberEnd + _layoutMarkerEnd.Length;
             }
             else
             {
@@ -617,20 +726,20 @@ public static class Latex
     private static bool TryGetTrailingLayoutNodeIndex(string value, out int nodeIndex)
     {
         nodeIndex = -1;
-        var end = value.LastIndexOf(LayoutMarkerEnd, StringComparison.Ordinal);
+        var end = value.LastIndexOf(_layoutMarkerEnd, StringComparison.Ordinal);
         if (end < 0)
         {
             return false;
         }
 
-        var start = value.LastIndexOf(LayoutMarkerStart, end, StringComparison.Ordinal);
-        if (start < 0 || start + LayoutMarkerStart.Length >= end)
+        var start = value.LastIndexOf(_layoutMarkerStart, end, StringComparison.Ordinal);
+        if (start < 0 || start + _layoutMarkerStart.Length >= end)
         {
             return false;
         }
 
-        var number = value[(start + LayoutMarkerStart.Length)..end];
-        return int.TryParse(number, out nodeIndex) && end + LayoutMarkerEnd.Length == value.Length;
+        var number = value[(start + _layoutMarkerStart.Length)..end];
+        return int.TryParse(number, out nodeIndex) && end + _layoutMarkerEnd.Length == value.Length;
     }
 
     private static string PadLayoutLine(string line, int width, bool centered = false)
@@ -727,12 +836,12 @@ public static class Latex
                 if (character == '\\')
                 {
                     var command = ParseCommand();
-                    if (command == NegativeSpace)
+                    if (command == _negativeSpace)
                     {
                         TrimEnd(result);
-                        if (EndsWith(result, NamedOperatorEnd))
+                        if (EndsWith(result, _namedOperatorEnd))
                         {
-                            result.Length -= NamedOperatorEnd.Length;
+                            result.Length -= _namedOperatorEnd.Length;
                         }
                     }
                     else
@@ -748,11 +857,11 @@ public static class Latex
                     _position++;
                     TrimEnd(result);
                     var script = FormatScript(ParseRequiredArgument(false), character == '_');
-                    if (EndsWith(result, NamedOperatorEnd))
+                    if (EndsWith(result, _namedOperatorEnd))
                     {
-                        result.Length -= NamedOperatorEnd.Length;
+                        result.Length -= _namedOperatorEnd.Length;
                         result.Append(script);
-                        result.Append(NamedOperatorEnd);
+                        result.Append(_namedOperatorEnd);
                     }
                     else
                     {
@@ -874,7 +983,7 @@ public static class Latex
 
             if (_negativeSpacingCommands.Contains(command))
             {
-                return NegativeSpace;
+                return _negativeSpace;
             }
 
             if (_ignoredCommands.Contains(command))
@@ -927,7 +1036,7 @@ public static class Latex
 
             if (_namedOperators.Contains(command))
             {
-                return NamedOperatorStart + command + NamedOperatorEnd;
+                return _namedOperatorStart + command + _namedOperatorEnd;
             }
 
             if (_sizeCommands.Contains(command))
@@ -954,7 +1063,7 @@ public static class Latex
                 {
                     var index = _layoutNodes.Count;
                     _layoutNodes.Add(new FractionNode(NormalizeOutput(numerator), NormalizeOutput(denominator)));
-                    return LayoutMarkerStart + index + LayoutMarkerEnd;
+                    return _layoutMarkerStart + index + _layoutMarkerEnd;
                 }
 
                 return FormatFraction(numerator, denominator);
@@ -1120,7 +1229,7 @@ public static class Latex
             {
                 var index = _layoutNodes.Count;
                 _layoutNodes.Add(new OperatorNode(@operator, lower, upper));
-                return LayoutMarkerStart + index + LayoutMarkerEnd;
+                return _layoutMarkerStart + index + _layoutMarkerEnd;
             }
 
             var rendered = @operator;
@@ -1247,7 +1356,7 @@ public static class Latex
             return null;
         }
 
-        private string[] SplitEnvironmentRows(string body) => _environmentRowBreak.Split(body);
+        private static string[] SplitEnvironmentRows(string body) => _environmentRowBreak.Split(body);
 
         private string ParseEnvironment()
         {
@@ -1334,7 +1443,7 @@ public static class Latex
                 Enumerable.Range(0, columnCount).Select(column =>
                 {
                     var cell = row.ElementAtOrDefault(column) ?? string.Empty;
-                    return cell + string.Concat(Enumerable.Repeat(ProtectedSpace, Math.Max(0, columnWidths[column] - TextMeasurement.VisibleWidth(cell))));
+                    return cell + string.Concat(Enumerable.Repeat(_protectedSpace, Math.Max(0, columnWidths[column] - TextMeasurement.VisibleWidth(cell))));
                 }))).ToArray();
 
             string[] lines;
@@ -1374,7 +1483,7 @@ public static class Latex
 
             var index = _layoutNodes.Count;
             _layoutNodes.Add(new MatrixNode(lines.ToList(), 0));
-            return LayoutMarkerStart + index + LayoutMarkerEnd;
+            return _layoutMarkerStart + index + _layoutMarkerEnd;
         }
 
         private string RenderNested(string source, bool stackFractions = true)
