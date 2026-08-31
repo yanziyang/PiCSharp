@@ -1,0 +1,99 @@
+{
+  "strikethrough-strict": [
+    "ParagraphBlock",
+    "EmphasisInline",
+    "LiteralInline",
+    "LiteralInline",
+    "EmphasisInline",
+    "LiteralInline"
+  ],
+  "strikethrough-spaced": [
+    "ParagraphBlock",
+    "LiteralInline"
+  ],
+  "table": [
+    "Table",
+    "TableRow",
+    "TableCell",
+    "ParagraphBlock",
+    "LiteralInline",
+    "TableCell",
+    "ParagraphBlock",
+    "LiteralInline",
+    "TableRow",
+    "TableCell",
+    "ParagraphBlock",
+    "LiteralInline",
+    "TableCell",
+    "ParagraphBlock",
+    "LiteralInline"
+  ],
+  "list-start": [
+    "ListBlock",
+    "ListItemBlock",
+    "ParagraphBlock",
+    "LiteralInline",
+    "ListItemBlock",
+    "ParagraphBlock",
+    "LiteralInline"
+  ],
+  "nested-list": [
+    "ListBlock",
+    "ListItemBlock",
+    "ParagraphBlock",
+    "LiteralInline",
+    "ListBlock",
+    "ListItemBlock",
+    "ParagraphBlock",
+    "LiteralInline",
+    "ListItemBlock",
+    "ParagraphBlock",
+    "LiteralInline"
+  ],
+  "codespan": [
+    "ParagraphBlock",
+    "LiteralInline",
+    "CodeInline",
+    "LiteralInline"
+  ],
+  "fenced": [
+    "FencedCodeBlock"
+  ],
+  "link": [
+    "ParagraphBlock",
+    "LinkInline",
+    "LiteralInline"
+  ],
+  "html-block": [
+    "HtmlBlock"
+  ],
+  "setext": [
+    "HeadingBlock",
+    "LiteralInline"
+  ],
+  "hr": [
+    "ThematicBreakBlock"
+  ],
+  "blockquote": [
+    "QuoteBlock",
+    "ParagraphBlock",
+    "LiteralInline",
+    "LineBreakInline",
+    "LiteralInline"
+  ],
+  "escape": [
+    "ParagraphBlock",
+    "LiteralInline",
+    "LiteralInline"
+  ],
+  "autolink": [
+    "ParagraphBlock",
+    "AutolinkInline"
+  ],
+  "hardbreak": [
+    "ParagraphBlock",
+    "LiteralInline",
+    "LineBreakInline",
+    "LiteralInline"
+  ]
+}

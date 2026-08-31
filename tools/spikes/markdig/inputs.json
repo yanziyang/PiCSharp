@@ -1,0 +1,17 @@
+{
+ "strikethrough-strict": "~~gone~~ and ~single~",
+ "strikethrough-spaced": "~~ padded ~~",
+ "table": "| a | b |\n|---|---|\n| 1 | 2 |",
+ "list-start": "3. three\n4. four",
+ "nested-list": "- a\n  - b\n- c",
+ "codespan": "use `x  y` here",
+ "fenced": "```js\nlet a=1;\n```",
+ "link": "[t](http://e.com \"ti\")",
+ "html-block": "<div>\nraw\n</div>",
+ "setext": "Title\n=====",
+ "hr": "***",
+ "blockquote": "> q1\n> q2",
+ "escape": "\\*not em\\*",
+ "autolink": "<http://e.com>",
+ "hardbreak": "a  \nb"
+}

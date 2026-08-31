@@ -1,0 +1,85 @@
+{
+ "strikethrough-strict": [
+  "paragraph",
+  "del",
+  "text",
+  "text",
+  "del",
+  "text"
+ ],
+ "strikethrough-spaced": [
+  "paragraph",
+  "text"
+ ],
+ "table": [
+  "table"
+ ],
+ "list-start": [
+  "list",
+  "list_item",
+  "text",
+  "text",
+  "list_item",
+  "text",
+  "text"
+ ],
+ "nested-list": [
+  "list",
+  "list_item",
+  "text",
+  "text",
+  "list",
+  "list_item",
+  "text",
+  "text",
+  "list_item",
+  "text",
+  "text"
+ ],
+ "codespan": [
+  "paragraph",
+  "text",
+  "codespan",
+  "text"
+ ],
+ "fenced": [
+  "code"
+ ],
+ "link": [
+  "paragraph",
+  "link",
+  "text"
+ ],
+ "html-block": [
+  "html"
+ ],
+ "setext": [
+  "heading",
+  "text"
+ ],
+ "hr": [
+  "hr"
+ ],
+ "blockquote": [
+  "blockquote",
+  "paragraph",
+  "text"
+ ],
+ "escape": [
+  "paragraph",
+  "escape",
+  "text",
+  "escape"
+ ],
+ "autolink": [
+  "paragraph",
+  "link",
+  "text"
+ ],
+ "hardbreak": [
+  "paragraph",
+  "text",
+  "br",
+  "text"
+ ]
+}
