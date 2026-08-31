@@ -34,10 +34,35 @@ server:Pi.Server
 tui:Pi.Tui
 "
 
+# Upstream cases that a C# port could actually run offline.
+#
+# Files gated on live provider credentials -- describe.skipIf(!process.env.GEMINI_API_KEY)
+# and friends -- hit real endpoints with retries. Upstream skips them itself without keys.
+# They are not portable as offline tests, so counting them made the denominator unreachable:
+# pi-ai carried 615 such cases out of 1,360, capping its achievable parity at 55% and
+# reporting 7% when the real figure against portable cases was 13%. A metric with an
+# unreachable ceiling stops being read, which is roughly what happened to pi-ai after wave 2.
+#
+# Excluded here and reported separately. This changes the denominator only; the floors
+# ratchet on PORTED counts and are unaffected.
+count_upstream_live() {
+  local pkg="$1"
+  [ -d "$REF/$pkg" ] || { echo 0; return; }
+  local total=0
+  while IFS= read -r f; do
+    grep -qE 'skipIf\(!?(process\.env|has[A-Za-z]*Credentials)' "$f" || continue
+    total=$(( total + $(grep -cE '^[[:space:]]*(it|test)\(' "$f") ))
+  done < <(find "$REF/$pkg" -name '*.test.ts' -not -path '*/node_modules/*')
+  echo "$total"
+}
+
 count_upstream() {
   local pkg="$1"
   [ -d "$REF/$pkg" ] || { echo 0; return; }
-  find "$REF/$pkg" -name '*.test.ts' -not -path '*/node_modules/*' -exec grep -hoE '^[[:space:]]*(it|test)\(' {} + 2>/dev/null | wc -l | tr -d ' '
+  local all live
+  all=$(find "$REF/$pkg" -name '*.test.ts' -not -path '*/node_modules/*' -exec grep -hoE '^[[:space:]]*(it|test)\(' {} + 2>/dev/null | wc -l | tr -d ' ')
+  live=$(count_upstream_live "$pkg")
+  echo $(( all - live ))
 }
 
 # Implementation LOC. C# runs 1.2-1.5x more verbose than TypeScript, so a ratio
@@ -93,7 +118,7 @@ if [ "$UPDATE" = "1" ]; then
 fi
 
 fail=0
-printf '%-12s %-16s %8s %8s %8s   %s\n' PACKAGE PROJECT UPSTREAM PORTED FLOOR STATUS
+printf '%-12s %-16s %8s %6s %8s %8s   %s\n' PACKAGE PROJECT PORTABLE LIVE PORTED FLOOR STATUS
 printf '%s\n' "----------------------------------------------------------------------------"
 
 while read -r pkg proj floor _recorded recorded_loc; do
@@ -116,9 +141,9 @@ while read -r pkg proj floor _recorded recorded_loc; do
     status="FAIL (+${grown} impl lines, no new tests)"
     fail=1
   else
-    status="ok  ${pct}% of upstream"
+    status="ok  ${pct}% of portable"
   fi
-  printf '%-12s %-16s %8s %8s %8s   %s\n' "$pkg" "$proj" "$up" "$got" "$floor" "$status"
+  printf '%-12s %-16s %8s %6s %8s %8s   %s\n' "$pkg" "$proj" "$up" "$(count_upstream_live "$pkg")" "$got" "$floor" "$status"
 done < "$BUDGET"
 
 if [ "$fail" = "1" ]; then
@@ -148,5 +173,6 @@ done < "$BUDGET"
 
 echo ""
 echo "All packages at or above their recorded test floors."
-echo "Percentages are coverage against the upstream suite, which docs/differential-testing.md"
-echo "treats as the specification. Low percentages are technical debt, not passing grades."
+echo "PORTABLE excludes upstream cases gated on live provider credentials; those are counted"
+echo "under LIVE and cannot be ported as offline tests. Percentages are against PORTABLE, the"
+echo "reachable denominator. Low percentages are technical debt, not passing grades."

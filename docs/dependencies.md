@@ -46,7 +46,7 @@
 | `DiffPlex` | `diff` | `Pi.AgentCore`, `Pi.CodingAgent` (edit tool) | Apache-2.0 | **Must produce upstream-identical hunks** — the edit tool's behaviour depends on it. Verify early; if it diverges, port `diff` instead. |
 | `Markdig` | `marked` | `Pi.Tui`, `Pi.CodingAgent` | BSD-2-Clause | Must support the transformer hook `registerMarkdownTransformer` needs. |
 | `NuGet.Versioning` | `semver` | `Pi.CodingAgent` (package manager) | Apache-2.0 | npm and SemVer 2.0 range syntax differ. Verify against upstream's range tests, or port `semver`. |
-| `SkiaSharp` | `@silvia-odwyer/photon-node` | `Pi.CodingAgent` (image handling) | MIT | See §5 — deliberately chosen over ImageSharp. |
+| `SkiaSharp` | `@silvia-odwyer/photon-node` | `Pi.CodingAgent` (image handling) | MIT | See §5 — deliberately chosen over ImageSharp. **Not needed for T5.5**: terminal images shipped in `f2a045f` with no dependency at all, since Kitty/iTerm2 encoding is escape-sequence building and dimension probing is magic-byte header reading. Wave 6 image handling only. |
 | `TextMateSharp` | `highlight.js` | `Pi.CodingAgent` (code rendering) | MIT | Grammar-based; output will not match `highlight.js` token-for-token. Golden tests must be regenerated, not ported. |
 | `xunit.v3` | `vitest` | all test projects | Apache-2.0 | Runs on Microsoft.Testing.Platform, which carries its own runner: `Microsoft.NET.Test.Sdk` and `xunit.runner.visualstudio` are **not** required. See `solution-layout.md §7`. |
 | `Verify.Xunit` | snapshot assertions | test projects | MIT | For golden buffers and normalised event sequences. |

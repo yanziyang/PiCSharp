@@ -23,7 +23,7 @@
          DiffPlex                (wave 3 / 6)
          Markdig                 (wave 5 / 6)
          NuGet.Versioning        (wave 6)
-         SkiaSharp               (T5.5 - confirm actual need first)
+         SkiaSharp               (wave 6 image handling; NOT needed for T5.5 - see dependencies.md)
          TextMateSharp           (wave 6)
          Verify.Xunit            (when golden tests land) -->
 
