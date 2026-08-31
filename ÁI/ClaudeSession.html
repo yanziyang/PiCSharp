@@ -56,8 +56,8 @@ footer{border-top:1px solid var(--line);background:var(--panel);padding:26px 0 4
 <div class="meta">
 <div>Dates<b>29–30 August 2026</b></div>
 <div>Project<b>C:\MyProjects\PiCSharp</b></div>
-<div>Exchanges<b>60</b></div>
-<div>Responses<b>92</b></div>
+<div>Exchanges<b>62</b></div>
+<div>Responses<b>94</b></div>
 <div>Model<b>Claude Opus 5</b></div>
 </div></div></header>
 <div class="shell">
@@ -122,6 +122,8 @@ footer{border-top:1px solid var(--line);background:var(--panel);padding:26px 0 4
 <a href="#p58"><span class="n">58</span>Follow your recommendation B</a>
 <a href="#p59"><span class="n">59</span>Update ClaudeSession.html and push</a>
 <a href="#p60"><span class="n">60</span>How you rate overall implementation so far: code quality , architecture …</a>
+<a href="#p61"><span class="n">61</span>Prefer Codex do it or yourself do these three?</a>
+<a href="#p62"><span class="n">62</span>Yes, proceed — The R4 investigation overturned my own review</a>
 </nav>
 <main>
 <section class="turn user" id="p1">
@@ -1480,11 +1482,56 @@ class StrictStrikethroughTokenizer extends Tokenizer { ... }</code></pre>
 <p>Also worth closing cheaply: D1 and D5 are still marked <strong>Proposed</strong> despite being substantially validated by two acceptance rounds and now a passing Amendment D test.</p>
 <p>Want this as a shareable artifact, or an <code>R4</code> packet drafted against the Pi.Ai gap?</p></div>
 </section>
+<section class="turn user" id="p61">
+  <div class="who"><span class="badge u">Exchange 61</span><time>2026-08-31 14:03:46</time></div>
+  <div class="bubble"><p>Prefer Codex do it or yourself do these three?</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Clear split. Here's my recommendation for each:</p>
+<h4>1. <code>Pi.Ai</code> → <strong>Codex</strong>, me writing the packets</h4>
+<p>This is high-volume porting against a spec that already exists — exactly what eight packets show Codex does well, and a poor use of my time (I'd be hand-translating hundreds of cases slowly).</p>
+<p>But <strong>not as one packet.</strong> The gap is ~140 upstream files with a long tail. The risk is concentrated in seven of them:</p>
+<div class="tw"><table><thead><tr><th>File</th><th>Cases</th></tr></thead><tbody><tr><td><code>stream.test.ts</code></td><td>184</td></tr><tr><td><code>empty.test.ts</code></td><td>104</td></tr><tr><td><code>unicode-surrogate.test.ts</code></td><td>78</td></tr><tr><td><code>abort.test.ts</code></td><td>39</td></tr><tr><td><code>context-overflow.test.ts</code></td><td>32</td></tr><tr><td><code>total-tokens.test.ts</code></td><td>31</td></tr><tr><td><code>tool-call-without-result.test.ts</code></td><td>26</td></tr></tbody></table></div>
+<p>That's <strong>494 cases of cross-provider streaming behaviour</strong> — the part where a port diverges silently. The remaining ~120 files are provider-specific edge cases: worth doing, lower risk per case, better batched afterwards.</p>
+<p>Sized against T5.3b's clean 191-case delivery, I'd split it:</p>
+<ul><li><strong>R4</strong> — <code>stream</code> + <code>abort</code> (223 cases): streaming lifecycle</li><li><strong>R5</strong> — <code>empty</code> + <code>unicode-surrogate</code> (182): degenerate content, chunk-split surrogates</li><li><strong>R6</strong> — overflow, token accounting, orphan tool calls (89) + the tail</li></ul>
+<h4>2. D1/D5 → <strong>Me to prepare, you to sign</strong></h4>
+<p>This isn't a task, it's a decision, and "signed off" means <em>you</em> accept it — I shouldn't mark my own design docs Accepted. What I can do is assemble the evidence: two acceptance rounds passed, five amendments absorbed without redesign, <code>AutocompleteProviderFactory</code> and Amendment D both now proven by passing tests rather than argument, and the Component-contract error found and corrected.</p>
+<p>Codex can't do this at all — it starts cold each packet, and the evidence <em>is</em> the cross-project history.</p>
+<h4>3. SkiaSharp → <strong>Me, now</strong></h4>
+<p>One-line register edit. Spinning up a packet costs more than the change.</p>
+<hr>
+<p>Want me to write R4 and draft the D1/D5 sign-off evidence, and fix the SkiaSharp line while I'm in <code>dependencies.md</code>? I'd hold R5/R6 until R4 comes back — if streaming diverges, that reshapes the ones after it.</p></div>
+</section>
+<section class="turn user" id="p62">
+  <div class="who"><span class="badge u">Exchange 62</span><time>2026-08-31 14:05:11</time></div>
+  <div class="bubble"><p>Yes, proceed</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>All three done, pushed as <code>bca8590</code>. T5.7's in-flight work verified untouched.</p>
+<h4>The R4 investigation overturned my own review</h4>
+<p>I told you <code>stream.test.ts</code> (184) and <code>abort.test.ts</code> (39) were the risk-concentrated core to attack first. <strong>That was wrong</strong>, and I caught it only by opening the files:</p>
+<pre class="code" data-lang="ts"><code>describe.skipIf(!process.env.GEMINI_API_KEY)("Gemini Provider (gemini-2.5-flash)", () =&gt; {
+  it.skipIf(!isVertexConfigured)("should handle streaming", { retry: 3 }, async () =&gt; {</code></pre>
+<p>All seven files I named are <strong>live E2E tests</strong> hitting real provider endpoints. Upstream skips them itself without keys. The packet I was about to write would have been impossible to execute.</p>
+<div class="tw"><table><thead><tr><th>Pi.Ai upstream cases</th><th></th></tr></thead><tbody><tr><td>Credential-gated live E2E</td><td><strong>615</strong></td></tr><tr><td>Offline-portable</td><td><strong>745</strong></td></tr><tr><td>Ported in C#</td><td>99</td></tr></tbody></table></div>
+<p>So Pi.Ai is at <strong>13% of what's reachable</strong>, not 7% of everything.</p>
+<p><strong>That's also a defect in my own gate</strong>, so I fixed it: <code>test-parity.sh</code> now excludes credential-gated cases from the denominator and reports them in a <code>LIVE</code> column. The old denominator had an unreachable ceiling of 55% — a good way to make a number stop being read, which is roughly what happened to Pi.Ai after wave 2. Floors ratchet on <em>ported</em> counts, so nothing was loosened.</p>
+<h4>R4, rebuilt on the real data</h4>
+<p>134 cases in one coherent theme — <em>what happens between the provider and the wire</em>: endpoint resolution, retry classification, error bodies, overflow, and <code>openai-codex-stream</code>, the one streaming suite that runs without credentials. <code>src/</code> is frozen; a failing ported test is the deliverable, not an obstacle.</p>
+<p>Its first hazard is specific: three target files are heavily env-driven (19, 18 and 5 <code>process.env</code> references), while <code>Pi.Ai.Tests</code> today mutates no environment and has no parallelization policy. That's precisely the setup that produced two flakes in <code>Pi.Tui</code>. The packet points at <code>ProcessTerminal</code>'s injected-environment pattern as the fix.</p>
+<h4>D1/D5 — evidence assembled, decision yours</h4>
+<p><code>docs/design-signoff.md</code>. I recommend <strong>accepting both</strong>, but I didn't stamp them — that's your call, and D5 comes with a caveat I won't paper over: it required <em>byte-identical golden buffers captured from the TypeScript renderer</em>, and that harness (<code>T0.2</code>) was never built. <code>Pi.Conformance.Tests</code> is three facts asserting the project references resolve. The parity ratchet substituted for it.</p>
+<p>Also worth knowing: <strong>all seven</strong> design docs are still Proposed, and D5 said "sign off before wave 5" — wave 5 is 83% done.</p>
+<pre class="code" data-lang="bash"><code>codex "Read ÍmplementationKit/packets/R4-ai-transport-and-resilience.md and implement it. Port all 134 cases from the twelve listed offline test files, names verbatim. src/ is frozen: if a ported test fails, report it with the upstream expectation and the actual C# behaviour, then fix it in a separate commit. Handle environment-driven endpoint resolution by injection rather than mutating process globals. Run the full suite at least three times."</code></pre></div>
+</section>
 
 </main></div>
 <footer><div class="wrap">
 <p style="margin:0 0 6px"><b>Session transcript exported from Claude Code.</b> Prompts and responses only — tool calls, tool results and internal reasoning are excluded as intermediate working detail.</p>
-<p style="margin:0 0 6px">This is a curated record, not a complete one. Bare continuations such as “proceed” are folded into the preceding exchange, keeping the work they triggered without the empty prompt. Short progress narration between tool calls is dropped. A further 6 exchanges were omitted as routine housekeeping.</p>
-<p style="margin:0">Generated 2026-08-31 · 152 entries from 3,810 transcript records.</p>
+<p style="margin:0 0 6px">This is a curated record, not a complete one. Bare continuations such as “proceed” are folded into the preceding exchange, keeping the work they triggered without the empty prompt. Short progress narration between tool calls is dropped. A further 7 exchanges were omitted as routine housekeeping.</p>
+<p style="margin:0">Generated 2026-08-31 · 156 entries from 3,994 transcript records.</p>
 </div></footer>
 </body></html>
