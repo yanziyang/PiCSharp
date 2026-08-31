@@ -56,8 +56,8 @@ footer{border-top:1px solid var(--line);background:var(--panel);padding:26px 0 4
 <div class="meta">
 <div>Dates<b>29–30 August 2026</b></div>
 <div>Project<b>C:\MyProjects\PiCSharp</b></div>
-<div>Exchanges<b>58</b></div>
-<div>Responses<b>90</b></div>
+<div>Exchanges<b>60</b></div>
+<div>Responses<b>92</b></div>
 <div>Model<b>Claude Opus 5</b></div>
 </div></div></header>
 <div class="shell">
@@ -120,6 +120,8 @@ footer{border-top:1px solid var(--line);background:var(--panel);padding:26px 0 4
 <a href="#p56"><span class="n">56</span>Update ClaudeSession.html and push</a>
 <a href="#p57"><span class="n">57</span>elaborate the open decision waiting for me: "what marked becomes in C#".</a>
 <a href="#p58"><span class="n">58</span>Follow your recommendation B</a>
+<a href="#p59"><span class="n">59</span>Update ClaudeSession.html and push</a>
+<a href="#p60"><span class="n">60</span>How you rate overall implementation so far: code quality , architecture …</a>
 </nav>
 <main>
 <section class="turn user" id="p1">
@@ -1439,11 +1441,50 @@ class StrictStrikethroughTokenizer extends Tokenizer { ... }</code></pre>
 <p>I also corrected T5.7's out-of-scope note, which still said markdown was "blocked on the dependency decision" — it's gated on this spike now, not on a decision.</p>
 <p>Your <code>SkiaSharp (T5.5 — confirm actual need first)</code> entry is still open in the register; T5.5 shipped with zero dependencies, so that need is disproved for terminal images. Say the word and I'll narrow it to wave 6.</p></div>
 </section>
+<section class="turn user" id="p59">
+  <div class="who"><span class="badge u">Exchange 59</span><time>2026-08-31 13:49:41</time></div>
+  <div class="bubble"><p>Update ClaudeSession.html and push</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Pushed as <code>9c1d89f</code> — HEAD and <code>origin/main</code> in sync, on <code>main</code>, tree clean.</p>
+<p><strong>58 exchanges, 90 responses, 212 KB</strong>, sections balance 148/148. New material: the <code>marked</code>/Markdig investigation — including my correction that the dependency was already approved in my own register — the measured divergence run, and the T5.8 handoff.</p>
+<p>Two packets are now in flight for Codex:</p>
+<div class="tw"><table><thead><tr><th></th><th></th></tr></thead><tbody><tr><td><code>T5.7</code></td><td>latex — 19 cases plus branch coverage</td></tr><tr><td><code>T5.8</code></td><td>Markdig divergence spike — findings, not a port</td></tr></tbody></table></div>
+<p>They're independent, so they can run in either order or together. T5.8 gates markdown (81 cases, the largest remaining piece of wave 5); T5.7 is on markdown's critical path regardless.</p>
+<p>Still open on your side: whether to narrow the <code>SkiaSharp</code> entry in <code>docs/dependencies.md</code> to wave 6, now that T5.5 shipped without it.</p></div>
+</section>
+<section class="turn user" id="p60">
+  <div class="who"><span class="badge u">Exchange 60</span><time>2026-08-31 13:57:58</time></div>
+  <div class="bubble"><p>How you rate overall implementation so far: code quality , architecture design etc.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span></div>
+  <div class="bubble"><p>Grounded assessment, with the caveat that T5.7 is landing in the tree as I write.</p>
+<h4>Verdict</h4>
+<p><strong>The code that exists is good. The coverage is uneven, and the riskiest package is the least verified.</strong></p>
+<h4>What's genuinely strong</h4>
+<p><strong>Verification is mechanical, not aspirational.</strong> The parity ratchet, skip budget, and CI gates enforce test-first behaviour rather than asking for it. This isn't decoration — it caught R2 shipping 1,212 lines with zero tests, and when I found the gate had a floor-only hole, closing it was a five-line change that has held since. Upstream's suites as oracle is the right call and it's been followed literally: case names diff clean against upstream, so divergence is detectable later.</p>
+<p><strong>Architecture decisions have been revised against evidence, not defended.</strong> Three "not delegable" C ratings (T5.2, T5.5, and T5.2's second half) turned out to have been assigned without measuring the files; each was re-rated with a measurement and each held. The <code>Component</code> contract I originally got wrong was corrected and the feasibility conclusion moved with it. Amendment D — the riskiest extension commitment — is now a passing test rather than a reading of two TypeScript files.</p>
+<p><strong>Defects were fixed at the root.</strong> <code>TERMUX_VERSION</code> moved to a constructor read rather than being suppressed; the render/input race got a real lock in its own commit. The one blunt instrument (<code>ParallelMode.None</code>) is justified and now documented so it doesn't get deleted as cruft.</p>
+<p><strong>Current state:</strong> 61,398 src lines, 28,280 test lines, zero skipped tests, all floors held.</p>
+<h4>The real weaknesses</h4>
+<p><strong>1. <code>Pi.Ai</code> is the biggest risk in the project by a wide margin.</strong></p>
+<div class="tw"><table><thead><tr><th></th><th></th></tr></thead><tbody><tr><td>Implementation</td><td>14,824 lines, 5 providers</td></tr><tr><td>Test parity</td><td><strong>7%</strong> — 99 cases against upstream's 1,360</td></tr></tbody></table></div>
+<p>And upstream's 1,360 aren't padding. They're <code>stream.test.ts</code> (184), <code>empty.test.ts</code> (104), <code>unicode-surrogate.test.ts</code> (78), <code>abort.test.ts</code> (39), <code>context-overflow.test.ts</code> (32) — 35,051 LOC of behavioural conformance covering streaming across five providers, surrogate pairs split across chunks, mid-stream aborts. That is precisely where a port diverges silently, and it's been sitting at 7% since wave 2.</p>
+<p><strong>2. The differential harness was never built.</strong> <code>differential-testing.md</code> specifies golden buffers and running the C# client against the real TypeScript server. <code>Pi.Conformance.Tests</code> contains <code>ProjectReferenceTests.cs</code> with 3 facts. The parity ratchet is standing in for it — a weaker proxy, since it counts cases rather than comparing behaviour.</p>
+<p><strong>3. ~41% of upstream is untouched.</strong> <code>coding-agent</code> is 60,960 LOC and holds the actual product — tools, permissions, sessions, modes. Everything built so far is the infrastructure beneath it.</p>
+<p><strong>4. Minor blemishes.</strong> An empty <code>Terminal : ITerminal</code> compatibility interface with CA1715 suppressed; <code>Focusable</code> without the <code>I</code> prefix. Both are deliberate upstream-name retention, both are defensible, neither is free.</p>
+<h4>What I'd do about it</h4>
+<p>Finish wave 5 — it's at 83% parity and cheap to complete. <strong>Then remediate <code>Pi.Ai</code> before starting wave 6</strong>, not after. Wave 6 sits directly on top of the streaming layer, and building 60,960 LOC on an under-verified foundation compounds the risk rather than deferring it. An <code>R4</code>-style packet against <code>stream.test.ts</code>, <code>abort.test.ts</code> and <code>unicode-surrogate.test.ts</code> would be the highest-value work available right now, and it's well-shaped for delegation — the upstream suite is the spec.</p>
+<p>Also worth closing cheaply: D1 and D5 are still marked <strong>Proposed</strong> despite being substantially validated by two acceptance rounds and now a passing Amendment D test.</p>
+<p>Want this as a shareable artifact, or an <code>R4</code> packet drafted against the Pi.Ai gap?</p></div>
+</section>
 
 </main></div>
 <footer><div class="wrap">
 <p style="margin:0 0 6px"><b>Session transcript exported from Claude Code.</b> Prompts and responses only — tool calls, tool results and internal reasoning are excluded as intermediate working detail.</p>
 <p style="margin:0 0 6px">This is a curated record, not a complete one. Bare continuations such as “proceed” are folded into the preceding exchange, keeping the work they triggered without the empty prompt. Short progress narration between tool calls is dropped. A further 6 exchanges were omitted as routine housekeeping.</p>
-<p style="margin:0">Generated 2026-08-31 · 148 entries from 3,758 transcript records.</p>
+<p style="margin:0">Generated 2026-08-31 · 152 entries from 3,810 transcript records.</p>
 </div></footer>
 </body></html>
