@@ -120,6 +120,12 @@ pole; discovering that in month nine is avoidable.
 | T5.3 | Editor, keybindings, kill-ring, undo, word navigation | ~4,000 | B |
 | T5.4 | Grapheme segmentation, East-Asian width, ANSI extraction | ~2,000 | B |
 | T5.5 | Terminal images: Kitty, iTerm, dimension probing | ~2,500 | C |
+
+> **T5.5 re-rated to B.** `terminal-image.ts` has zero local imports; dimension probing is magic-byte
+> and big-endian header reading, not decoding; encoding is deterministic string building; and 64
+> upstream cases specify it. No image library is involved in TypeScript either. The one platform
+> dependency is a `tmux` probe that falls back to `false`, with precedent in T5.6's `fd` handling.
+> See `ÍmplementationKit/packets/T5.5-terminal-image.md`.
 | T5.6 | Autocomplete, fuzzy matching, alt-screen search | ~2,000 | A |
 
 **T5.2 is rated C and must not be delegated as a single packet.** The diff renderer is the component
