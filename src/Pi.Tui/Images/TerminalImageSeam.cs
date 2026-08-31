@@ -19,11 +19,7 @@ public readonly record struct TerminalCapabilities(
 /// <summary>Measured terminal cell dimensions in pixels.</summary>
 public readonly record struct CellDimensions(int WidthPx, int HeightPx);
 
-/// <summary>
-/// Narrow seam between the TUI core and terminal-image protocol support. T5.2b intentionally
-/// supplies only the no-image implementation; protocol encoding and capability detection belong
-/// to the later terminal-image port.
-/// </summary>
+/// <summary>Narrow seam between the TUI core and terminal-image protocol support.</summary>
 public interface ITerminalImageSeam
 {
     /// <summary>Returns the capabilities currently exposed to the TUI.</summary>
@@ -96,7 +92,7 @@ public sealed class NoImageTerminalImageSeam : ITerminalImageSeam
 }
 
 /// <summary>Image-escape helpers required by the TUI without implementing image protocols.</summary>
-public static class TerminalImage
+public static partial class TerminalImage
 {
     /// <summary>Kitty graphics APC prefix.</summary>
     public const string KittyPrefix = "\x1b_G";
