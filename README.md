@@ -10,6 +10,10 @@ eventual extension model to the .NET ecosystem without introducing a Node.js run
 > delivered in focused milestones; the `pi` executable and several high-level features are still
 > under construction.
 
+> **Latest milestone:** R5 client/server protocol-boundary coverage is delivered, including all 42
+> transport-independent upstream cases with their upstream names preserved. Unix transport and the
+> `TestServerService` harness remain deferred to R5b.
+
 ## What is here
 
 The repository currently contains the following delivered foundations:
@@ -18,14 +22,16 @@ The repository currently contains the following delivered foundations:
 - **Agent runtime** — stateful agent-loop orchestration with deterministic faux-provider support.
 - **AI provider layer** — shared abstractions plus authentication, HTTP/SSE transport, and adapters
   for Anthropic, OpenAI, Google Generative AI, Mistral, and Amazon Bedrock.
+- **Client/server boundary** — transport-independent connection, session, request, state, disposal,
+  protocol, and listener behavior covered against the pinned upstream suite.
 - **Terminal UI foundation** — layout/container contracts, text measurement, key input, autocomplete,
   bounded terminal output, and differential rendering.
 - **Compatibility documentation** — translation patterns, dependency decisions, session format,
   extension API boundaries, and delegation packets for the remaining work.
 
-The remaining high-risk areas include the complete coding-agent tool surface, interactive editor and
-CLI modes, terminal images, and the redesigned extension host. Treat the milestone status and tests
-as the source of truth for what is usable today.
+The remaining high-risk areas include the Unix client/server transport and `TestServerService` harness,
+the complete coding-agent tool surface, interactive editor and CLI modes, and the redesigned extension
+host. Treat the milestone status and tests as the source of truth for what is usable today.
 
 ## Architecture at a glance
 
