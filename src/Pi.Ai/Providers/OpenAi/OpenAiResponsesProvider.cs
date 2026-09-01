@@ -215,6 +215,11 @@ public sealed class OpenAiResponsesProvider : ProviderStreams
                     continue;
                 }
 
+                if (string.Equals(sse.Data.Trim(), "[DONE]", StringComparison.Ordinal))
+                {
+                    break;
+                }
+
                 var node = JsonParseUtilities.ParseJsonWithRepair(sse.Data) as JsonObject;
                 if (node is null)
                 {
@@ -222,6 +227,10 @@ public sealed class OpenAiResponsesProvider : ProviderStreams
                 }
 
                 HandleEvent(state, stream, model, node);
+                if (state.SawTerminalResponseEvent)
+                {
+                    break;
+                }
             }
 
             if (options?.Signal.IsCancellationRequested == true)

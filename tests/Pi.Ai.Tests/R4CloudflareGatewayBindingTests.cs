@@ -1,4 +1,6 @@
 using System.Net;
+using System.Net.Http.Headers;
+using System.Text;
 using System.Text.Json.Nodes;
 
 using Pi.Ai;
@@ -14,24 +16,23 @@ public sealed class R4CloudflareGatewayBindingTests
     [Fact(DisplayName = "derives provider and endpoint from gateway passthrough URLs")]
     public async Task Derives_provider_and_endpoint_from_gateway_passthrough_URLs()
     {
-        var handler = new R4CapturingHandler(_ => new HttpResponseMessage(HttpStatusCode.OK));
-        var client = new ProviderHttpClient(new HttpClient(handler));
-        var model = R4TestSupport.Model(api: ApiNames.OpenAiCompletions, provider: "gateway", baseUrl: _baseUrl);
+        var binding = new R4CloudflareBinding();
+        var transport = new CloudflareGatewayBindingTransport(binding, _baseUrl, "my-gateway");
 
         foreach (var path in new[] { "/anthropic/v1/messages", "/openai/responses", "/workers-ai/v1/chat/completions" })
         {
-            using var response = await client.SendAsync(
-                model,
-                HttpMethod.Post,
-                new Uri(_baseUrl + path),
-                new JsonObject { ["model"] = "test" },
-                new ProviderRequestOptions { ApiKey = "test" },
-                cancellationToken: TestContext.Current.CancellationToken);
+            using var request = new HttpRequestMessage(HttpMethod.Post, new Uri(_baseUrl + path))
+            {
+                Content = new StringContent("{\"model\":\"test\"}", Encoding.UTF8, "application/json"),
+            };
+            using var response = await transport.SendAsync(request, TestContext.Current.CancellationToken);
         }
 
         Assert.Equal(
-            ["/anthropic/v1/messages", "/openai/responses", "/workers-ai/v1/chat/completions"],
-            handler.Requests.Select(request => request.Uri.AbsolutePath));
+            [("anthropic", "v1/messages"), ("openai", "responses"), ("workers-ai", "v1/chat/completions")],
+            binding.Runs.Select(run => (run.Request.Provider, run.Request.Endpoint)));
+        Assert.Equal(["my-gateway", "my-gateway", "my-gateway"], binding.Runs.Select(run => run.GatewayId));
+        Assert.Equal("test", binding.Runs[0].Request.Query!["model"]!.GetValue<string>());
     }
 
     [Fact(DisplayName = "keeps the query string in the endpoint")]
@@ -112,7 +113,7 @@ public sealed class R4CloudflareGatewayBindingTests
             });
 
         Assert.False(request.Headers.Contains("cf-aig-authorization"));
-        Assert.False(request.Headers.Contains("content-length"));
+        Assert.False(request.Content?.Headers.Contains("content-length") == true);
         Assert.Equal("{\"user\":\"42\"}", request.Headers.GetValues("cf-aig-metadata").Single());
         Assert.Equal("provider-key", request.Headers.GetValues("x-api-key").Single());
     }
@@ -120,18 +121,22 @@ public sealed class R4CloudflareGatewayBindingTests
     [Fact(DisplayName = "accepts Request inputs and forwards their headers and body")]
     public async Task Accepts_Request_inputs_and_forwards_their_headers_and_body()
     {
-        var request = await SendAsync(
-            new Uri($"{_baseUrl}/openai/chat/completions"),
+        var binding = new R4CloudflareBinding();
+        var transport = new CloudflareGatewayBindingTransport(binding, _baseUrl, "my-gateway");
+        using var request = new HttpRequestMessage(
             HttpMethod.Post,
-            new JsonObject { ["stream"] = true },
-            new ProviderRequestOptions
-            {
-                Headers = new Dictionary<string, string?> { ["content-type"] = "application/json" },
-            });
+            new Uri($"{_baseUrl}/openai/chat/completions"))
+        {
+            Content = new StringContent("{\"stream\":true}", Encoding.UTF8, "application/json"),
+        };
+        request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+        using var response = await transport.SendAsync(request, TestContext.Current.CancellationToken);
+        var run = Assert.Single(binding.Runs);
 
-        Assert.Equal("/openai/chat/completions", request.Uri.AbsolutePath);
-        Assert.Equal("application/json", request.Header("content-type"));
-        Assert.Equal("{\"stream\":true}", request.Body);
+        Assert.Equal("openai", run.Request.Provider);
+        Assert.Equal("chat/completions", run.Request.Endpoint);
+        Assert.True(run.Request.Query!["stream"]!.GetValue<bool>());
+        Assert.Equal("application/json", run.Request.Headers["content-type"]);
     }
 
     [Fact(DisplayName = "forwards the abort signal")]
@@ -166,7 +171,8 @@ public sealed class R4CloudflareGatewayBindingTests
     {
         CancellationToken observed = new CancellationTokenSource().Token;
         var client = new ProviderHttpClient();
-        using var response = await client.SendAsync(
+        using var response = await R4TestSupport.SendWithoutCancellationAsync(
+            client,
             R4TestSupport.Model(),
             HttpMethod.Post,
             new Uri("https://example.test"),
@@ -178,8 +184,7 @@ public sealed class R4CloudflareGatewayBindingTests
                     observed = token;
                     return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK));
                 },
-            },
-            cancellationToken: TestContext.Current.CancellationToken);
+            });
 
         // CancellationToken is a value type in the C# port; default Signal is the explicit
         // no-signal representation of JavaScript's null override.

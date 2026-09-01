@@ -45,13 +45,14 @@ public sealed class ProviderHttpClient
         }
 
         using var operationCancellation = CreateOperationCancellation(options, cancellationToken);
+        var operationToken = operationCancellation?.Token ?? CancellationToken.None;
         using var request = BuildRequest(model, method, uri, effectivePayload, options, defaultHeaders);
         var response = options?.Fetch is not null
-            ? await options.Fetch(request, operationCancellation.Token).ConfigureAwait(false)
+            ? await options.Fetch(request, operationToken).ConfigureAwait(false)
             : await _httpClient.SendAsync(
                     request,
                     HttpCompletionOption.ResponseHeadersRead,
-                    operationCancellation.Token)
+                    operationToken)
                 .ConfigureAwait(false);
 
         if (options?.OnResponse is not null)
@@ -69,7 +70,7 @@ public sealed class ProviderHttpClient
 
         var body = response.Content is null
             ? null
-            : await response.Content.ReadAsStringAsync(operationCancellation.Token).ConfigureAwait(false);
+            : await response.Content.ReadAsStringAsync(operationToken).ConfigureAwait(false);
         response.Dispose();
         throw new ProviderErrorMetadataException(
             $"{(int)response.StatusCode} status code (no body)",
@@ -119,8 +120,15 @@ public sealed class ProviderHttpClient
         {
             if (pair.Value is null)
             {
-                request.Headers.Remove(pair.Key);
-                request.Content?.Headers.Remove(pair.Key);
+                if (IsContentHeader(pair.Key))
+                {
+                    request.Content?.Headers.Remove(pair.Key);
+                }
+                else
+                {
+                    request.Headers.Remove(pair.Key);
+                }
+
                 continue;
             }
 
@@ -143,13 +151,18 @@ public sealed class ProviderHttpClient
         return request;
     }
 
-    private static CancellationTokenSource CreateOperationCancellation(
+    private static CancellationTokenSource? CreateOperationCancellation(
         ProviderRequestOptions? options,
         CancellationToken cancellationToken)
     {
         var tokens = new[] { cancellationToken, options?.Signal ?? default }
             .Where(static token => token.CanBeCanceled)
             .ToArray();
+        if (tokens.Length == 0 && options?.TimeoutMs is not > 0)
+        {
+            return null;
+        }
+
         var source = tokens.Length switch
         {
             0 => new CancellationTokenSource(),
@@ -163,6 +176,9 @@ public sealed class ProviderHttpClient
 
         return source;
     }
+
+    private static bool IsContentHeader(string name) =>
+        name.StartsWith("Content-", StringComparison.OrdinalIgnoreCase);
 
     private static void MergeHeaders(
         Dictionary<string, string?> destination,

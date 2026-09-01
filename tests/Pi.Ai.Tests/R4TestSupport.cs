@@ -192,6 +192,15 @@ internal static class R4TestSupport
         return (events, await stream.Result);
     }
 
+    public static Task<HttpResponseMessage> SendWithoutCancellationAsync(
+        ProviderHttpClient client,
+        Model model,
+        HttpMethod method,
+        Uri uri,
+        JsonNode? payload,
+        ProviderRequestOptions options) =>
+        client.SendAsync(model, method, uri, payload, options, cancellationToken: CancellationToken.None);
+
     public static BedrockConverseResponse BedrockResponse(params BedrockConverseEvent[] events) => new()
     {
         Status = 200,
@@ -238,14 +247,14 @@ internal sealed class R4CapturingHandler : HttpMessageHandler
         var headers = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         foreach (var pair in request.Headers)
         {
-            headers[pair.Key] = string.Join(", ", pair.Value);
+            headers[pair.Key] = FormatHeaderValue(pair.Key, pair.Value);
         }
 
         if (request.Content is not null)
         {
             foreach (var pair in request.Content.Headers)
             {
-                headers[pair.Key] = string.Join(", ", pair.Value);
+                headers[pair.Key] = FormatHeaderValue(pair.Key, pair.Value);
             }
         }
 
@@ -255,6 +264,11 @@ internal sealed class R4CapturingHandler : HttpMessageHandler
         Requests.Add(new R4CapturedRequest(request.Method, request.RequestUri!, headers, body));
         return _responder(request, ++_requestCount);
     }
+
+    private static string FormatHeaderValue(string name, IEnumerable<string> values) =>
+        string.Equals(name, "User-Agent", StringComparison.OrdinalIgnoreCase)
+            ? string.Join(" ", values)
+            : string.Join(", ", values);
 }
 
 internal sealed record R4CapturedRequest(
@@ -265,6 +279,32 @@ internal sealed record R4CapturedRequest(
 {
     public string? Header(string name) => Headers.TryGetValue(name, out var value) ? value : null;
 }
+
+/// <summary>Captures calls made through the Cloudflare gateway binding transport.</summary>
+internal sealed class R4CloudflareBinding : ICloudflareAiGatewayBinding
+{
+    public HttpResponseMessage? Response { get; init; }
+
+    public List<R4GatewayRun> Runs { get; } = [];
+
+    public ICloudflareAiGateway Gateway(string id) => new GatewayImplementation(this, id);
+
+    private sealed class GatewayImplementation(R4CloudflareBinding owner, string id) : ICloudflareAiGateway
+    {
+        public Task<HttpResponseMessage> RunAsync(
+            CloudflareAiGatewayUniversalRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            owner.Runs.Add(new R4GatewayRun(id, request, cancellationToken));
+            return Task.FromResult(owner.Response ?? new HttpResponseMessage(HttpStatusCode.OK));
+        }
+    }
+}
+
+internal sealed record R4GatewayRun(
+    string GatewayId,
+    CloudflareAiGatewayUniversalRequest Request,
+    CancellationToken CancellationToken);
 
 /// <summary>Captures the public options sent to an injected Bedrock transport.</summary>
 internal sealed class R4BedrockTransport : IBedrockConverseTransport

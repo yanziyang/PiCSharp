@@ -365,7 +365,7 @@ public sealed class R4ErrorBodyTests
     [Fact(DisplayName = "returns the bare message for a non-Error value")]
     public void Returns_the_bare_message_for_a_non_Error_value()
     {
-        var normalized = ErrorBodyUtilities.NormalizeProviderError("plain message");
-        Assert.Equal("plain message", ErrorBodyUtilities.FormatProviderError(normalized, "Ignored prefix"));
+        var normalized = ErrorBodyUtilities.NormalizeProviderError(new Dictionary<string, string> { ["reason"] = "boom" });
+        Assert.Equal("{\"reason\":\"boom\"}", ErrorBodyUtilities.FormatProviderError(normalized, "Ignored prefix"));
     }
 }
