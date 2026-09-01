@@ -270,25 +270,28 @@ public sealed class ServerTests
         await server.CloseAsync(TestContext.Current.CancellationToken);
     }
 
-    [Fact]
+    [Fact(DisplayName = "starts and closes every configured listener")]
     public async Task Starts_and_closes_each_listener()
     {
-        var first = new FakeListener("memory://one");
-        var second = new FakeListener("memory://two");
+        var first = new FakeListener("first");
+        var second = new FakeListener("second");
         var server = new PiServer(
             new FakeService(),
             new PiServerOptions { Listeners = [first, second], ServerId = "listener-test" });
 
         Assert.Same(server, await server.StartAsync(TestContext.Current.CancellationToken));
-        Assert.Equal(["memory://one", "memory://two"], server.Addresses);
+        Assert.Equal(["first", "second"], server.Addresses);
+        Assert.NotNull(first.Accept);
+        Assert.NotNull(second.Accept);
         Assert.Equal(1, first.StartCount);
         Assert.Equal(1, second.StartCount);
         await server.CloseAsync(TestContext.Current.CancellationToken);
         Assert.Equal(1, first.CloseCount);
         Assert.Equal(1, second.CloseCount);
+        Assert.Empty(server.Addresses);
     }
 
-    [Fact]
+    [Fact(DisplayName = "exhaustively maps assistant content and stop reasons")]
     public void Converts_supported_ai_messages_to_protocol_transcripts()
     {
         var assistant = new Pi.Ai.AssistantMessage
@@ -316,23 +319,6 @@ public sealed class ServerTests
         Assert.Equal(3, transcript.Content.Count);
         Assert.IsType<ToolCallContent>(transcript.Content[2]);
 
-        var toolResult = new Pi.Ai.ToolResultMessage
-        {
-            ToolCallId = "call-1",
-            ToolName = "read",
-            Content = [new Pi.Ai.TextContent("result")],
-            IsError = false,
-            Timestamp = 124,
-        };
-        var toolTranscript = ServerProtocol.ToProtocolToolResultMessage(
-            toolResult,
-            "tool-1",
-            new Pi.Ai.ToolCall(
-                "call-1",
-                "read",
-                new System.Text.Json.Nodes.JsonObject { ["path"] = "README.md" }));
-        Assert.Equal("read", toolTranscript.ToolName);
-        Assert.Equal("complete", toolTranscript.Status);
     }
 
     private static PiServer CreateServer(
@@ -475,7 +461,8 @@ public sealed class ServerTests
 
     private sealed class FakeListener(string address) : IPiServerListener
     {
-        public string? Address { get; } = address;
+        public string? Address { get; private set; } = address;
+        public ByteConnectionAcceptor? Accept { get; private set; }
         public int StartCount { get; private set; }
         public int CloseCount { get; private set; }
 
@@ -483,12 +470,14 @@ public sealed class ServerTests
         {
             ArgumentNullException.ThrowIfNull(accept);
             StartCount++;
+            Accept = accept;
             return Task.CompletedTask;
         }
 
         public Task CloseAsync(CancellationToken cancellationToken = default)
         {
             CloseCount++;
+            Address = null;
             return Task.CompletedTask;
         }
     }

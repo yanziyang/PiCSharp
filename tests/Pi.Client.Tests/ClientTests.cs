@@ -7,7 +7,7 @@ namespace Pi.Client.Tests;
 
 public sealed class ClientTests
 {
-    [Fact]
+    [Fact(DisplayName = "sends a framed version before accepting a fragmented server hello")]
     public async Task Sends_hello_before_accepting_fragmented_server_hello()
     {
         var server = new MemoryByteServer();
@@ -39,7 +39,7 @@ public sealed class ClientTests
             states);
     }
 
-    [Fact]
+    [Fact(DisplayName = "rejects server data delivered before sending the client hello")]
     public async Task Rejects_data_delivered_before_client_hello()
     {
         var server = new MemoryByteServer();
@@ -65,7 +65,7 @@ public sealed class ClientTests
         Assert.Equal(1, server.Transport?.CloseCount ?? 0);
     }
 
-    [Fact]
+    [Fact(DisplayName = "reports subscriber failures without changing connection state")]
     public async Task Isolates_listener_failures_and_reports_them()
     {
         var server = CreateHandshakeServer();
@@ -85,10 +85,10 @@ public sealed class ClientTests
         Assert.All(listenerErrors, error => Assert.Equal("consumer failure", error.Message));
     }
 
-    [Fact]
+    [Fact(DisplayName = "does not let a delayed command response replace a newer event snapshot")]
     public async Task Correlates_requests_and_updates_session_snapshot_monotonically()
     {
-        var server = CreateHandshakeServer();
+        var server = new MemoryByteServer();
         var initial = SessionSnapshotFor("session-1", revision: 1);
         server.OnClientMessage = message =>
         {
@@ -100,9 +100,23 @@ public sealed class ClientTests
             {
                 server.Send(new ResponseEnvelope(request.Id, true, new AttachResult(initial)));
             }
+            else if (message is RequestEnvelope { Request: SetThinkingCommand } thinkingRequest)
+            {
+                server.Send(new ResponseEnvelope(
+                    thinkingRequest.Id,
+                    true,
+                    new SetThinkingResult(initial with
+                    {
+                        Revision = 2,
+                        ThinkingLevel = ThinkingLevel.Medium,
+                    })));
+            }
             else if (message is RequestEnvelope { Request: DetachCommand detach } detachRequest)
             {
-                server.Send(new ResponseEnvelope(detachRequest.Id, true, new DetachResult(detach.SessionId)));
+                server.Send(new ResponseEnvelope(
+                    detachRequest.Id,
+                    true,
+                    new DetachResult(detach.SessionId)));
             }
         };
         var client = await PiClient.ConnectAsync(
@@ -110,8 +124,13 @@ public sealed class ClientTests
             TestContext.Current.CancellationToken);
         var handle = await client.AttachSessionAsync("session-1", TestContext.Current.CancellationToken);
 
-        server.Send(new EventEnvelope(new SessionSnapshotEvent(initial with { Revision = 3, ThinkingLevel = ThinkingLevel.High })));
-        server.Send(new EventEnvelope(new SessionSnapshotEvent(initial with { Revision = 2, ThinkingLevel = ThinkingLevel.Low })));
+        var changing = handle.SetThinkingAsync(ThinkingLevel.High, TestContext.Current.CancellationToken);
+        server.Send(new EventEnvelope(new SessionSnapshotEvent(initial with
+        {
+            Revision = 3,
+            ThinkingLevel = ThinkingLevel.High,
+        })));
+        await changing;
 
         Assert.Equal(3, handle.Snapshot!.Revision);
         Assert.Equal(ThinkingLevel.High, handle.Snapshot.ThinkingLevel);
@@ -119,7 +138,7 @@ public sealed class ClientTests
         await client.DisposeAsync(TestContext.Current.CancellationToken);
     }
 
-    [Fact]
+    [Fact(DisplayName = "rejects a mismatched response instead of leaving its request pending")]
     public async Task Rejects_command_mismatch_and_disconnects()
     {
         var server = CreateHandshakeServer();
@@ -145,7 +164,7 @@ public sealed class ClientTests
         Assert.Equal(ConnectionState.Disconnected, client.ConnectionState);
     }
 
-    [Fact]
+    [Fact(DisplayName = "detaches a shared session only after its final lease is released")]
     public async Task Enforces_shared_and_exclusive_session_leases_with_reference_counted_detach()
     {
         var server = CreateHandshakeServer();
@@ -195,7 +214,7 @@ public sealed class ClientTests
         await client.DisposeAsync(TestContext.Current.CancellationToken);
     }
 
-    [Fact]
+    [Fact(DisplayName = "rejects pending requests on close and reconnects through a fresh factory result")]
     public async Task Rejects_pending_request_on_transport_close_and_allows_reconnect()
     {
         var first = CreateHandshakeServer();
@@ -227,6 +246,8 @@ public sealed class ClientTests
                 return (connection == 1 ? first : second).Connect(handlers);
             },
         });
+        var states = new List<ConnectionState>();
+        client.OnConnectionStateChange(change => states.Add(change.State));
         await client.ConnectAsync(TestContext.Current.CancellationToken);
         var pending = client.ListSessionsAsync(TestContext.Current.CancellationToken);
         first.Transport!.Close();
@@ -238,6 +259,15 @@ public sealed class ClientTests
         Assert.Equal(2, snapshot.Revision);
         Assert.Empty(sessions);
         Assert.Equal(ConnectionState.Connected, client.ConnectionState);
+        Assert.Equal(
+            [
+                ConnectionState.Connecting,
+                ConnectionState.Connected,
+                ConnectionState.Disconnected,
+                ConnectionState.Connecting,
+                ConnectionState.Connected,
+            ],
+            states);
     }
 
     private static MemoryByteServer CreateHandshakeServer()
