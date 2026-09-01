@@ -3,6 +3,30 @@
 **Wave:** remediation  **Delegation fit:** A
 **Depends on:** `Pi.Ai` implementation (wave 2, already shipped)
 **Plan reference:** remediation of the wave-2 test gap.
+**Status:** ✅ Delivered in `a5632ad` (tests) and `e09ee52` (fixes). Pi.Ai parity 13% → **32% of
+portable** (99 → 244 cases). Full suite 1,472 tests, 0 failed, 0 skipped, three runs.
+
+All 134 upstream case names ported with **zero missing**, plus 11 branch-coverage cases.
+
+**The packet's premise was right: `Pi.Ai` had diverged from upstream in nine places**, and
+`tests/Pi.Ai.Tests/R4Findings.md` documents each with the upstream expectation against the actual C#
+behaviour. They were fixed in a separate commit, and no case was skipped or weakened. Spot-checked
+two:
+
+- **`cloudflare-gateway-binding.ts` had no C# equivalent at all.** 176 lines of upstream
+  functionality, absent since wave 2, found by a ported test.
+- The OpenAI Responses SSE loop never terminated on `[DONE]` or on a terminal response event, so a
+  stream whose body stayed open would hang. The fix is nine lines and the upstream case
+  (`openai-codex-stream.test.ts:212`) is real.
+
+Hazard 1 was respected: `tests/Pi.Ai.Tests` contains no `SetEnvironmentVariable` call — environment
+handling is injected, so no process-global race was introduced.
+
+**One packet defect, correctly caught by the delivery.** The target paths froze everything except
+`tests/Pi.Ai.Tests/**`, while the acceptance criteria required raising `.test-parity`. Those
+contradict. The delivery declined the edit and **said so in `R4Findings.md`** rather than silently
+breaching the freeze — the disclosure behaviour every packet since H1 has asked for. Floors raised
+separately here.
 
 ---
 
