@@ -227,7 +227,7 @@ TS throws arbitrary values and frequently returns error *results* rather than th
 
 ## 11. Mutable event payloads
 
-The one place we deliberately choose classes over records: extension event payloads whose contract is
+The first place we deliberately choose classes over records: extension event payloads whose contract is
 in-place mutation (`event.input`). See `extension-api.md §4.1`. Mark them clearly:
 
 ```csharp
@@ -237,6 +237,10 @@ public sealed class BashToolCallEvent : ToolCallEvent
     public BashToolInput Input { get; set; } = default!;
 }
 ```
+
+The second, added 2026-09-13, is marked tokens (`src/Pi.Tui/Marked/`). marked's lexer edits tokens after
+creating them: it merges paragraph text, fills child token lists from its inline queue, sets `loose` and
+inserts checkboxes. `markdown.ts` edits `token.text` as well. In-place mutation is their contract too.
 
 Everything else is a `record` with `init` accessors.
 
@@ -276,6 +280,69 @@ ValueTask<SessionResult> NewSessionAsync(
 - Fire-and-forget in TS (`void` returning, un-awaited): model explicitly and document it. **Never
   silently make an awaited call fire-and-forget** — it changes ordering on the interception path,
   which is exactly where extension semantics live.
+
+---
+
+## 15. Regular expressions
+
+Added 2026-09-13 for the marked port (`src/Pi.Tui/Marked/`), the first regex-heavy translation in this
+repository. JavaScript and .NET regular expressions look alike and differ in exactly the places a lexer
+depends on, so **a pattern copied verbatim is a defect until shown otherwise.**
+
+**Anchors and character classes.**
+
+- `$` without the `m` flag matches only at the end of input in JavaScript. In .NET, `$` also matches
+  before a final `\n`. Translate to `\z`.
+- With the `m` flag, JavaScript treats `\n`, `\r`, U+2028 and U+2029 as line terminators for `^` and
+  `$`. .NET `RegexOptions.Multiline` treats only `\n` that way.
+- `.` without the `s` flag excludes `\n`, `\r`, U+2028 and U+2029 in JavaScript; in .NET it excludes
+  only `\n`. Translate to `[^\n\r\u2028\u2029]`.
+- `\d`, `\w` and `\b` are ASCII in JavaScript and Unicode-aware in .NET. Translate to `[0-9]`,
+  `[A-Za-z0-9_]`, and lookarounds over that class.
+- `\s` differs at two code points: JavaScript includes U+FEFF and excludes U+0085, and .NET is the
+  reverse. Translate to `[\t\n\v\f\r \u00A0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]`.
+- Do not reach for `RegexOptions.ECMAScript`. Its `\s` is ASCII-only while JavaScript's includes
+  Unicode spaces, so it reproduces neither. Translate classes explicitly.
+
+**Unicode.**
+
+- `\p{…}` under the `u` or `v` flag matches whole code points in JavaScript. .NET regex matches UTF-16
+  code units, so a property class never matches an astral character — and most emoji are `\p{So}`.
+  Where a pattern classifies the character beside a delimiter, classify the code point in code
+  (`Rune.GetUnicodeCategory`) or match surrogate pairs explicitly, and test it with emoji.
+- V8 and .NET can ship different Unicode data. Recorded fixtures catch the difference; do not paper
+  over it.
+
+**Flags, state and composition.**
+
+- `i` becomes `RegexOptions.IgnoreCase | RegexOptions.CultureInvariant`. Never culture-sensitive.
+- A JavaScript regex with `g` or `y` carries state in `lastIndex`. .NET `Regex` is stateless: use
+  `Match(input, startat)` and `NextMatch()`, and `\G` for sticky matching. Never keep match state on a
+  shared object.
+- In replacement strings, JavaScript `$&` is .NET `$0`; `$1` and `$$` are the same.
+- Both support lookbehind. Where the source feature-detects it, port the branch V8 takes.
+- When the source composes patterns at runtime, translate the **final** pattern rather than its
+  fragments. For marked those are recorded in `reference/marked/composed-rules.gfm.json`.
+
+**Performance and Native AOT.**
+
+- Prefer `[GeneratedRegex]` for fixed patterns: it is source-generated, fast, and safe under Native
+  AOT. `RegexOptions.Compiled` needs dynamic code and runs interpreted under Native AOT.
+- Do not use `RegexOptions.NonBacktracking` to defend against slow patterns. On .NET 10 it throws
+  `NotSupportedException` for lookahead, lookbehind and backreferences, which JavaScript patterns use
+  freely.
+- **Never port a `src = src.substring(n)` loop literally.** V8 slices strings in constant time; .NET
+  `Substring` copies. A tokenizer that re-slices its remaining input after every token is quadratic in
+  C#. Measured on 2026-09-13 in Release with 100-character tokens, the copies alone cost 46 ms at
+  100 KB and 8,081 ms at 1 MB, including 418 gen-2 collections: ten times the input, 175 times the time.
+  Track an offset instead.
+- `Regex.Match(input, beginning, length)` matches a range as if it were its own string: `^` matches at
+  `beginning`, lookbehind cannot see before it, and `$` and `\z` match at the end of the range.
+  `Match.Index` stays relative to the whole input. `Regex.Match(input, startat)` is **not** equivalent:
+  `^` does not match at `startat`, and lookbehind sees the text before it. That suits `lastIndex`
+  iteration and is the wrong tool for substring semantics. Both verified on .NET 10, 2026-09-13.
+
+The recorded oracle, not this list, is the arbiter. When a port proves a rule missing here, add it.
 
 ---
 

@@ -104,6 +104,23 @@ a redundant full repaint on every keystroke.
 
 ---
 
+## Oracle 6 — Recorded library output (the `marked` port)
+
+Added 2026-09-13. Where an npm library is ported rather than replaced with a .NET equivalent, the
+library itself is the oracle. `src/Pi.Tui/Marked/` ports the marked 18.0.5 lexer, so its tokens are
+compared with marked's.
+
+`tools/marked-oracle/` installs the pinned version (`reference/marked/PINNED`) into a scratch directory,
+checks its integrity, lexes a committed corpus in each configuration pi uses, and records the token
+streams into `tests/fixtures/marked/`. The C# tests compare structurally: exact key sets, value types,
+array order. Node is needed only to record, never to test.
+
+The corpus combines the upstream markdown test inputs, targeted probes and a seeded generated set that
+includes streaming prefixes, because pi re-lexes partial Markdown on every streamed update. Re-record
+deliberately, in its own commit, when the pin moves.
+
+---
+
 ## Normalisation rules
 
 Differential comparison needs a canonical form or it drowns in false positives. Normalise before
