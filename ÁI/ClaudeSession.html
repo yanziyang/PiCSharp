@@ -52,8 +52,8 @@
 <p class="eyebrow">Claude Code · Session Transcript</p>
 <h1>PiCSharp — Pi to .NET 10 feasibility, port scaffold and review</h1>
 <div class="stat-bar">
-  <div>Exchanges<b>67</b></div>
-  <div>Responses<b>99</b></div>
+  <div>Exchanges<b>68</b></div>
+  <div>Responses<b>102</b></div>
 </div>
 </div></header>
 <div class="shell">
@@ -125,6 +125,7 @@
 <a href="#p65"><span class="n">65</span>what shall be next step?</a>
 <a href="#p66"><span class="n">66</span>Yes, write R5</a>
 <a href="#p67"><span class="n">67</span>I did not work on this project for two weeks. Do a summary for current s…</a>
+<a href="#p68"><span class="n">68</span>Update ClaudeSession.html and push</a>
 </nav>
 <main>
 <section class="turn user" id="p1">
@@ -1615,12 +1616,37 @@ class StrictStrikethroughTokenizer extends Tokenizer { ... }</code></pre>
 <p>Verify R5 properly, then either finish T5.8 (unblocks markdown, the largest remaining TUI file) or continue <code>Pi.Ai</code>/<code>Pi.Server</code> remediation (<code>R6</code>) at the ~36–32% parity packages beneath wave 6. Want me to run the R5 verification now?</p></div>
 </section>
 
+<section class="turn user" id="p68">
+  <div class="who"><span class="badge u">Exchange 68</span><time>2026-09-13 01:57:32</time></div>
+  <div class="bubble"><p>Update ClaudeSession.html and push</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span><time>2026-09-13 02:05:57</time></div>
+  <div class="bubble"><p>Confirmed and bounded: the previously-published file is genuinely complete through the R4 decision, but is missing exactly what happened after — the R5 handoff, the "commit and push" check, and the two-weeks status. Both session files record identical content up to that point, then diverge. Hardening the exporter against this before trusting it further.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span><time>2026-09-13 02:10:54</time></div>
+  <div class="bubble"><p>Found it — a timestamp precision bug. The old file truncates timestamps to the second (no milliseconds), so the real <code>14:05:11.080Z</code> compares as <em>later</em> than the truncated <code>14:05:11.000Z</code> cutoff, duplicating exchange 62. Fixing the comparison to compare at second granularity.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span><time>2026-09-13 02:13:14</time></div>
+  <div class="bubble"><p>Pushed as <code>8e61d97</code> — HEAD and <code>origin/main</code> in sync, only the HTML changed. <strong>67 exchanges, 99 responses, 237 KB.</strong></p>
+<p>This one turned into real archaeology, worth explaining in full:</p>
+<p><strong>The exporter itself was gone.</strong> It only ever lived in a session scratchpad directory, and the two-week gap let Windows clear it. I rebuilt it from the filtering rules established earlier this session, then refused to trust it until I'd verified it against the actual transcript.</p>
+<p>That verification surfaced two genuine bugs, not just the loss:</p>
+<ol><li><strong>The file-selection heuristic was wrong in a new way.</strong> It picked the transcript by OS file mtime. A sibling session — an abandoned parallel fork whose last real content was nine days stale, ending in <code>[Request interrupted by user]</code> on 2026-09-09 — had its mtime touched by something other than new content, making it look newer than the file that was actually live. Fixed to select by each file's own last <em>recorded message</em> timestamp, which can't be touched without a real new message.</li></ol>
+<ol><li><strong>Regenerating from the live transcript alone would have quietly destroyed history.</strong> <code>ClaudeSession.html</code> is a cumulative record spanning many sessions, but the current transcript only reaches back to this session's own continuation boundary. A straight regenerate would have replaced 230 KB of curated project history — everything from the original feasibility study through the R4 investigation — with an 86 KB fragment starting mid-story. I caught this by comparing exchange counts before touching git, and fixed it with a splice: the published file is read as a validated prefix, and only genuinely new exchanges are appended and renumbered.</li></ol>
+<p>A smaller bug fell out of rebuilding the harness-fold logic: the compaction summary lands as message <em>one</em> of a fresh session with no preceding exchange to fold into, so it needs its own handling rather than the mid-transcript fold — it now gets a short placeholder instead of rendering a 16 KB raw dump as if you'd typed it.</p>
+<p><strong>Five exchanges were genuinely new</strong>: the R4 verification handoff, the R4→R5 sequencing decision, and the two-weeks status check. The other 62 are untouched.</p>
+<p>One thing worth deciding: this exporter has now been lost once and nearly caused a silent history-loss on reconstruction. Want me to commit a copy into the repo (e.g. under <code>ÁI/</code> or <code>tools/</code>) so it survives the next gap?</p></div>
+</section>
+
 </main>
 </div>
 <footer><div class="wrap">
 <p style="margin:0 0 6px"><b>Session transcript exported from Claude Code.</b> Prompts and responses only — tool calls, tool results and internal reasoning are excluded as intermediate working detail.</p>
-<p style="margin:0 0 6px">This is a curated record, not a complete one. Bare continuations such as “proceed” are folded into the preceding exchange, keeping the work they triggered without the empty prompt. Short progress narration between tool calls is dropped. A further 9 exchanges were omitted as routine housekeeping.</p>
-<p style="margin:0">Generated 2026-09-13 · 166 entries from 5,635 transcript records.</p>
+<p style="margin:0 0 6px">This is a curated record, not a complete one. Bare continuations such as “proceed” are folded into the preceding exchange, keeping the work they triggered without the empty prompt. Short progress narration between tool calls is dropped. A further 10 exchanges were omitted as routine housekeeping.</p>
+<p style="margin:0">Generated 2026-09-13 · 170 entries from 7,356 transcript records.</p>
 </div></footer>
 </body>
 </html>
