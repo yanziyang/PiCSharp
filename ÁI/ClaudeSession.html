@@ -1,65 +1,61 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Claude Code Session — PiCSharp — Aug 2026</title>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Claude Code Session — PiCSharp — Aug–Sep 2026</title>
 <style>
-:root{--ink:#0f172a;--body:#334155;--muted:#64748b;--faint:#94a3b8;--line:#e2e8f0;--line2:#cbd5e1;
---bg:#fff;--panel:#f8fafc;--panel2:#f1f5f9;--indigo:#4f46e5;
---sans:'Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;
---mono:'Cascadia Code',Consolas,'SF Mono',Menlo,monospace;}
-*{box-sizing:border-box}html{scroll-behavior:smooth}
-body{margin:0;background:var(--bg);color:var(--body);font-family:var(--sans);font-size:15.5px;line-height:1.68}
-.mast{background:linear-gradient(135deg,#1e1b4b,#312e81 45%,#4338ca);color:#fff;padding:44px 0 38px}
-.wrap{max-width:1120px;margin:0 auto;padding:0 32px}
-.eyebrow{font-size:11px;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;color:#c7d2fe;margin:0 0 12px}
-.mast h1{font-size:30px;margin:0 0 10px;font-weight:700;letter-spacing:-.4px}
-.mast p{margin:0;color:#dbeafe;font-size:15px;max-width:760px}
-.meta{display:flex;flex-wrap:wrap;gap:26px;margin-top:22px;padding-top:18px;border-top:1px solid rgba(255,255,255,.18);font-size:12px;color:#c7d2fe}
-.meta b{display:block;color:#fff;font-size:14px;font-weight:650;margin-top:2px}
-.shell{max-width:1120px;margin:0 auto;padding:0 32px;display:grid;grid-template-columns:250px minmax(0,1fr);gap:44px;align-items:start}
-nav{position:sticky;top:20px;padding:28px 0 40px;font-size:12.5px;max-height:100vh;overflow-y:auto}
-nav .t{font-size:10.5px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--faint);margin-bottom:10px}
-nav a{display:flex;gap:8px;color:var(--muted);text-decoration:none;padding:5px 8px 5px 10px;border-left:2px solid var(--line);line-height:1.35}
-nav a:hover{color:var(--indigo);border-left-color:var(--indigo);background:var(--panel)}
-nav .n{color:var(--faint);font-variant-numeric:tabular-nums;flex:0 0 auto}
-main{padding:28px 0 80px;min-width:0}
-.turn{margin:0 0 30px;scroll-margin-top:20px}
-.who{display:flex;align-items:center;gap:10px;margin-bottom:8px}
-.badge{font-size:10.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;padding:3px 9px;border-radius:20px}
-.badge.u{background:#e0e7ff;color:#3730a3}.badge.a{background:var(--panel2);color:var(--muted)}
-time{font-size:11px;color:var(--faint);font-variant-numeric:tabular-nums}
-.user .bubble{background:#eef2ff;border:1px solid #c7d2fe;padding:14px 18px;border-radius:11px}
-.asst .bubble{padding:0 2px}
-.bubble{min-width:0}
-.bubble>:first-child{margin-top:0}.bubble>:last-child{margin-bottom:0}
-h3,h4,h5,h6{color:var(--ink);margin:22px 0 8px;line-height:1.3}
-h3{font-size:19px}h4{font-size:16.5px}h5{font-size:14.5px}h6{font-size:13.5px}
-p{margin:0 0 12px}ul,ol{margin:0 0 12px;padding-left:22px}li{margin-bottom:5px}
-a{color:var(--indigo)}strong{color:var(--ink);font-weight:650}hr{border:0;border-top:1px solid var(--line);margin:24px 0}
-code{font-family:var(--mono);font-size:.87em;background:var(--panel2);border:1px solid var(--line);border-radius:4px;padding:1px 5px;color:#be185d;overflow-wrap:anywhere}
-pre.code{background:#0f172a;color:#e2e8f0;border-radius:9px;padding:14px 16px;overflow-x:auto;margin:12px 0;
-font-family:var(--mono);font-size:12.4px;line-height:1.6;white-space:pre}
-pre.code code{background:none;border:0;padding:0;color:inherit;font-size:inherit;overflow-wrap:normal}
-.tw{overflow-x:auto;border:1px solid var(--line);border-radius:10px;margin:14px 0}
-table{width:100%;border-collapse:collapse;font-size:13.2px;min-width:520px}
-th{background:var(--panel2);text-align:left;padding:9px 12px;font-size:11px;letter-spacing:.4px;text-transform:uppercase;color:var(--ink);font-weight:650;border-bottom:1px solid var(--line2)}
-td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
-tbody tr:last-child td{border-bottom:none}
-footer{border-top:1px solid var(--line);background:var(--panel);padding:26px 0 40px;font-size:12.5px;color:var(--muted);margin-top:40px}
-@media(max-width:1040px){.shell{grid-template-columns:1fr;padding:0 22px}nav{display:none}.wrap{padding:0 22px}}
-@media print{.mast{background:#312e81!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}nav{display:none}.shell{grid-template-columns:1fr}.turn{break-inside:avoid}}
-</style></head><body>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; background: #f7f7f8; color: #1b1b1f; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding-left: 32px; padding-right: 32px; }
+  .mast { padding: 28px 0 22px; background: #14141a; color: #fff; }
+  .eyebrow { text-transform: uppercase; letter-spacing: .08em; font-size: 12px; color: #9a9aa8; margin: 0 0 6px; }
+  .mast h1 { margin: 0 0 14px; font-size: 22px; line-height: 1.3; }
+  .stat-bar { display: flex; gap: 22px; margin: 0 0 12px; flex-wrap: wrap; }
+  .stat-bar div { font-size: 13px; color: #c8c8d4; }
+  .stat-bar b { display: block; font-size: 20px; color: #fff; }
+  .shell { display: grid; grid-template-columns: 300px 1fr; align-items: start; max-width: 1180px; margin: 0 auto; }
+  nav { position: sticky; top: 0; max-height: 100vh; overflow-y: auto; padding: 18px 14px; border-right: 1px solid #e2e2e8; background: #fff; }
+  nav .t { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #9a9aa8; padding: 4px 8px 10px; }
+  nav a { display: flex; gap: 8px; padding: 6px 8px; border-radius: 6px; font-size: 12.5px; color: #33333d; text-decoration: none; line-height: 1.35; }
+  nav a:hover { background: #f0f0f4; }
+  nav .n { flex-shrink: 0; font-weight: 600; color: #8a8a98; min-width: 18px; }
+  main { min-width: 0; padding: 28px 40px 80px; max-width: 900px; }
+  section.turn { margin: 0 0 20px; }
+  .who { display: flex; align-items: baseline; gap: 10px; margin: 0 0 6px; }
+  .badge { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; padding: 2px 8px; border-radius: 999px; }
+  .badge.u { background: #dbe6ff; color: #1a4fc4; }
+  .badge.a { background: #eee; color: #555; }
+  time { font-size: 11px; color: #9a9aa8; }
+  .bubble { border: 1px solid #e2e2e8; border-radius: 10px; padding: 14px 18px; background: #fff; }
+  .turn.user .bubble { background: #f5f8ff; border-color: #d8e3fb; }
+  .bubble p { margin: 0 0 10px; line-height: 1.55; }
+  .bubble p:last-child { margin-bottom: 0; }
+  .bubble h4, .bubble h5, .bubble h6 { margin: 16px 0 6px; }
+  .bubble ul, .bubble ol { margin: 8px 0; padding-left: 22px; }
+  .bubble li { margin: 3px 0; line-height: 1.5; }
+  .bubble code { background: #eef0f4; padding: 1px 5px; border-radius: 4px; font-size: .92em; }
+  pre.code { background: #14141a; color: #e6e6ef; padding: 12px 14px; border-radius: 8px; overflow-x: auto; font-size: 12.5px; line-height: 1.5; }
+  pre.code code { background: none; padding: 0; color: inherit; }
+  .tw { overflow-x: auto; margin: 10px 0; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { border: 1px solid #e2e2e8; padding: 6px 10px; text-align: left; vertical-align: top; }
+  th { background: #f5f5f8; }
+  a { color: #1a4fc4; }
+  hr { border: none; border-top: 1px solid #e2e2e8; margin: 18px 0; }
+  footer { border-top: 1px solid #e2e2e8; padding: 18px 0 40px; font-size: 12.5px; color: #6b6b78; line-height: 1.55; }
+  @media print { .mast { background:#312e81!important; -webkit-print-color-adjust:exact; print-color-adjust:exact } nav { display:none } .shell { grid-template-columns:1fr } .turn { break-inside:avoid } }
+</style>
+</head>
+<body>
 <header class="mast"><div class="wrap">
 <p class="eyebrow">Claude Code · Session Transcript</p>
 <h1>PiCSharp — Pi to .NET 10 feasibility, port scaffold and review</h1>
-<p>Feasibility assessment, delegation kit, design specifications, D1 acceptance spikes, the .NET 10 solution scaffold, the wave 1–5 code review, and the R1 test backfill.</p>
-<div class="meta">
-<div>Dates<b>29–30 August 2026</b></div>
-<div>Project<b>C:\MyProjects\PiCSharp</b></div>
-<div>Exchanges<b>62</b></div>
-<div>Responses<b>94</b></div>
-<div>Model<b>Claude Opus 5</b></div>
-</div></div></header>
+<div class="stat-bar">
+  <div>Exchanges<b>67</b></div>
+  <div>Responses<b>99</b></div>
+</div>
+</div></header>
 <div class="shell">
 <nav><div class="t">Exchanges</div>
 <a href="#p1"><span class="n">1</span>Evaluate feasibility of migrating Pi Coding Agent to .NET 10. Need nearl…</a>
@@ -124,6 +120,11 @@ footer{border-top:1px solid var(--line);background:var(--panel);padding:26px 0 4
 <a href="#p60"><span class="n">60</span>How you rate overall implementation so far: code quality , architecture …</a>
 <a href="#p61"><span class="n">61</span>Prefer Codex do it or yourself do these three?</a>
 <a href="#p62"><span class="n">62</span>Yes, proceed — The R4 investigation overturned my own review</a>
+<a href="#p63"><span class="n">63</span>Update ClaudeSession.html and push</a>
+<a href="#p64"><span class="n">64</span>the R4 implementation is one</a>
+<a href="#p65"><span class="n">65</span>what shall be next step?</a>
+<a href="#p66"><span class="n">66</span>Yes, write R5</a>
+<a href="#p67"><span class="n">67</span>I did not work on this project for two weeks. Do a summary for current s…</a>
 </nav>
 <main>
 <section class="turn user" id="p1">
@@ -1528,10 +1529,98 @@ class StrictStrikethroughTokenizer extends Tokenizer { ... }</code></pre>
 <pre class="code" data-lang="bash"><code>codex "Read ÍmplementationKit/packets/R4-ai-transport-and-resilience.md and implement it. Port all 134 cases from the twelve listed offline test files, names verbatim. src/ is frozen: if a ported test fails, report it with the upstream expectation and the actual C# behaviour, then fix it in a separate commit. Handle environment-driven endpoint resolution by injection rather than mutating process globals. Run the full suite at least three times."</code></pre></div>
 </section>
 
-</main></div>
+<section class="turn user" id="p63">
+  <div class="who"><span class="badge u">Exchange 63</span><time>2026-08-31 14:17:29</time></div>
+  <div class="bubble"><p>Update ClaudeSession.html and push</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span><time>2026-08-31 14:17:58</time></div>
+  <div class="bubble"><p>Pushed as <code>d06196e</code> — HEAD and <code>origin/main</code> in sync. <strong>62 exchanges, 94 responses, 225 KB</strong>, sections balance 156/156.</p>
+<p>Staged only the export again; T5.7's three files are still sitting untracked exactly as Codex left them.</p>
+<p>The new material is the substantive part of this stretch: the implementation review, the discovery that 615 of Pi.Ai's upstream cases are credential-gated live E2E (which overturned the R4 target I'd recommended), the parity denominator fix, and the D1/D5 sign-off evidence.</p>
+<p>Three packets are now queued for Codex, all independent:</p>
+<div class="tw"><table><thead><tr><th></th><th></th></tr></thead><tbody><tr><td><code>T5.7</code></td><td>latex — <strong>in flight right now</strong></td></tr><tr><td><code>T5.8</code></td><td>Markdig divergence spike</td></tr><tr><td><code>R4</code></td><td>Pi.Ai transport and resilience, 134 cases</td></tr></tbody></table></div>
+<p>And two things sitting with you: whether to accept <strong>D1 and D5</strong> (evidence in <code>docs/design-signoff.md</code>), and whether <strong><code>T0.2</code></strong> — the differential harness D5 required and nobody built — becomes a real backlog item rather than a quiet omission.</p></div>
+</section>
+<section class="turn user" id="p64">
+  <div class="who"><span class="badge u">Exchange 64</span><time>2026-09-01 13:27:39</time></div>
+  <div class="bubble"><p>the R4 implementation is one</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span><time>2026-09-01 13:36:20</time></div>
+  <div class="bubble"><p>Verified and pushed as <code>47020f8</code>. <strong>R4 found exactly what it was written to find.</strong></p>
+<h4>Nine real divergences in <code>Pi.Ai</code></h4>
+<p><code>tests/Pi.Ai.Tests/R4Findings.md</code> documents each one — upstream expectation against actual C# behaviour — fixed in a separate commit, with no case skipped or weakened. I spot-checked the two that matter most:</p>
+<ul><li><strong><code>cloudflare-gateway-binding.ts</code> had no C# equivalent at all.</strong> 176 lines of upstream functionality missing since wave 2, discovered by a ported test. Confirmed the file exists upstream and was genuinely absent before <code>e09ee52</code>.</li><li><strong>The OpenAI Responses SSE loop terminated on neither <code>[DONE]</code> nor a terminal response event</strong> — a stream whose body stayed open would hang. Nine-line fix, and the upstream case (<code>openai-codex-stream.test.ts:212</code>) is real.</li></ul>
+<div class="tw"><table><thead><tr><th></th><th></th></tr></thead><tbody><tr><td>Full suite</td><td><strong>1,472 tests, 0 failed, 0 skipped</strong> (3 runs)</td></tr><tr><td>Pi.Ai parity</td><td>13% → <strong>32% of portable</strong> (99 → 244)</td></tr><tr><td>Tui parity</td><td>79% → <strong>83%</strong> (T5.7 also landed)</td></tr><tr><td>Case names</td><td>134/134 upstream, <strong>zero missing</strong>, +11 branch coverage</td></tr></tbody></table></div>
+<p>Hazard 1 held: no <code>SetEnvironmentVariable</code> anywhere in <code>Pi.Ai.Tests</code> — environment handling is injected, so the process-global race that bit <code>Pi.Tui</code> twice wasn't imported.</p>
+<h4>The packet contradicted itself, and the delivery caught it</h4>
+<p>R4's target paths froze everything outside <code>tests/Pi.Ai.Tests/<strong></code>, while its acceptance criteria required raising <code>.test-parity</code>. Those can't both hold. Codex </strong>declined the edit and said so in its findings** rather than breaching the freeze quietly — the disclosure behaviour every packet since H1 has asked for, and the first time it's been volunteered unprompted. The contradiction was mine; I've raised the floors here instead (ai 99 → 244, tui 668 → 703, and ai's stale denominator corrected 1360 → 745).</p>
+<p>T5.7 also landed clean, both objectives intact — 23 upstream-named latex cases plus 12 branch-coverage. T5.4's silently-dropped second objective did not repeat.</p>
+<p>The wider point: R4 was worth doing on its own terms. Nine divergences sat in the package wave 6 will be built on, and the only reason they surfaced is that someone ported the tests. <code>T5.8</code> (Markdig spike) is still outstanding, and <code>R5</code>/<code>R6</code> would take Pi.Ai further into the remaining 501 portable cases.</p></div>
+</section>
+<section class="turn user" id="p65">
+  <div class="who"><span class="badge u">Exchange 65</span><time>2026-09-01 13:43:10</time></div>
+  <div class="bubble"><p>what shall be next step?</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span><time>2026-09-01 13:44:03</time></div>
+  <div class="bubble"><p>Numbers make the answer fairly clear.</p>
+<h4>Recommend: <code>R5</code> — close <code>Pi.Client</code> and <code>Pi.Server</code></h4>
+<div class="tw"><table><thead><tr><th>Package</th><th>Upstream</th><th>Ported</th><th>Gap</th></tr></thead><tbody><tr><td><code>Pi.Client</code></td><td>36</td><td>7</td><td>29</td></tr><tr><td><code>Pi.Server</code></td><td>50</td><td>9</td><td>41</td></tr></tbody></table></div>
+<p><strong>86 cases total, ~70 to add — smaller than R4 was</strong>, and it takes two entire packages from ~19% to complete rather than nudging a big one.</p>
+<p>Three reasons it beats the alternatives:</p>
+<p><strong>1. R4 just measured the defect rate.</strong> Nine divergences in 134 ported cases is roughly one per fifteen. That's not a guess about untested code any more — it's an observation. <code>Pi.Client</code> and <code>Pi.Server</code> have 70 untested cases between them, so expect four or five real findings, and they're cheap to reach.</p>
+<p><strong>2. It's the boundary wave 6 sits on.</strong> <code>Pi.CodingAgent</code> is 60,960 LOC that talks to the server through exactly this protocol. <code>server/test/conformance.test.ts</code> (14 cases), <code>protocol.test.ts</code> (9) and <code>sessions.test.ts</code> (12) specify that contract, and none of it is verified today.</p>
+<p><strong>3. <code>conformance.test.ts</code> is the natural seed for <code>T0.2</code>.</strong> The differential harness D5 required and nobody built has an empty home in <code>Pi.Conformance.Tests</code> — 3 facts asserting project references resolve. Upstream's conformance suite is the obvious first tenant.</p>
+<h4>Sequencing after that</h4>
+<ul><li><strong><code>T5.8</code></strong> (Markdig spike) is already written and queued — independent, can run alongside R5</li><li><strong><code>R6</code></strong> — the remaining 501 portable <code>Pi.Ai</code> cases, in themed batches like R4</li><li><strong>Then wave 6</strong></li></ul>
+<p>I'd hold wave 6 until R5 and R6 land. Starting 60,960 LOC on a foundation with a measured defect rate of one per fifteen cases compounds the problem rather than deferring it — and R4 showed the defects include <em>entirely missing features</em>, not just edge-case drift.</p>
+<p>Two things still sitting with you: <strong>D1/D5 sign-off</strong> (evidence in <code>docs/design-signoff.md</code>), and whether <strong><code>T0.2</code></strong> becomes a real backlog item.</p>
+<p>Want me to write R5?</p></div>
+</section>
+<section class="turn user" id="p66">
+  <div class="who"><span class="badge u">Exchange 66</span><time>2026-09-01 13:44:25</time></div>
+  <div class="bubble"><p>Yes, write R5</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span><time>2026-09-01 13:46:52</time></div>
+  <div class="bubble"><p>R5 pushed as <code>db0ad3b</code>.</p>
+<pre class="code" data-lang="bash"><code>codex "Read ÍmplementationKit/packets/R5-client-server-protocol.md and implement it. Port all 42 transport-independent cases from the seven listed client and server test files, names verbatim. src/ is frozen: a failing ported test is a finding - report it with the upstream expectation and the actual C# behaviour, then fix it in a separate commit, as R4 did. Reconcile any pre-existing overlapping cases to upstream names rather than duplicating. If a case turns out to need the Unix transport or TestServerService, report it and leave it for R5b - do not half-build the harness. Run the full suite at least three times."</code></pre>
+<p><strong>The investigation reshaped the packet.</strong> I'd pitched R5 as all 86 cases; it can't be. Upstream ships exactly one transport — <code>transports/unix</code> (475 LOC) — plus a testing library <code>src/testing</code> (466 LOC) with <code>TestServerService</code> and <code>ProtocolTestClient</code>. <strong>Neither exists in C#.</strong></p>
+<pre class="code"><code>42  transport-independent  → R5 (this packet)
+44  need the Unix transport + testing library  → R5b</code></pre>
+<p>The good news is architectural: <code>PiServer</code> is already transport-agnostic with a clean three-member <code>IPiServerListener</code> contract, so a Unix listener plugs in rather than requiring surgery. R5b is a real implementation packet (~940 upstream LOC plus 44 cases), and worth doing on its own terms — <code>server/test/conformance.test.ts</code> is in that group, and it's the obvious first tenant for the <code>T0.2</code> harness that's never been built.</p>
+<p><strong>I also fixed my own defect from R4.</strong> That packet froze <code>.test-parity</code> in its target paths while its acceptance criteria demanded raising it. Codex hit the contradiction, declined to breach the freeze, and wrote down why — which is the only reason I found it. R5 puts <code>.test-parity</code> in the target paths explicitly.</p>
+<p>Two hazards carried forward from what's actually gone wrong here before: reconcile overlapping cases to upstream names rather than leaving duplicate pairs (the <code>TestTui</code> lesson), and don't half-build the test harness to make a case pass — report it and let R5b do it properly.</p>
+<p>Expect roughly three findings at R4's observed rate of one per fifteen cases.</p></div>
+</section>
+<section class="turn user" id="p67">
+  <div class="who"><span class="badge u">Exchange 67</span><time>2026-09-13 01:46:48</time></div>
+  <div class="bubble"><p>I did not work on this project for two weeks. Do a summary for current status.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span><time>2026-09-13 01:57:06</time></div>
+  <div class="bubble"><p>I have everything needed. Everything checks out clean after the gap — build, 1,505 tests, format, and parity all pass exactly as left.</p>
+<h4>Status after two weeks — nothing drifted, gates are clean</h4>
+<p><strong>Verified fresh, not from memory:</strong> build succeeds with zero warnings, <strong>1,505 tests pass, 0 failed, 0 skipped</strong>, <code>dotnet format</code> is clean, and <code>origin/main</code> matches local <code>HEAD</code> at <code>bebd460</code>. Nobody else touched the repo.</p>
+<h5>Test parity by package</h5>
+<div class="tw"><table><thead><tr><th>Package</th><th>Portable</th><th>Ported</th><th>%</th></tr></thead><tbody><tr><td>Pi.Protocol</td><td>33</td><td>51</td><td>154%</td></tr><tr><td>Pi.Telemetry</td><td>7</td><td>15</td><td>214%</td></tr><tr><td>Pi.AgentCore</td><td>226</td><td>248</td><td>109%</td></tr><tr><td><strong>Pi.Ai</strong></td><td>745</td><td>244</td><td><strong>32%</strong></td></tr><tr><td><strong>Pi.Client</strong></td><td>36</td><td>31</td><td><strong>86%</strong></td></tr><tr><td><strong>Pi.Server</strong></td><td>50</td><td>18</td><td><strong>36%</strong></td></tr><tr><td><strong>Pi.Tui</strong></td><td>838</td><td>703</td><td><strong>83%</strong></td></tr></tbody></table></div>
+<p><em>(Pi.Ai also carries 615 credential-gated live-E2E cases that can't run offline — excluded from the denominator since I fixed that measurement two weeks ago.)</em></p>
+<h5>What happened in your last session, in order</h5>
+<ol><li><strong>R4</strong> — ported 134 offline <code>Pi.Ai</code> cases, and it found real bugs: <code>cloudflare-gateway-binding.ts</code> had <strong>no C# equivalent at all</strong> (176 lines, missing since wave 2), and the OpenAI Responses SSE loop never terminated on a closed-but-open stream. Both fixed in a separate commit, documented in <code>R4Findings.md</code>.</li><li><strong>T5.7</strong> — LaTeX renderer, 23 upstream cases + 12 branch-coverage cases, clean.</li><li><strong>R5</strong> — 42 client/server protocol cases. <strong>Zero divergences found this time</strong> — a clean pass, documented in <code>R5Findings.md</code>.</li><li>A small README commit (<code>bebd460</code>) followed R5, done outside our usual verify-and-record loop.</li></ol>
+<h5>What's incomplete</h5>
+<ul><li><strong>T5.8</strong> (Markdig spike) never progressed past my own preliminary 15-case probe — still marked "Preliminary" in <code>docs/spikes/markdig-divergence.md</code>. This still blocks <code>markdown.ts</code> (81 cases).</li><li><strong>R5 was never given my independent verification pass</strong> — no Status line in the packet, no build/test-three-times check, no confirmation the hazards held. Worth doing before treating it as closed.</li><li><strong>D1 and D5 sign-off</strong> is still sitting with you — evidence is in <code>docs/design-signoff.md</code>, untouched.</li><li><strong><code>T0.2</code></strong>, the differential harness, still doesn't exist.</li></ul>
+<h5>Natural next step</h5>
+<p>Verify R5 properly, then either finish T5.8 (unblocks markdown, the largest remaining TUI file) or continue <code>Pi.Ai</code>/<code>Pi.Server</code> remediation (<code>R6</code>) at the ~36–32% parity packages beneath wave 6. Want me to run the R5 verification now?</p></div>
+</section>
+
+</main>
+</div>
 <footer><div class="wrap">
 <p style="margin:0 0 6px"><b>Session transcript exported from Claude Code.</b> Prompts and responses only — tool calls, tool results and internal reasoning are excluded as intermediate working detail.</p>
-<p style="margin:0 0 6px">This is a curated record, not a complete one. Bare continuations such as “proceed” are folded into the preceding exchange, keeping the work they triggered without the empty prompt. Short progress narration between tool calls is dropped. A further 7 exchanges were omitted as routine housekeeping.</p>
-<p style="margin:0">Generated 2026-08-31 · 156 entries from 3,994 transcript records.</p>
+<p style="margin:0 0 6px">This is a curated record, not a complete one. Bare continuations such as “proceed” are folded into the preceding exchange, keeping the work they triggered without the empty prompt. Short progress narration between tool calls is dropped. A further 9 exchanges were omitted as routine housekeeping.</p>
+<p style="margin:0">Generated 2026-09-13 · 166 entries from 5,635 transcript records.</p>
 </div></footer>
-</body></html>
+</body>
+</html>
