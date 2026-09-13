@@ -1,85 +1,4007 @@
 {
- "strikethrough-strict": [
-  "paragraph",
-  "del",
-  "text",
-  "text",
-  "del",
-  "text"
- ],
- "strikethrough-spaced": [
-  "paragraph",
-  "text"
- ],
- "table": [
-  "table"
- ],
- "list-start": [
-  "list",
-  "list_item",
-  "text",
-  "text",
-  "list_item",
-  "text",
-  "text"
- ],
- "nested-list": [
-  "list",
-  "list_item",
-  "text",
-  "text",
-  "list",
-  "list_item",
-  "text",
-  "text",
-  "list_item",
-  "text",
-  "text"
- ],
- "codespan": [
-  "paragraph",
-  "text",
-  "codespan",
-  "text"
- ],
- "fenced": [
-  "code"
- ],
- "link": [
-  "paragraph",
-  "link",
-  "text"
- ],
- "html-block": [
-  "html"
- ],
- "setext": [
-  "heading",
-  "text"
- ],
- "hr": [
-  "hr"
- ],
- "blockquote": [
-  "blockquote",
-  "paragraph",
-  "text"
- ],
- "escape": [
-  "paragraph",
-  "escape",
-  "text",
-  "escape"
- ],
- "autolink": [
-  "paragraph",
-  "link",
-  "text"
- ],
- "hardbreak": [
-  "paragraph",
-  "text",
-  "br",
-  "text"
- ]
+ "metadata": {
+  "parser": "Marked",
+  "version": "18.0.5",
+  "strictStrikethrough": true,
+  "latexExtensions": "not loaded; the production tokenizer is the extension under test",
+  "caseCount": 109,
+  "source": "reference/pi/packages/tui/test/markdown.test.ts"
+ },
+ "cases": {
+  "test-01-01": {
+   "types": [
+    "paragraph",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "source",
+     "text": "source"
+    },
+    {
+     "type": "text",
+     "raw": "source",
+     "text": "source"
+    }
+   ]
+  },
+  "test-01-02": {
+   "types": [
+    "paragraph",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "updated",
+     "text": "updated"
+    },
+    {
+     "type": "text",
+     "raw": "updated",
+     "text": "updated"
+    }
+   ]
+  },
+  "test-02-01": {
+   "types": [
+    "list",
+    "list_item",
+    "text",
+    "text",
+    "list",
+    "list_item",
+    "text",
+    "text",
+    "list_item",
+    "text",
+    "text",
+    "list_item",
+    "text",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "list",
+     "raw": "- Item 1\n  - Nested 1.1\n  - Nested 1.2\n- Item 2",
+     "ordered": false,
+     "start": "",
+     "loose": false
+    },
+    {
+     "type": "list_item",
+     "raw": "- Item 1\n  - Nested 1.1\n  - Nested 1.2\n",
+     "text": "Item 1\n- Nested 1.1\n- Nested 1.2",
+     "task": false,
+     "loose": false
+    },
+    {
+     "type": "text",
+     "raw": "Item 1\n",
+     "text": "Item 1"
+    },
+    {
+     "type": "text",
+     "raw": "Item 1",
+     "text": "Item 1"
+    },
+    {
+     "type": "list",
+     "raw": "- Nested 1.1\n- Nested 1.2",
+     "ordered": false,
+     "start": "",
+     "loose": false
+    },
+    {
+     "type": "list_item",
+     "raw": "- Nested 1.1\n",
+     "text": "Nested 1.1",
+     "task": false,
+     "loose": false
+    },
+    {
+     "type": "text",
+     "raw": "Nested 1.1",
+     "text": "Nested 1.1"
+    },
+    {
+     "type": "text",
+     "raw": "Nested 1.1",
+     "text": "Nested 1.1"
+    },
+    {
+     "type": "list_item",
+     "raw": "- Nested 1.2",
+     "text": "Nested 1.2",
+     "task": false,
+     "loose": false
+    },
+    {
+     "type": "text",
+     "raw": "Nested 1.2",
+     "text": "Nested 1.2"
+    },
+    {
+     "type": "text",
+     "raw": "Nested 1.2",
+     "text": "Nested 1.2"
+    },
+    {
+     "type": "list_item",
+     "raw": "- Item 2",
+     "text": "Item 2",
+     "task": false,
+     "loose": false
+    },
+    {
+     "type": "text",
+     "raw": "Item 2",
+     "text": "Item 2"
+    },
+    {
+     "type": "text",
+     "raw": "Item 2",
+     "text": "Item 2"
+    }
+   ]
+  },
+  "test-03-01": {
+   "types": [
+    "list",
+    "list_item",
+    "text",
+    "text",
+    "list",
+    "list_item",
+    "text",
+    "text",
+    "list",
+    "list_item",
+    "text",
+    "text",
+    "list",
+    "list_item",
+    "text",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "list",
+     "raw": "- Level 1\n  - Level 2\n    - Level 3\n      - Level 4",
+     "ordered": false,
+     "start": "",
+     "loose": false
+    },
+    {
+     "type": "list_item",
+     "raw": "- Level 1\n  - Level 2\n    - Level 3\n      - Level 4",
+     "text": "Level 1\n- Level 2\n  - Level 3\n    - Level 4",
+     "task": false,
+     "loose": false
+    },
+    {
+     "type": "text",
+     "raw": "Level 1\n",
+     "text": "Level 1"
+    },
+    {
+     "type": "text",
+     "raw": "Level 1",
+     "text": "Level 1"
+    },
+    {
+     "type": "list",
+     "raw": "- Level 2\n  - Level 3\n    - Level 4",
+     "ordered": false,
+     "start": "",
+     "loose": false
+    },
+    {
+     "type": "list_item",
+     "raw": "- Level 2\n  - Level 3\n    - Level 4",
+     "text": "Level 2\n- Level 3\n  - Level 4",
+     "task": false,
+     "loose": false
+    },
+    {
+     "type": "text",
+     "raw": "Level 2\n",
+     "text": "Level 2"
+    },
+    {
+     "type": "text",
+     "raw": "Level 2",
+     "text": "Level 2"
+    },
+    {
+     "type": "list",
+     "raw": "- Level 3\n  - Level 4",
+     "ordered": false,
+     "start": "",
+     "loose": false
+    },
+    {
+     "type": "list_item",
+     "raw": "- Level 3\n  - Level 4",
+     "text": "Level 3\n- Level 4",
+     "task": false,
+     "loose": false
+    },
+    {
+     "type": "text",
+     "raw": "Level 3\n",
+     "text": "Level 3"
+    },
+    {
+     "type": "text",
+     "raw": "Level 3",
+     "text": "Level 3"
+    },
+    {
+     "type": "list",
+     "raw": "- Level 4",
+     "ordered": false,
+     "start": "",
+     "loose": false
+    },
+    {
+     "type": "list_item",
+     "raw": "- Level 4",
+     "text": "Level 4",
+     "task": false,
+     "loose": false
+    },
+    {
+     "type": "text",
+     "raw": "Level 4",
+     "text": "Level 4"
+    },
+    {
+     "type": "text",
+     "raw": "Level 4",
+     "text": "Level 4"
+    }
+   ]
+  },
+  "test-04-01": {
+   "types": [
+    "list",
+    "list_item",
+    "text",
+    "text",
+    "list",
+    "list_item",
+    "text",
+    "text",
+    "list_item",
+    "text",
+    "text",
+    "list_item",
+    "text",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "list",
+     "raw": "1. First\n   1. Nested first\n   2. Nested second\n2. Second",
+     "ordered": true,
+     "start": 1,
+     "loose": false
+    },
+    {
+     "type": "list_item",
+     "raw": "1. First\n   1. Nested first\n   2. Nested second\n",
+     "text": "First\n1. Nested first\n2. Nested second",
+     "task": false,
+     "loose": false
+    },
+    {
+     "type": "text",
+     "raw": "First\n",
+     "text": "First"
+    },
+    {
+     "type": "text",
+     "raw": "First",
+     "text": "First"
+    },
+    {
+     "type": "list",
+     "raw": "1. Nested first\n2. Nested second",
+     "ordered": true,
+     "start": 1,
+     "loose": false
+    },
+    {
+     "type": "list_item",
+     "raw": "1. Nested first\n",
+     "text": "Nested first",
+     "task": false,
+     "loose": false
+    },
+    {
+     "type": "text",
+     "raw": "Nested first",
+     "text": "Nested first"
+    },
+    {
+     "type": "text",
+     "raw": "Nested first",
+     "text": "Nested first"
+    },
+    {
+     "type": "list_item",
+     "raw": "2. Nested second",
+     "text": "Nested second",
+     "task": false,
+     "loose": false
+    },
+    {
+     "type": "text",
+     "raw": "Nested second",
+     "text": "Nested second"
+    },
+    {
+     "type": "text",
+     "raw": "Nested second",
+     "text": "Nested second"
+    },
+    {
+     "type": "list_item",
+     "raw": "2. Second",
+     "text": "Second",
+     "task": false,
+     "loose": false
+    },
+    {
+     "type": "text",
+     "raw": "Second",
+     "text": "Second"
+    },
+    {
+     "type": "text",
+     "raw": "Second",
+     "text": "Second"
+    }
+   ]
+  },
+  "test-05-01": {
+   "types": [
+    "list",
+    "list_item",
+    "text",
+    "text",
+    "list_item",
+    "text",
+    "text",
+    "list_item",
+    "text",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "list",
+     "raw": "1. alpha\n1. beta\n1. gamma",
+     "ordered": true,
+     "start": 1,
+     "loose": false
+    },
+    {
+     "type": "list_item",
+     "raw": "1. alpha\n",
+     "text": "alpha",
+     "task": false,
+     "loose": false
+    },
+    {
+     "type": "text",
+     "raw": "alpha",
+     "text": "alpha"
+    },
+    {
+     "type": "text",
+     "raw": "alpha",
+     "text": "alpha"
+    },
+    {
+     "type": "list_item",
+     "raw": "1. beta\n",
+     "text": "beta",
+     "task": false,
+     "loose": false
+    },
+    {
+     "type": "text",
+     "raw": "beta",
+     "text": "beta"
+    },
+    {
+     "type": "text",
+     "raw": "beta",
+     "text": "beta"
+    },
+    {
+     "type": "list_item",
+     "raw": "1. gamma",
+     "text": "gamma",
+     "task": false,
+     "loose": false
+    },
+    {
+     "type": "text",
+     "raw": "gamma",
+     "text": "gamma"
+    },
+    {
+     "type": "text",
+     "raw": "gamma",
+     "text": "gamma"
+    }
+   ]
+  },
+  "test-06-01": {
+   "types": [
+    "list",
+    "list_item",
+    "text",
+    "text",
+    "list_item",
+    "text",
+    "text",
+    "space",
+    "list",
+    "list_item",
+    "text",
+    "text",
+    "list_item",
+    "text",
+    "text",
+    "space",
+    "list",
+    "list_item",
+    "text",
+    "text",
+    "list",
+    "list_item",
+    "text",
+    "text",
+    "list",
+    "list_item",
+    "text",
+    "text",
+    "list",
+    "list_item"
+   ],
+   "nodes": [
+    {
+     "type": "list",
+     "raw": "  4. forth\n  3. third",
+     "ordered": true,
+     "start": 4,
+     "loose": false
+    },
+    {
+     "type": "list_item",
+     "raw": "  4. forth\n",
+     "text": "forth",
+     "task": false,
+     "loose": false
+    },
+    {
+     "type": "text",
+     "raw": "forth",
+     "text": "forth"
+    },
+    {
+     "type": "text",
+     "raw": "forth",
+     "text": "forth"
+    },
+    {
+     "type": "list_item",
+     "raw": "  3. third",
+     "text": "third",
+     "task": false,
+     "loose": false
+    },
+    {
+     "type": "text",
+     "raw": "third",
+     "text": "third"
+    },
+    {
+     "type": "text",
+     "raw": "third",
+     "text": "third"
+    },
+    {
+     "type": "space",
+     "raw": "\n\n"
+    },
+    {
+     "type": "list",
+     "raw": "10) ten\n7) seven",
+     "ordered": true,
+     "start": 10,
+     "loose": false
+    },
+    {
+     "type": "list_item",
+     "raw": "10) ten\n",
+     "text": "ten",
+     "task": false,
+     "loose": false
+    },
+    {
+     "type": "text",
+     "raw": "ten",
+     "text": "ten"
+    },
+    {
+     "type": "text",
+     "raw": "ten",
+     "text": "ten"
+    },
+    {
+     "type": "list_item",
+     "raw": "7) seven",
+     "text": "seven",
+     "task": false,
+     "loose": false
+    },
+    {
+     "type": "text",
+     "raw": "seven",
+     "text": "seven"
+    },
+    {
+     "type": "text",
+     "raw": "seven",
+     "text": "seven"
+    },
+    {
+     "type": "space",
+     "raw": "\n\n"
+    },
+    {
+     "type": "list",
+     "raw": "+ plus\n",
+     "ordered": false,
+     "start": "",
+     "loose": false
+    },
+    {
+     "type": "list_item",
+     "raw": "+ plus",
+     "text": "plus",
+     "task": false,
+     "loose": false
+    },
+    {
+     "type": "text",
+     "raw": "plus",
+     "text": "plus"
+    },
+    {
+     "type": "text",
+     "raw": "plus",
+     "text": "plus"
+    },
+    {
+     "type": "list",
+     "raw": "* star\n",
+     "ordered": false,
+     "start": "",
+     "loose": false
+    },
+    {
+     "type": "list_item",
+     "raw": "* star",
+     "text": "star",
+     "task": false,
+     "loose": false
+    },
+    {
+     "type": "text",
+     "raw": "star",
+     "text": "star"
+    },
+    {
+     "type": "text",
+     "raw": "star",
+     "text": "star"
+    },
+    {
+     "type": "list",
+     "raw": "- minus\n",
+     "ordered": false,
+     "start": "",
+     "loose": false
+    },
+    {
+     "type": "list_item",
+     "raw": "- minus",
+     "text": "minus",
+     "task": false,
+     "loose": false
+    },
+    {
+     "type": "text",
+     "raw": "minus",
+     "text": "minus"
+    },
+    {
+     "type": "text",
+     "raw": "minus",
+     "text": "minus"
+    },
+    {
+     "type": "list",
+     "raw": "+",
+     "ordered": false,
+     "start": "",
+     "loose": false
+    },
+    {
+     "type": "list_item",
+     "raw": "+",
+     "text": "",
+     "task": false,
+     "loose": false
+    }
+   ]
+  },
+  "test-07-01": {
+   "types": [
+    "list",
+    "list_item",
+    "text",
+    "text",
+    "list",
+    "list_item",
+    "text",
+    "text",
+    "list_item",
+    "text",
+    "text",
+    "list_item",
+    "text",
+    "text",
+    "list",
+    "list_item",
+    "text",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "list",
+     "raw": "1. Ordered item\n   - Unordered nested\n   - Another nested\n2. Second ordered\n   - More nested",
+     "ordered": true,
+     "start": 1,
+     "loose": false
+    },
+    {
+     "type": "list_item",
+     "raw": "1. Ordered item\n   - Unordered nested\n   - Another nested\n",
+     "text": "Ordered item\n- Unordered nested\n- Another nested",
+     "task": false,
+     "loose": false
+    },
+    {
+     "type": "text",
+     "raw": "Ordered item\n",
+     "text": "Ordered item"
+    },
+    {
+     "type": "text",
+     "raw": "Ordered item",
+     "text": "Ordered item"
+    },
+    {
+     "type": "list",
+     "raw": "- Unordered nested\n- Another nested",
+     "ordered": false,
+     "start": "",
+     "loose": false
+    },
+    {
+     "type": "list_item",
+     "raw": "- Unordered nested\n",
+     "text": "Unordered nested",
+     "task": false,
+     "loose": false
+    },
+    {
+     "type": "text",
+     "raw": "Unordered nested",
+     "text": "Unordered nested"
+    },
+    {
+     "type": "text",
+     "raw": "Unordered nested",
+     "text": "Unordered nested"
+    },
+    {
+     "type": "list_item",
+     "raw": "- Another nested",
+     "text": "Another nested",
+     "task": false,
+     "loose": false
+    },
+    {
+     "type": "text",
+     "raw": "Another nested",
+     "text": "Another nested"
+    },
+    {
+     "type": "text",
+     "raw": "Another nested",
+     "text": "Another nested"
+    },
+    {
+     "type": "list_item",
+     "raw": "2. Second ordered\n   - More nested",
+     "text": "Second ordered\n- More nested",
+     "task": false,
+     "loose": false
+    },
+    {
+     "type": "text",
+     "raw": "Second ordered\n",
+     "text": "Second ordered"
+    },
+    {
+     "type": "text",
+     "raw": "Second ordered",
+     "text": "Second ordered"
+    },
+    {
+     "type": "list",
+     "raw": "- More nested",
+     "ordered": false,
+     "start": "",
+     "loose": false
+    },
+    {
+     "type": "list_item",
+     "raw": "- More nested",
+     "text": "More nested",
+     "task": false,
+     "loose": false
+    },
+    {
+     "type": "text",
+     "raw": "More nested",
+     "text": "More nested"
+    },
+    {
+     "type": "text",
+     "raw": "More nested",
+     "text": "More nested"
+    }
+   ]
+  },
+  "test-08-01": {
+   "types": [
+    "list",
+    "list_item",
+    "paragraph",
+    "text",
+    "space",
+    "paragraph",
+    "text",
+    "list_item",
+    "paragraph",
+    "text",
+    "space",
+    "paragraph",
+    "text",
+    "list_item",
+    "paragraph",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "list",
+     "raw": "1. Lorem ipsum dolor sit amet.\n\n   Ut enim ad minim veniam.\n\n2. Duis aute irure dolor.\n\n   Excepteur sint occaecat cupidatat.\n\n3. Beep boop",
+     "ordered": true,
+     "start": 1,
+     "loose": true
+    },
+    {
+     "type": "list_item",
+     "raw": "1. Lorem ipsum dolor sit amet.\n\n   Ut enim ad minim veniam.\n\n",
+     "text": "Lorem ipsum dolor sit amet.\n\nUt enim ad minim veniam.\n",
+     "task": false,
+     "loose": true
+    },
+    {
+     "type": "paragraph",
+     "raw": "Lorem ipsum dolor sit amet.",
+     "text": "Lorem ipsum dolor sit amet."
+    },
+    {
+     "type": "text",
+     "raw": "Lorem ipsum dolor sit amet.",
+     "text": "Lorem ipsum dolor sit amet."
+    },
+    {
+     "type": "space",
+     "raw": "\n\n"
+    },
+    {
+     "type": "paragraph",
+     "raw": "Ut enim ad minim veniam.\n",
+     "text": "Ut enim ad minim veniam."
+    },
+    {
+     "type": "text",
+     "raw": "Ut enim ad minim veniam.",
+     "text": "Ut enim ad minim veniam."
+    },
+    {
+     "type": "list_item",
+     "raw": "2. Duis aute irure dolor.\n\n   Excepteur sint occaecat cupidatat.\n\n",
+     "text": "Duis aute irure dolor.\n\nExcepteur sint occaecat cupidatat.\n",
+     "task": false,
+     "loose": true
+    },
+    {
+     "type": "paragraph",
+     "raw": "Duis aute irure dolor.",
+     "text": "Duis aute irure dolor."
+    },
+    {
+     "type": "text",
+     "raw": "Duis aute irure dolor.",
+     "text": "Duis aute irure dolor."
+    },
+    {
+     "type": "space",
+     "raw": "\n\n"
+    },
+    {
+     "type": "paragraph",
+     "raw": "Excepteur sint occaecat cupidatat.\n",
+     "text": "Excepteur sint occaecat cupidatat."
+    },
+    {
+     "type": "text",
+     "raw": "Excepteur sint occaecat cupidatat.",
+     "text": "Excepteur sint occaecat cupidatat."
+    },
+    {
+     "type": "list_item",
+     "raw": "3. Beep boop",
+     "text": "Beep boop",
+     "task": false,
+     "loose": true
+    },
+    {
+     "type": "paragraph",
+     "raw": "Beep boop",
+     "text": "Beep boop"
+    },
+    {
+     "type": "text",
+     "raw": "Beep boop",
+     "text": "Beep boop"
+    }
+   ]
+  },
+  "test-09-01": {
+   "types": [
+    "list",
+    "list_item",
+    "checkbox",
+    "text",
+    "text",
+    "list_item",
+    "checkbox",
+    "text",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "list",
+     "raw": "- [ ] beep\n- [x] boop",
+     "ordered": false,
+     "start": "",
+     "loose": false
+    },
+    {
+     "type": "list_item",
+     "raw": "- [ ] beep\n",
+     "text": "beep",
+     "checked": false,
+     "task": true,
+     "loose": false
+    },
+    {
+     "type": "checkbox",
+     "raw": "[ ] ",
+     "checked": false
+    },
+    {
+     "type": "text",
+     "raw": "beep",
+     "text": "beep"
+    },
+    {
+     "type": "text",
+     "raw": "beep",
+     "text": "beep"
+    },
+    {
+     "type": "list_item",
+     "raw": "- [x] boop",
+     "text": "boop",
+     "checked": true,
+     "task": true,
+     "loose": false
+    },
+    {
+     "type": "checkbox",
+     "raw": "[x] ",
+     "checked": true
+    },
+    {
+     "type": "text",
+     "raw": "boop",
+     "text": "boop"
+    },
+    {
+     "type": "text",
+     "raw": "boop",
+     "text": "boop"
+    }
+   ]
+  },
+  "test-10-01": {
+   "types": [
+    "list",
+    "list_item",
+    "text",
+    "text",
+    "space",
+    "code",
+    "space",
+    "list",
+    "list_item",
+    "text",
+    "text",
+    "space",
+    "code",
+    "space",
+    "list",
+    "list_item",
+    "text",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "list",
+     "raw": "1. First item",
+     "ordered": true,
+     "start": 1,
+     "loose": false
+    },
+    {
+     "type": "list_item",
+     "raw": "1. First item",
+     "text": "First item",
+     "task": false,
+     "loose": false
+    },
+    {
+     "type": "text",
+     "raw": "First item",
+     "text": "First item"
+    },
+    {
+     "type": "text",
+     "raw": "First item",
+     "text": "First item"
+    },
+    {
+     "type": "space",
+     "raw": "\n\n"
+    },
+    {
+     "type": "code",
+     "raw": "```typescript\n// code block\n```",
+     "text": "// code block",
+     "lang": "typescript"
+    },
+    {
+     "type": "space",
+     "raw": "\n\n"
+    },
+    {
+     "type": "list",
+     "raw": "2. Second item",
+     "ordered": true,
+     "start": 2,
+     "loose": false
+    },
+    {
+     "type": "list_item",
+     "raw": "2. Second item",
+     "text": "Second item",
+     "task": false,
+     "loose": false
+    },
+    {
+     "type": "text",
+     "raw": "Second item",
+     "text": "Second item"
+    },
+    {
+     "type": "text",
+     "raw": "Second item",
+     "text": "Second item"
+    },
+    {
+     "type": "space",
+     "raw": "\n\n"
+    },
+    {
+     "type": "code",
+     "raw": "```typescript\n// another code block\n```",
+     "text": "// another code block",
+     "lang": "typescript"
+    },
+    {
+     "type": "space",
+     "raw": "\n\n"
+    },
+    {
+     "type": "list",
+     "raw": "3. Third item",
+     "ordered": true,
+     "start": 3,
+     "loose": false
+    },
+    {
+     "type": "list_item",
+     "raw": "3. Third item",
+     "text": "Third item",
+     "task": false,
+     "loose": false
+    },
+    {
+     "type": "text",
+     "raw": "Third item",
+     "text": "Third item"
+    },
+    {
+     "type": "text",
+     "raw": "Third item",
+     "text": "Third item"
+    }
+   ]
+  },
+  "test-11-01": {
+   "types": [
+    "list",
+    "list_item",
+    "text",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "list",
+     "raw": "- alpha beta gamma delta epsilon",
+     "ordered": false,
+     "start": "",
+     "loose": false
+    },
+    {
+     "type": "list_item",
+     "raw": "- alpha beta gamma delta epsilon",
+     "text": "alpha beta gamma delta epsilon",
+     "task": false,
+     "loose": false
+    },
+    {
+     "type": "text",
+     "raw": "alpha beta gamma delta epsilon",
+     "text": "alpha beta gamma delta epsilon"
+    },
+    {
+     "type": "text",
+     "raw": "alpha beta gamma delta epsilon",
+     "text": "alpha beta gamma delta epsilon"
+    }
+   ]
+  },
+  "test-12-01": {
+   "types": [
+    "list",
+    "list_item",
+    "text",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "list",
+     "raw": "1. alpha beta gamma delta epsilon",
+     "ordered": true,
+     "start": 1,
+     "loose": false
+    },
+    {
+     "type": "list_item",
+     "raw": "1. alpha beta gamma delta epsilon",
+     "text": "alpha beta gamma delta epsilon",
+     "task": false,
+     "loose": false
+    },
+    {
+     "type": "text",
+     "raw": "alpha beta gamma delta epsilon",
+     "text": "alpha beta gamma delta epsilon"
+    },
+    {
+     "type": "text",
+     "raw": "alpha beta gamma delta epsilon",
+     "text": "alpha beta gamma delta epsilon"
+    }
+   ]
+  },
+  "test-13-01": {
+   "types": [
+    "list",
+    "list_item",
+    "text",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "list",
+     "raw": "10. alpha beta gamma delta epsilon",
+     "ordered": true,
+     "start": 10,
+     "loose": false
+    },
+    {
+     "type": "list_item",
+     "raw": "10. alpha beta gamma delta epsilon",
+     "text": "alpha beta gamma delta epsilon",
+     "task": false,
+     "loose": false
+    },
+    {
+     "type": "text",
+     "raw": "alpha beta gamma delta epsilon",
+     "text": "alpha beta gamma delta epsilon"
+    },
+    {
+     "type": "text",
+     "raw": "alpha beta gamma delta epsilon",
+     "text": "alpha beta gamma delta epsilon"
+    }
+   ]
+  },
+  "test-14-01": {
+   "types": [
+    "list",
+    "list_item",
+    "text",
+    "text",
+    "list",
+    "list_item",
+    "text",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "list",
+     "raw": "- parent\n  - alpha beta gamma delta epsilon",
+     "ordered": false,
+     "start": "",
+     "loose": false
+    },
+    {
+     "type": "list_item",
+     "raw": "- parent\n  - alpha beta gamma delta epsilon",
+     "text": "parent\n- alpha beta gamma delta epsilon",
+     "task": false,
+     "loose": false
+    },
+    {
+     "type": "text",
+     "raw": "parent\n",
+     "text": "parent"
+    },
+    {
+     "type": "text",
+     "raw": "parent",
+     "text": "parent"
+    },
+    {
+     "type": "list",
+     "raw": "- alpha beta gamma delta epsilon",
+     "ordered": false,
+     "start": "",
+     "loose": false
+    },
+    {
+     "type": "list_item",
+     "raw": "- alpha beta gamma delta epsilon",
+     "text": "alpha beta gamma delta epsilon",
+     "task": false,
+     "loose": false
+    },
+    {
+     "type": "text",
+     "raw": "alpha beta gamma delta epsilon",
+     "text": "alpha beta gamma delta epsilon"
+    },
+    {
+     "type": "text",
+     "raw": "alpha beta gamma delta epsilon",
+     "text": "alpha beta gamma delta epsilon"
+    }
+   ]
+  },
+  "test-15-01": {
+   "types": [
+    "list",
+    "list_item",
+    "text",
+    "text",
+    "list",
+    "list_item",
+    "text",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "list",
+     "raw": "1. parent\n   - alpha beta gamma delta epsilon",
+     "ordered": true,
+     "start": 1,
+     "loose": false
+    },
+    {
+     "type": "list_item",
+     "raw": "1. parent\n   - alpha beta gamma delta epsilon",
+     "text": "parent\n- alpha beta gamma delta epsilon",
+     "task": false,
+     "loose": false
+    },
+    {
+     "type": "text",
+     "raw": "parent\n",
+     "text": "parent"
+    },
+    {
+     "type": "text",
+     "raw": "parent",
+     "text": "parent"
+    },
+    {
+     "type": "list",
+     "raw": "- alpha beta gamma delta epsilon",
+     "ordered": false,
+     "start": "",
+     "loose": false
+    },
+    {
+     "type": "list_item",
+     "raw": "- alpha beta gamma delta epsilon",
+     "text": "alpha beta gamma delta epsilon",
+     "task": false,
+     "loose": false
+    },
+    {
+     "type": "text",
+     "raw": "alpha beta gamma delta epsilon",
+     "text": "alpha beta gamma delta epsilon"
+    },
+    {
+     "type": "text",
+     "raw": "alpha beta gamma delta epsilon",
+     "text": "alpha beta gamma delta epsilon"
+    }
+   ]
+  },
+  "test-16-01": {
+   "types": [
+    "list",
+    "list_item",
+    "blockquote",
+    "paragraph",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "list",
+     "raw": "- > alpha beta gamma delta epsilon zeta",
+     "ordered": false,
+     "start": "",
+     "loose": false
+    },
+    {
+     "type": "list_item",
+     "raw": "- > alpha beta gamma delta epsilon zeta",
+     "text": "> alpha beta gamma delta epsilon zeta",
+     "task": false,
+     "loose": false
+    },
+    {
+     "type": "blockquote",
+     "raw": "> alpha beta gamma delta epsilon zeta",
+     "text": "alpha beta gamma delta epsilon zeta"
+    },
+    {
+     "type": "paragraph",
+     "raw": "alpha beta gamma delta epsilon zeta",
+     "text": "alpha beta gamma delta epsilon zeta"
+    },
+    {
+     "type": "text",
+     "raw": "alpha beta gamma delta epsilon zeta",
+     "text": "alpha beta gamma delta epsilon zeta"
+    }
+   ]
+  },
+  "test-17-01": {
+   "types": [
+    "list",
+    "list_item",
+    "code"
+   ],
+   "nodes": [
+    {
+     "type": "list",
+     "raw": "- ```ts\n  alpha beta gamma delta epsilon zeta\n  ```",
+     "ordered": false,
+     "start": "",
+     "loose": false
+    },
+    {
+     "type": "list_item",
+     "raw": "- ```ts\n  alpha beta gamma delta epsilon zeta\n  ```",
+     "text": "```ts\nalpha beta gamma delta epsilon zeta\n```",
+     "task": false,
+     "loose": false
+    },
+    {
+     "type": "code",
+     "raw": "```ts\nalpha beta gamma delta epsilon zeta\n```",
+     "text": "alpha beta gamma delta epsilon zeta",
+     "lang": "ts"
+    }
+   ]
+  },
+  "test-18-01": {
+   "types": [
+    "table"
+   ],
+   "nodes": [
+    {
+     "type": "table",
+     "raw": "| Name | Age |\n| --- | --- |\n| Alice | 30 |\n| Bob | 25 |",
+     "align": [
+      null,
+      null
+     ]
+    }
+   ]
+  },
+  "test-19-01": {
+   "types": [
+    "table"
+   ],
+   "nodes": [
+    {
+     "type": "table",
+     "raw": "| Name | Age |\n| --- | --- |\n| Alice | 30 |\n| Bob | 25 |",
+     "align": [
+      null,
+      null
+     ]
+    }
+   ]
+  },
+  "test-20-01": {
+   "types": [
+    "table"
+   ],
+   "nodes": [
+    {
+     "type": "table",
+     "raw": "| Column One | Column Two |\n| --- | --- |\n| superlongword short | otherword |\n| small | tiny |",
+     "align": [
+      null,
+      null
+     ]
+    }
+   ]
+  },
+  "test-21-01": {
+   "types": [
+    "table"
+   ],
+   "nodes": [
+    {
+     "type": "table",
+     "raw": "| Left | Center | Right |\n| :--- | :---: | ---: |\n| A | B | C |\n| Long text | Middle | End |",
+     "align": [
+      "left",
+      "center",
+      "right"
+     ]
+    }
+   ]
+  },
+  "test-22-01": {
+   "types": [
+    "table"
+   ],
+   "nodes": [
+    {
+     "type": "table",
+     "raw": "| Short | Very long column header |\n| --- | --- |\n| A | This is a much longer cell content |\n| B | Short |",
+     "align": [
+      null,
+      null
+     ]
+    }
+   ]
+  },
+  "test-23-01": {
+   "types": [
+    "table"
+   ],
+   "nodes": [
+    {
+     "type": "table",
+     "raw": "| Command | Description | Example |\n| --- | --- | --- |\n| npm install | Install all dependencies | npm install |\n| npm run build | Build the project | npm run build |",
+     "align": [
+      null,
+      null,
+      null
+     ]
+    }
+   ]
+  },
+  "test-24-01": {
+   "types": [
+    "table"
+   ],
+   "nodes": [
+    {
+     "type": "table",
+     "raw": "| Link | Plain |\n| --- | --- |\n| [**one two three four five six**](https://example.com) | normal text |",
+     "align": [
+      null,
+      null
+     ]
+    }
+   ]
+  },
+  "test-25-01": {
+   "types": [
+    "blockquote",
+    "table"
+   ],
+   "nodes": [
+    {
+     "type": "blockquote",
+     "raw": "> | Link | Plain |\n> | --- | --- |\n> | [one two three four five six](https://example.com) | normal text |",
+     "text": "| Link | Plain |\n| --- | --- |\n| [one two three four five six](https://example.com) | normal text |"
+    },
+    {
+     "type": "table",
+     "raw": "| Link | Plain |\n| --- | --- |\n| [one two three four five six](https://example.com) | normal text |",
+     "align": [
+      null,
+      null
+     ]
+    }
+   ]
+  },
+  "test-26-01": {
+   "types": [
+    "table"
+   ],
+   "nodes": [
+    {
+     "type": "table",
+     "raw": "| Header |\n| --- |\n| This is a very long cell content that should wrap |",
+     "align": [
+      null
+     ]
+    }
+   ]
+  },
+  "test-27-01": {
+   "types": [
+    "table"
+   ],
+   "nodes": [
+    {
+     "type": "table",
+     "raw": "| Value |\n| --- |\n| prefix https://example.com/this/is/a/very/long/url/that/should/wrap |",
+     "align": [
+      null
+     ]
+    }
+   ]
+  },
+  "test-28-01": {
+   "types": [
+    "table"
+   ],
+   "nodes": [
+    {
+     "type": "table",
+     "raw": "| Code |\n| --- |\n| `averyveryveryverylongidentifier` |",
+     "align": [
+      null
+     ]
+    }
+   ]
+  },
+  "test-29-01": {
+   "types": [
+    "table"
+   ],
+   "nodes": [
+    {
+     "type": "table",
+     "raw": "| A | B | C |\n| --- | --- | --- |\n| 1 | 2 | 3 |",
+     "align": [
+      null,
+      null,
+      null
+     ]
+    }
+   ]
+  },
+  "test-30-01": {
+   "types": [
+    "table"
+   ],
+   "nodes": [
+    {
+     "type": "table",
+     "raw": "| A | B |\n| --- | --- |\n| 1 | 2 |",
+     "align": [
+      null,
+      null
+     ]
+    }
+   ]
+  },
+  "test-31-01": {
+   "types": [
+    "table"
+   ],
+   "nodes": [
+    {
+     "type": "table",
+     "raw": "| Column One | Column Two |\n| --- | --- |\n| Data 1 | Data 2 |",
+     "align": [
+      null,
+      null
+     ]
+    }
+   ]
+  },
+  "test-32-01": {
+   "types": [
+    "table"
+   ],
+   "nodes": [
+    {
+     "type": "table",
+     "raw": "| Name |\n| --- |\n| Alice |",
+     "align": [
+      null
+     ]
+    }
+   ]
+  },
+  "test-33-01": {
+   "types": [
+    "heading",
+    "text",
+    "space",
+    "list",
+    "list_item",
+    "text",
+    "text",
+    "list",
+    "list_item",
+    "text",
+    "text",
+    "list_item",
+    "text",
+    "text",
+    "space",
+    "table"
+   ],
+   "nodes": [
+    {
+     "type": "heading",
+     "raw": "# Test Document",
+     "text": "Test Document",
+     "depth": 1
+    },
+    {
+     "type": "text",
+     "raw": "Test Document",
+     "text": "Test Document"
+    },
+    {
+     "type": "space",
+     "raw": "\n\n"
+    },
+    {
+     "type": "list",
+     "raw": "- Item 1\n  - Nested item\n- Item 2",
+     "ordered": false,
+     "start": "",
+     "loose": false
+    },
+    {
+     "type": "list_item",
+     "raw": "- Item 1\n  - Nested item\n",
+     "text": "Item 1\n- Nested item",
+     "task": false,
+     "loose": false
+    },
+    {
+     "type": "text",
+     "raw": "Item 1\n",
+     "text": "Item 1"
+    },
+    {
+     "type": "text",
+     "raw": "Item 1",
+     "text": "Item 1"
+    },
+    {
+     "type": "list",
+     "raw": "- Nested item",
+     "ordered": false,
+     "start": "",
+     "loose": false
+    },
+    {
+     "type": "list_item",
+     "raw": "- Nested item",
+     "text": "Nested item",
+     "task": false,
+     "loose": false
+    },
+    {
+     "type": "text",
+     "raw": "Nested item",
+     "text": "Nested item"
+    },
+    {
+     "type": "text",
+     "raw": "Nested item",
+     "text": "Nested item"
+    },
+    {
+     "type": "list_item",
+     "raw": "- Item 2",
+     "text": "Item 2",
+     "task": false,
+     "loose": false
+    },
+    {
+     "type": "text",
+     "raw": "Item 2",
+     "text": "Item 2"
+    },
+    {
+     "type": "text",
+     "raw": "Item 2",
+     "text": "Item 2"
+    },
+    {
+     "type": "space",
+     "raw": "\n\n"
+    },
+    {
+     "type": "table",
+     "raw": "| Col1 | Col2 |\n| --- | --- |\n| A | B |",
+     "align": [
+      null,
+      null
+     ]
+    }
+   ]
+  },
+  "test-34-01": {
+   "types": [
+    "paragraph",
+    "text",
+    "escape",
+    "text",
+    "escape",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "A map $\\mathbb{C}^3 \\to \\mathbb{C}^3$, $xy$, $x-y$, $-x$, $\\frac{1}{2}$, and \\(s \\to \\infty\\).",
+     "text": "A map $\\mathbb{C}^3 \\to \\mathbb{C}^3$, $xy$, $x-y$, $-x$, $\\frac{1}{2}$, and \\(s \\to \\infty\\)."
+    },
+    {
+     "type": "text",
+     "raw": "A map $\\mathbb{C}^3 \\to \\mathbb{C}^3$, $xy$, $x-y$, $-x$, $\\frac{1}{2}$, and ",
+     "text": "A map $\\mathbb{C}^3 \\to \\mathbb{C}^3$, $xy$, $x-y$, $-x$, $\\frac{1}{2}$, and "
+    },
+    {
+     "type": "escape",
+     "raw": "\\(",
+     "text": "("
+    },
+    {
+     "type": "text",
+     "raw": "s \\to \\infty",
+     "text": "s \\to \\infty"
+    },
+    {
+     "type": "escape",
+     "raw": "\\)",
+     "text": ")"
+    },
+    {
+     "type": "text",
+     "raw": ".",
+     "text": "."
+    }
+   ]
+  },
+  "test-35-01": {
+   "types": [
+    "paragraph",
+    "text",
+    "space",
+    "paragraph",
+    "text",
+    "escape",
+    "text",
+    "escape",
+    "text",
+    "escape",
+    "text",
+    "escape",
+    "escape",
+    "text",
+    "space",
+    "paragraph",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "Before",
+     "text": "Before"
+    },
+    {
+     "type": "text",
+     "raw": "Before",
+     "text": "Before"
+    },
+    {
+     "type": "space",
+     "raw": "\n\n"
+    },
+    {
+     "type": "paragraph",
+     "raw": "$$\\{3x+2y,\\; x \\in \\{0, \\pm 1\\}\\}$$",
+     "text": "$$\\{3x+2y,\\; x \\in \\{0, \\pm 1\\}\\}$$"
+    },
+    {
+     "type": "text",
+     "raw": "$$",
+     "text": "$$"
+    },
+    {
+     "type": "escape",
+     "raw": "\\{",
+     "text": "{"
+    },
+    {
+     "type": "text",
+     "raw": "3x+2y,",
+     "text": "3x+2y,"
+    },
+    {
+     "type": "escape",
+     "raw": "\\;",
+     "text": ";"
+    },
+    {
+     "type": "text",
+     "raw": " x \\in ",
+     "text": " x \\in "
+    },
+    {
+     "type": "escape",
+     "raw": "\\{",
+     "text": "{"
+    },
+    {
+     "type": "text",
+     "raw": "0, \\pm 1",
+     "text": "0, \\pm 1"
+    },
+    {
+     "type": "escape",
+     "raw": "\\}",
+     "text": "}"
+    },
+    {
+     "type": "escape",
+     "raw": "\\}",
+     "text": "}"
+    },
+    {
+     "type": "text",
+     "raw": "$$",
+     "text": "$$"
+    },
+    {
+     "type": "space",
+     "raw": "\n\n"
+    },
+    {
+     "type": "paragraph",
+     "raw": "after",
+     "text": "after"
+    },
+    {
+     "type": "text",
+     "raw": "after",
+     "text": "after"
+    }
+   ]
+  },
+  "test-36-01": {
+   "types": [
+    "paragraph",
+    "text",
+    "space",
+    "paragraph",
+    "escape",
+    "text",
+    "escape",
+    "space",
+    "paragraph",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "Before",
+     "text": "Before"
+    },
+    {
+     "type": "text",
+     "raw": "Before",
+     "text": "Before"
+    },
+    {
+     "type": "space",
+     "raw": "\n\n"
+    },
+    {
+     "type": "paragraph",
+     "raw": "\\[\nE \\approx \\frac{0.1\\ \\text{lux}}{100\\ \\text{lm/W}}\n\\]",
+     "text": "\\[\nE \\approx \\frac{0.1\\ \\text{lux}}{100\\ \\text{lm/W}}\n\\]"
+    },
+    {
+     "type": "escape",
+     "raw": "\\[",
+     "text": "["
+    },
+    {
+     "type": "text",
+     "raw": "\nE \\approx \\frac{0.1\\ \\text{lux}}{100\\ \\text{lm/W}}\n",
+     "text": "\nE \\approx \\frac{0.1\\ \\text{lux}}{100\\ \\text{lm/W}}\n"
+    },
+    {
+     "type": "escape",
+     "raw": "\\]",
+     "text": "]"
+    },
+    {
+     "type": "space",
+     "raw": "\n\n"
+    },
+    {
+     "type": "paragraph",
+     "raw": "after",
+     "text": "after"
+    },
+    {
+     "type": "text",
+     "raw": "after",
+     "text": "after"
+    }
+   ]
+  },
+  "test-37-01": {
+   "types": [
+    "paragraph",
+    "text",
+    "space",
+    "paragraph",
+    "escape",
+    "text",
+    "escape",
+    "text",
+    "escape"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "Consider the matrix",
+     "text": "Consider the matrix"
+    },
+    {
+     "type": "text",
+     "raw": "Consider the matrix",
+     "text": "Consider the matrix"
+    },
+    {
+     "type": "space",
+     "raw": "\n\n"
+    },
+    {
+     "type": "paragraph",
+     "raw": "\\[\nA=\n\\begin{pmatrix}\n\\pi & 0\\\\\n0 & \\frac{1}{\\pi}\n\\end{pmatrix}.\n\\]",
+     "text": "\\[\nA=\n\\begin{pmatrix}\n\\pi & 0\\\\\n0 & \\frac{1}{\\pi}\n\\end{pmatrix}.\n\\]"
+    },
+    {
+     "type": "escape",
+     "raw": "\\[",
+     "text": "["
+    },
+    {
+     "type": "text",
+     "raw": "\nA=\n\\begin{pmatrix}\n\\pi & 0",
+     "text": "\nA=\n\\begin{pmatrix}\n\\pi & 0"
+    },
+    {
+     "type": "escape",
+     "raw": "\\\\",
+     "text": "\\"
+    },
+    {
+     "type": "text",
+     "raw": "\n0 & \\frac{1}{\\pi}\n\\end{pmatrix}.\n",
+     "text": "\n0 & \\frac{1}{\\pi}\n\\end{pmatrix}.\n"
+    },
+    {
+     "type": "escape",
+     "raw": "\\]",
+     "text": "]"
+    }
+   ]
+  },
+  "test-38-01": {
+   "types": [
+    "paragraph",
+    "escape",
+    "text",
+    "escape"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "\\[\n\\lim_{x\\to 0}\\frac{\\frac{\\sin x}{x}-1}{\\frac{e^x-1}{x}-1}=0\n\\]",
+     "text": "\\[\n\\lim_{x\\to 0}\\frac{\\frac{\\sin x}{x}-1}{\\frac{e^x-1}{x}-1}=0\n\\]"
+    },
+    {
+     "type": "escape",
+     "raw": "\\[",
+     "text": "["
+    },
+    {
+     "type": "text",
+     "raw": "\n\\lim_{x\\to 0}\\frac{\\frac{\\sin x}{x}-1}{\\frac{e^x-1}{x}-1}=0\n",
+     "text": "\n\\lim_{x\\to 0}\\frac{\\frac{\\sin x}{x}-1}{\\frac{e^x-1}{x}-1}=0\n"
+    },
+    {
+     "type": "escape",
+     "raw": "\\]",
+     "text": "]"
+    }
+   ]
+  },
+  "test-39-01": {
+   "types": [
+    "list",
+    "list_item",
+    "text",
+    "text",
+    "space",
+    "table"
+   ],
+   "nodes": [
+    {
+     "type": "list",
+     "raw": "- Formula: $F_1 = u^2$",
+     "ordered": false,
+     "start": "",
+     "loose": false
+    },
+    {
+     "type": "list_item",
+     "raw": "- Formula: $F_1 = u^2$",
+     "text": "Formula: $F_1 = u^2$",
+     "task": false,
+     "loose": false
+    },
+    {
+     "type": "text",
+     "raw": "Formula: $F_1 = u^2$",
+     "text": "Formula: $F_1 = u^2$"
+    },
+    {
+     "type": "text",
+     "raw": "Formula: $F_1 = u^2$",
+     "text": "Formula: $F_1 = u^2$"
+    },
+    {
+     "type": "space",
+     "raw": "\n\n"
+    },
+    {
+     "type": "table",
+     "raw": "| Value |\n| --- |\n| $\\mathbb{C}^3$ |",
+     "align": [
+      null
+     ]
+    }
+   ]
+  },
+  "test-40-01": {
+   "types": [
+    "paragraph",
+    "text",
+    "codespan",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "Costs $5 and $10 or $8k–$12k; use `$x$`, $HOME, and ${PATH}.",
+     "text": "Costs $5 and $10 or $8k–$12k; use `$x$`, $HOME, and ${PATH}."
+    },
+    {
+     "type": "text",
+     "raw": "Costs $5 and $10 or $8k–$12k; use ",
+     "text": "Costs $5 and $10 or $8k–$12k; use "
+    },
+    {
+     "type": "codespan",
+     "raw": "`$x$`",
+     "text": "$x$"
+    },
+    {
+     "type": "text",
+     "raw": ", $HOME, and ${PATH}.",
+     "text": ", $HOME, and ${PATH}."
+    }
+   ]
+  },
+  "test-40-02": {
+   "types": [
+    "paragraph",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "Paths: $HOME/$USER and $XDG_CONFIG_HOME/$APP_CONFIG",
+     "text": "Paths: $HOME/$USER and $XDG_CONFIG_HOME/$APP_CONFIG"
+    },
+    {
+     "type": "text",
+     "raw": "Paths: $HOME/$USER and $XDG_CONFIG_HOME/$APP_CONFIG",
+     "text": "Paths: $HOME/$USER and $XDG_CONFIG_HOME/$APP_CONFIG"
+    }
+   ]
+  },
+  "test-41-01": {
+   "types": [
+    "paragraph",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "Unknown $x + \\unknown{y}$ after",
+     "text": "Unknown $x + \\unknown{y}$ after"
+    },
+    {
+     "type": "text",
+     "raw": "Unknown $x + \\unknown{y}$ after",
+     "text": "Unknown $x + \\unknown{y}$ after"
+    }
+   ]
+  },
+  "test-41-02": {
+   "types": [
+    "paragraph",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "Streaming $\\mathbb{C}^3",
+     "text": "Streaming $\\mathbb{C}^3"
+    },
+    {
+     "type": "text",
+     "raw": "Streaming $\\mathbb{C}^3",
+     "text": "Streaming $\\mathbb{C}^3"
+    }
+   ]
+  },
+  "test-42-01": {
+   "types": [
+    "paragraph",
+    "text",
+    "escape",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "Map \\(\\mathbb{C}^3",
+     "text": "Map \\(\\mathbb{C}^3"
+    },
+    {
+     "type": "text",
+     "raw": "Map ",
+     "text": "Map "
+    },
+    {
+     "type": "escape",
+     "raw": "\\(",
+     "text": "("
+    },
+    {
+     "type": "text",
+     "raw": "\\mathbb{C}^3",
+     "text": "\\mathbb{C}^3"
+    }
+   ]
+  },
+  "test-42-02": {
+   "types": [
+    "paragraph",
+    "escape",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "\\[\nx^2",
+     "text": "\\[\nx^2"
+    },
+    {
+     "type": "escape",
+     "raw": "\\[",
+     "text": "["
+    },
+    {
+     "type": "text",
+     "raw": "\nx^2",
+     "text": "\nx^2"
+    }
+   ]
+  },
+  "test-43-01": {
+   "types": [
+    "paragraph",
+    "text",
+    "escape",
+    "text",
+    "escape",
+    "text",
+    "space",
+    "code"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "Escaped \\$x-y\\$.",
+     "text": "Escaped \\$x-y\\$."
+    },
+    {
+     "type": "text",
+     "raw": "Escaped ",
+     "text": "Escaped "
+    },
+    {
+     "type": "escape",
+     "raw": "\\$",
+     "text": "$"
+    },
+    {
+     "type": "text",
+     "raw": "x-y",
+     "text": "x-y"
+    },
+    {
+     "type": "escape",
+     "raw": "\\$",
+     "text": "$"
+    },
+    {
+     "type": "text",
+     "raw": ".",
+     "text": "."
+    },
+    {
+     "type": "space",
+     "raw": "\n\n"
+    },
+    {
+     "type": "code",
+     "raw": "```text\n$\\mathbb{C}^3$\n```",
+     "text": "$\\mathbb{C}^3$",
+     "lang": "text"
+    }
+   ]
+  },
+  "test-44-01": {
+   "types": [
+    "paragraph",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "Map $\\mathbb{C}^3 \\to \\mathbb{C}^3$",
+     "text": "Map $\\mathbb{C}^3 \\to \\mathbb{C}^3$"
+    },
+    {
+     "type": "text",
+     "raw": "Map $\\mathbb{C}^3 \\to \\mathbb{C}^3$",
+     "text": "Map $\\mathbb{C}^3 \\to \\mathbb{C}^3$"
+    }
+   ]
+  },
+  "test-45-01": {
+   "types": [
+    "paragraph",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "Map $\\mathbb{C}^3",
+     "text": "Map $\\mathbb{C}^3"
+    },
+    {
+     "type": "text",
+     "raw": "Map $\\mathbb{C}^3",
+     "text": "Map $\\mathbb{C}^3"
+    }
+   ]
+  },
+  "test-45-02": {
+   "types": [
+    "paragraph",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "Map $\\mathbb{C}^3$",
+     "text": "Map $\\mathbb{C}^3$"
+    },
+    {
+     "type": "text",
+     "raw": "Map $\\mathbb{C}^3$",
+     "text": "Map $\\mathbb{C}^3$"
+    }
+   ]
+  },
+  "test-46-01": {
+   "types": [
+    "paragraph",
+    "text",
+    "escape"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "\"\\\"",
+     "text": "\"\\\""
+    },
+    {
+     "type": "text",
+     "raw": "\"",
+     "text": "\""
+    },
+    {
+     "type": "escape",
+     "raw": "\\\"",
+     "text": "\""
+    }
+   ]
+  },
+  "test-47-01": {
+   "types": [
+    "paragraph",
+    "text",
+    "escape"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "\"\\\"",
+     "text": "\"\\\""
+    },
+    {
+     "type": "text",
+     "raw": "\"",
+     "text": "\""
+    },
+    {
+     "type": "escape",
+     "raw": "\\\"",
+     "text": "\""
+    }
+   ]
+  },
+  "test-48-01": {
+   "types": [
+    "paragraph",
+    "text",
+    "codespan",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "This is thinking with `inline code` and more text after",
+     "text": "This is thinking with `inline code` and more text after"
+    },
+    {
+     "type": "text",
+     "raw": "This is thinking with ",
+     "text": "This is thinking with "
+    },
+    {
+     "type": "codespan",
+     "raw": "`inline code`",
+     "text": "inline code"
+    },
+    {
+     "type": "text",
+     "raw": " and more text after",
+     "text": " and more text after"
+    }
+   ]
+  },
+  "test-49-01": {
+   "types": [
+    "paragraph",
+    "text",
+    "strong",
+    "text",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "This is thinking with **bold text** and more after",
+     "text": "This is thinking with **bold text** and more after"
+    },
+    {
+     "type": "text",
+     "raw": "This is thinking with ",
+     "text": "This is thinking with "
+    },
+    {
+     "type": "strong",
+     "raw": "**bold text**",
+     "text": "bold text"
+    },
+    {
+     "type": "text",
+     "raw": "bold text",
+     "text": "bold text"
+    },
+    {
+     "type": "text",
+     "raw": " and more after",
+     "text": " and more after"
+    }
+   ]
+  },
+  "test-50-01": {
+   "types": [
+    "paragraph",
+    "text",
+    "codespan"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "This is thinking with `inline code`",
+     "text": "This is thinking with `inline code`"
+    },
+    {
+     "type": "text",
+     "raw": "This is thinking with ",
+     "text": "This is thinking with "
+    },
+    {
+     "type": "codespan",
+     "raw": "`inline code`",
+     "text": "inline code"
+    }
+   ]
+  },
+  "test-51-01": {
+   "types": [
+    "paragraph",
+    "text",
+    "space",
+    "code",
+    "space",
+    "paragraph",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "hello world",
+     "text": "hello world"
+    },
+    {
+     "type": "text",
+     "raw": "hello world",
+     "text": "hello world"
+    },
+    {
+     "type": "space",
+     "raw": "\n\n"
+    },
+    {
+     "type": "code",
+     "raw": "```js\nconst hello = \"world\";\n```",
+     "text": "const hello = \"world\";",
+     "lang": "js"
+    },
+    {
+     "type": "space",
+     "raw": "\n\n"
+    },
+    {
+     "type": "paragraph",
+     "raw": "again, hello world",
+     "text": "again, hello world"
+    },
+    {
+     "type": "text",
+     "raw": "again, hello world",
+     "text": "again, hello world"
+    }
+   ]
+  },
+  "test-52-01": {
+   "types": [
+    "paragraph",
+    "text",
+    "code",
+    "paragraph",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "hello this is text\n",
+     "text": "hello this is text"
+    },
+    {
+     "type": "text",
+     "raw": "hello this is text",
+     "text": "hello this is text"
+    },
+    {
+     "type": "code",
+     "raw": "```\ncode block\n```\n",
+     "text": "code block",
+     "lang": ""
+    },
+    {
+     "type": "paragraph",
+     "raw": "more text",
+     "text": "more text"
+    },
+    {
+     "type": "text",
+     "raw": "more text",
+     "text": "more text"
+    }
+   ]
+  },
+  "test-52-02": {
+   "types": [
+    "paragraph",
+    "text",
+    "space",
+    "code",
+    "space",
+    "paragraph",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "hello this is text",
+     "text": "hello this is text"
+    },
+    {
+     "type": "text",
+     "raw": "hello this is text",
+     "text": "hello this is text"
+    },
+    {
+     "type": "space",
+     "raw": "\n\n"
+    },
+    {
+     "type": "code",
+     "raw": "```\ncode block\n```",
+     "text": "code block",
+     "lang": ""
+    },
+    {
+     "type": "space",
+     "raw": "\n\n"
+    },
+    {
+     "type": "paragraph",
+     "raw": "more text",
+     "text": "more text"
+    },
+    {
+     "type": "text",
+     "raw": "more text",
+     "text": "more text"
+    }
+   ]
+  },
+  "test-53-01": {
+   "types": [
+    "code"
+   ],
+   "nodes": [
+    {
+     "type": "code",
+     "raw": "```js\nconst hello = 'world';\n```",
+     "text": "const hello = 'world';",
+     "lang": "js"
+    }
+   ]
+  },
+  "test-53-02": {
+   "types": [
+    "paragraph",
+    "text",
+    "space",
+    "code"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "hello world",
+     "text": "hello world"
+    },
+    {
+     "type": "text",
+     "raw": "hello world",
+     "text": "hello world"
+    },
+    {
+     "type": "space",
+     "raw": "\n\n"
+    },
+    {
+     "type": "code",
+     "raw": "```js\nconst hello = 'world';\n```",
+     "text": "const hello = 'world';",
+     "lang": "js"
+    }
+   ]
+  },
+  "test-54-01": {
+   "types": [
+    "paragraph",
+    "text",
+    "space",
+    "hr",
+    "space",
+    "paragraph",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "hello world",
+     "text": "hello world"
+    },
+    {
+     "type": "text",
+     "raw": "hello world",
+     "text": "hello world"
+    },
+    {
+     "type": "space",
+     "raw": "\n\n"
+    },
+    {
+     "type": "hr",
+     "raw": "---"
+    },
+    {
+     "type": "space",
+     "raw": "\n\n"
+    },
+    {
+     "type": "paragraph",
+     "raw": "again, hello world",
+     "text": "again, hello world"
+    },
+    {
+     "type": "text",
+     "raw": "again, hello world",
+     "text": "again, hello world"
+    }
+   ]
+  },
+  "test-55-01": {
+   "types": [
+    "hr"
+   ],
+   "nodes": [
+    {
+     "type": "hr",
+     "raw": "---"
+    }
+   ]
+  },
+  "test-56-01": {
+   "types": [
+    "heading",
+    "text",
+    "space",
+    "paragraph",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "heading",
+     "raw": "# Hello",
+     "text": "Hello",
+     "depth": 1
+    },
+    {
+     "type": "text",
+     "raw": "Hello",
+     "text": "Hello"
+    },
+    {
+     "type": "space",
+     "raw": "\n\n"
+    },
+    {
+     "type": "paragraph",
+     "raw": "This is a paragraph",
+     "text": "This is a paragraph"
+    },
+    {
+     "type": "text",
+     "raw": "This is a paragraph",
+     "text": "This is a paragraph"
+    }
+   ]
+  },
+  "test-57-01": {
+   "types": [
+    "heading",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "heading",
+     "raw": "# Hello",
+     "text": "Hello",
+     "depth": 1
+    },
+    {
+     "type": "text",
+     "raw": "Hello",
+     "text": "Hello"
+    }
+   ]
+  },
+  "test-58-01": {
+   "types": [
+    "paragraph",
+    "text",
+    "space",
+    "blockquote",
+    "paragraph",
+    "text",
+    "space",
+    "paragraph",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "hello world",
+     "text": "hello world"
+    },
+    {
+     "type": "text",
+     "raw": "hello world",
+     "text": "hello world"
+    },
+    {
+     "type": "space",
+     "raw": "\n\n"
+    },
+    {
+     "type": "blockquote",
+     "raw": "> This is a quote",
+     "text": "This is a quote"
+    },
+    {
+     "type": "paragraph",
+     "raw": "This is a quote",
+     "text": "This is a quote"
+    },
+    {
+     "type": "text",
+     "raw": "This is a quote",
+     "text": "This is a quote"
+    },
+    {
+     "type": "space",
+     "raw": "\n\n"
+    },
+    {
+     "type": "paragraph",
+     "raw": "again, hello world",
+     "text": "again, hello world"
+    },
+    {
+     "type": "text",
+     "raw": "again, hello world",
+     "text": "again, hello world"
+    }
+   ]
+  },
+  "test-59-01": {
+   "types": [
+    "blockquote",
+    "paragraph",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "blockquote",
+     "raw": "> This is a quote",
+     "text": "This is a quote"
+    },
+    {
+     "type": "paragraph",
+     "raw": "This is a quote",
+     "text": "This is a quote"
+    },
+    {
+     "type": "text",
+     "raw": "This is a quote",
+     "text": "This is a quote"
+    }
+   ]
+  },
+  "test-60-01": {
+   "types": [
+    "blockquote",
+    "paragraph",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "blockquote",
+     "raw": ">Foo\nbar",
+     "text": "Foo\nbar"
+    },
+    {
+     "type": "paragraph",
+     "raw": "Foo\nbar",
+     "text": "Foo\nbar"
+    },
+    {
+     "type": "text",
+     "raw": "Foo\nbar",
+     "text": "Foo\nbar"
+    }
+   ]
+  },
+  "test-61-01": {
+   "types": [
+    "blockquote",
+    "paragraph",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "blockquote",
+     "raw": ">Foo\n>bar",
+     "text": "Foo\nbar"
+    },
+    {
+     "type": "paragraph",
+     "raw": "Foo\nbar",
+     "text": "Foo\nbar"
+    },
+    {
+     "type": "text",
+     "raw": "Foo\nbar",
+     "text": "Foo\nbar"
+    }
+   ]
+  },
+  "test-62-01": {
+   "types": [
+    "blockquote",
+    "list",
+    "list_item",
+    "text",
+    "text",
+    "list",
+    "list_item",
+    "text",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "blockquote",
+     "raw": "> 1. bla bla\n> - nested bullet",
+     "text": "1. bla bla\n- nested bullet"
+    },
+    {
+     "type": "list",
+     "raw": "1. bla bla\n",
+     "ordered": true,
+     "start": 1,
+     "loose": false
+    },
+    {
+     "type": "list_item",
+     "raw": "1. bla bla",
+     "text": "bla bla",
+     "task": false,
+     "loose": false
+    },
+    {
+     "type": "text",
+     "raw": "bla bla",
+     "text": "bla bla"
+    },
+    {
+     "type": "text",
+     "raw": "bla bla",
+     "text": "bla bla"
+    },
+    {
+     "type": "list",
+     "raw": "- nested bullet",
+     "ordered": false,
+     "start": "",
+     "loose": false
+    },
+    {
+     "type": "list_item",
+     "raw": "- nested bullet",
+     "text": "nested bullet",
+     "task": false,
+     "loose": false
+    },
+    {
+     "type": "text",
+     "raw": "nested bullet",
+     "text": "nested bullet"
+    },
+    {
+     "type": "text",
+     "raw": "nested bullet",
+     "text": "nested bullet"
+    }
+   ]
+  },
+  "test-63-01": {
+   "types": [
+    "blockquote",
+    "paragraph",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "blockquote",
+     "raw": "> This is a very long blockquote line that should wrap to multiple lines when rendered",
+     "text": "This is a very long blockquote line that should wrap to multiple lines when rendered"
+    },
+    {
+     "type": "paragraph",
+     "raw": "This is a very long blockquote line that should wrap to multiple lines when rendered",
+     "text": "This is a very long blockquote line that should wrap to multiple lines when rendered"
+    },
+    {
+     "type": "text",
+     "raw": "This is a very long blockquote line that should wrap to multiple lines when rendered",
+     "text": "This is a very long blockquote line that should wrap to multiple lines when rendered"
+    }
+   ]
+  },
+  "test-64-01": {
+   "types": [
+    "blockquote",
+    "paragraph",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "blockquote",
+     "raw": "> This is styled text that is long enough to wrap",
+     "text": "This is styled text that is long enough to wrap"
+    },
+    {
+     "type": "paragraph",
+     "raw": "This is styled text that is long enough to wrap",
+     "text": "This is styled text that is long enough to wrap"
+    },
+    {
+     "type": "text",
+     "raw": "This is styled text that is long enough to wrap",
+     "text": "This is styled text that is long enough to wrap"
+    }
+   ]
+  },
+  "test-65-01": {
+   "types": [
+    "blockquote",
+    "paragraph",
+    "text",
+    "strong",
+    "text",
+    "text",
+    "codespan"
+   ],
+   "nodes": [
+    {
+     "type": "blockquote",
+     "raw": "> Quote with **bold** and `code`",
+     "text": "Quote with **bold** and `code`"
+    },
+    {
+     "type": "paragraph",
+     "raw": "Quote with **bold** and `code`",
+     "text": "Quote with **bold** and `code`"
+    },
+    {
+     "type": "text",
+     "raw": "Quote with ",
+     "text": "Quote with "
+    },
+    {
+     "type": "strong",
+     "raw": "**bold**",
+     "text": "bold"
+    },
+    {
+     "type": "text",
+     "raw": "bold",
+     "text": "bold"
+    },
+    {
+     "type": "text",
+     "raw": " and ",
+     "text": " and "
+    },
+    {
+     "type": "codespan",
+     "raw": "`code`",
+     "text": "code"
+    }
+   ]
+  },
+  "test-66-01": {
+   "types": [
+    "heading",
+    "text",
+    "codespan",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "heading",
+     "raw": "### Why `sourceInfo` should not be optional",
+     "text": "Why `sourceInfo` should not be optional",
+     "depth": 3
+    },
+    {
+     "type": "text",
+     "raw": "Why ",
+     "text": "Why "
+    },
+    {
+     "type": "codespan",
+     "raw": "`sourceInfo`",
+     "text": "sourceInfo"
+    },
+    {
+     "type": "text",
+     "raw": " should not be optional",
+     "text": " should not be optional"
+    }
+   ]
+  },
+  "test-67-01": {
+   "types": [
+    "heading",
+    "text",
+    "codespan",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "heading",
+     "raw": "# Title with `code` inside",
+     "text": "Title with `code` inside",
+     "depth": 1
+    },
+    {
+     "type": "text",
+     "raw": "Title with ",
+     "text": "Title with "
+    },
+    {
+     "type": "codespan",
+     "raw": "`code`",
+     "text": "code"
+    },
+    {
+     "type": "text",
+     "raw": " inside",
+     "text": " inside"
+    }
+   ]
+  },
+  "test-68-01": {
+   "types": [
+    "heading",
+    "text",
+    "codespan"
+   ],
+   "nodes": [
+    {
+     "type": "heading",
+     "raw": "# Important distinction from `open()`",
+     "text": "Important distinction from `open()`",
+     "depth": 1
+    },
+    {
+     "type": "text",
+     "raw": "Important distinction from ",
+     "text": "Important distinction from "
+    },
+    {
+     "type": "codespan",
+     "raw": "`open()`",
+     "text": "open()"
+    }
+   ]
+  },
+  "test-69-01": {
+   "types": [
+    "heading",
+    "text",
+    "strong",
+    "text",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "heading",
+     "raw": "## Heading with **bold** and more",
+     "text": "Heading with **bold** and more",
+     "depth": 2
+    },
+    {
+     "type": "text",
+     "raw": "Heading with ",
+     "text": "Heading with "
+    },
+    {
+     "type": "strong",
+     "raw": "**bold**",
+     "text": "bold"
+    },
+    {
+     "type": "text",
+     "raw": "bold",
+     "text": "bold"
+    },
+    {
+     "type": "text",
+     "raw": " and more",
+     "text": " and more"
+    }
+   ]
+  },
+  "test-70-01": {
+   "types": [
+    "paragraph",
+    "text",
+    "del",
+    "text",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "Use ~~strikethrough~~ here",
+     "text": "Use ~~strikethrough~~ here"
+    },
+    {
+     "type": "text",
+     "raw": "Use ",
+     "text": "Use "
+    },
+    {
+     "type": "del",
+     "raw": "~~strikethrough~~",
+     "text": "strikethrough"
+    },
+    {
+     "type": "text",
+     "raw": "strikethrough",
+     "text": "strikethrough"
+    },
+    {
+     "type": "text",
+     "raw": " here",
+     "text": " here"
+    }
+   ]
+  },
+  "test-71-01": {
+   "types": [
+    "paragraph",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "Use ~strikethrough~ literally",
+     "text": "Use ~strikethrough~ literally"
+    },
+    {
+     "type": "text",
+     "raw": "Use ~strikethrough~ literally",
+     "text": "Use ~strikethrough~ literally"
+    }
+   ]
+  },
+  "test-72-01": {
+   "types": [
+    "paragraph",
+    "text",
+    "link",
+    "text",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "Contact user@example.com for help",
+     "text": "Contact user@example.com for help"
+    },
+    {
+     "type": "text",
+     "raw": "Contact ",
+     "text": "Contact "
+    },
+    {
+     "type": "link",
+     "raw": "user@example.com",
+     "text": "user@example.com",
+     "href": "mailto:user@example.com"
+    },
+    {
+     "type": "text",
+     "raw": "user@example.com",
+     "text": "user@example.com"
+    },
+    {
+     "type": "text",
+     "raw": " for help",
+     "text": " for help"
+    }
+   ]
+  },
+  "test-73-01": {
+   "types": [
+    "paragraph",
+    "text",
+    "link",
+    "text",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "Visit https://example.com for more",
+     "text": "Visit https://example.com for more"
+    },
+    {
+     "type": "text",
+     "raw": "Visit ",
+     "text": "Visit "
+    },
+    {
+     "type": "link",
+     "raw": "https://example.com",
+     "text": "https://example.com",
+     "href": "https://example.com"
+    },
+    {
+     "type": "text",
+     "raw": "https://example.com",
+     "text": "https://example.com"
+    },
+    {
+     "type": "text",
+     "raw": " for more",
+     "text": " for more"
+    }
+   ]
+  },
+  "test-74-01": {
+   "types": [
+    "paragraph",
+    "link",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "[click here](https://example.com)",
+     "text": "[click here](https://example.com)"
+    },
+    {
+     "type": "link",
+     "raw": "[click here](https://example.com)",
+     "text": "click here",
+     "href": "https://example.com"
+    },
+    {
+     "type": "text",
+     "raw": "click here",
+     "text": "click here"
+    }
+   ]
+  },
+  "test-75-01": {
+   "types": [
+    "paragraph",
+    "link",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "[Email me](mailto:test@example.com)",
+     "text": "[Email me](mailto:test@example.com)"
+    },
+    {
+     "type": "link",
+     "raw": "[Email me](mailto:test@example.com)",
+     "text": "Email me",
+     "href": "mailto:test@example.com"
+    },
+    {
+     "type": "text",
+     "raw": "Email me",
+     "text": "Email me"
+    }
+   ]
+  },
+  "test-76-01": {
+   "types": [
+    "paragraph",
+    "link",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "[click here](https://example.com)",
+     "text": "[click here](https://example.com)"
+    },
+    {
+     "type": "link",
+     "raw": "[click here](https://example.com)",
+     "text": "click here",
+     "href": "https://example.com"
+    },
+    {
+     "type": "text",
+     "raw": "click here",
+     "text": "click here"
+    }
+   ]
+  },
+  "test-77-01": {
+   "types": [
+    "paragraph",
+    "link",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "[Email me](mailto:test@example.com)",
+     "text": "[Email me](mailto:test@example.com)"
+    },
+    {
+     "type": "link",
+     "raw": "[Email me](mailto:test@example.com)",
+     "text": "Email me",
+     "href": "mailto:test@example.com"
+    },
+    {
+     "type": "text",
+     "raw": "Email me",
+     "text": "Email me"
+    }
+   ]
+  },
+  "test-78-01": {
+   "types": [
+    "paragraph",
+    "text",
+    "link",
+    "text",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "Visit https://example.com for more",
+     "text": "Visit https://example.com for more"
+    },
+    {
+     "type": "text",
+     "raw": "Visit ",
+     "text": "Visit "
+    },
+    {
+     "type": "link",
+     "raw": "https://example.com",
+     "text": "https://example.com",
+     "href": "https://example.com"
+    },
+    {
+     "type": "text",
+     "raw": "https://example.com",
+     "text": "https://example.com"
+    },
+    {
+     "type": "text",
+     "raw": " for more",
+     "text": " for more"
+    }
+   ]
+  },
+  "test-79-01": {
+   "types": [
+    "paragraph",
+    "text",
+    "html",
+    "text",
+    "html",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "This is text with <thinking>hidden content</thinking> that should be visible",
+     "text": "This is text with <thinking>hidden content</thinking> that should be visible"
+    },
+    {
+     "type": "text",
+     "raw": "This is text with ",
+     "text": "This is text with "
+    },
+    {
+     "type": "html",
+     "raw": "<thinking>",
+     "text": "<thinking>"
+    },
+    {
+     "type": "text",
+     "raw": "hidden content",
+     "text": "hidden content"
+    },
+    {
+     "type": "html",
+     "raw": "</thinking>",
+     "text": "</thinking>"
+    },
+    {
+     "type": "text",
+     "raw": " that should be visible",
+     "text": " that should be visible"
+    }
+   ]
+  },
+  "test-80-01": {
+   "types": [
+    "code"
+   ],
+   "nodes": [
+    {
+     "type": "code",
+     "raw": "```html\n<div>Some HTML</div>\n```",
+     "text": "<div>Some HTML</div>",
+     "lang": "html"
+    }
+   ]
+  },
+  "test-81-01": {
+   "types": [
+    "code"
+   ],
+   "nodes": [
+    {
+     "type": "code",
+     "raw": "```ts\nconst x = 1;\n``",
+     "text": "const x = 1;\n``",
+     "lang": "ts"
+    }
+   ]
+  },
+  "test-81-02": {
+   "types": [
+    "code"
+   ],
+   "nodes": [
+    {
+     "type": "code",
+     "raw": "```md\nnot a closing fence:\n``\n```",
+     "text": "not a closing fence:\n``",
+     "lang": "md"
+    }
+   ]
+  },
+  "test-81-03": {
+   "types": [
+    "code"
+   ],
+   "nodes": [
+    {
+     "type": "code",
+     "raw": "```ts\n``",
+     "text": "``",
+     "lang": "ts"
+    }
+   ]
+  },
+  "test-81-04": {
+   "types": [
+    "code"
+   ],
+   "nodes": [
+    {
+     "type": "code",
+     "raw": "````\n```",
+     "text": "```",
+     "lang": ""
+    }
+   ]
+  },
+  "test-81-05": {
+   "types": [
+    "code"
+   ],
+   "nodes": [
+    {
+     "type": "code",
+     "raw": "~~~~~\n~~~~",
+     "text": "~~~~",
+     "lang": ""
+    }
+   ]
+  },
+  "test-81-06": {
+   "types": [
+    "code",
+    "space",
+    "paragraph",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "code",
+     "raw": "```md\nnot a closing fence:\n``\n```",
+     "text": "not a closing fence:\n``",
+     "lang": "md"
+    },
+    {
+     "type": "space",
+     "raw": "\n\n"
+    },
+    {
+     "type": "paragraph",
+     "raw": "after",
+     "text": "after"
+    },
+    {
+     "type": "text",
+     "raw": "after",
+     "text": "after"
+    }
+   ]
+  },
+  "test-81-07": {
+   "types": [
+    "code"
+   ],
+   "nodes": [
+    {
+     "type": "code",
+     "raw": "```ts\nconst x = 1;\n```",
+     "text": "const x = 1;",
+     "lang": "ts"
+    }
+   ]
+  },
+  "probe-strikethrough-strict": {
+   "types": [
+    "paragraph",
+    "del",
+    "text",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "~~gone~~ and ~single~",
+     "text": "~~gone~~ and ~single~"
+    },
+    {
+     "type": "del",
+     "raw": "~~gone~~",
+     "text": "gone"
+    },
+    {
+     "type": "text",
+     "raw": "gone",
+     "text": "gone"
+    },
+    {
+     "type": "text",
+     "raw": " and ~single~",
+     "text": " and ~single~"
+    }
+   ]
+  },
+  "probe-strikethrough-spaced": {
+   "types": [
+    "paragraph",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "~~ padded ~~",
+     "text": "~~ padded ~~"
+    },
+    {
+     "type": "text",
+     "raw": "~~ padded ~~",
+     "text": "~~ padded ~~"
+    }
+   ]
+  },
+  "probe-table": {
+   "types": [
+    "table"
+   ],
+   "nodes": [
+    {
+     "type": "table",
+     "raw": "| a | b |\n|---|---|\n| 1 | 2 |",
+     "align": [
+      null,
+      null
+     ]
+    }
+   ]
+  },
+  "probe-list-start": {
+   "types": [
+    "list",
+    "list_item",
+    "text",
+    "text",
+    "list_item",
+    "text",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "list",
+     "raw": "3. three\n4. four",
+     "ordered": true,
+     "start": 3,
+     "loose": false
+    },
+    {
+     "type": "list_item",
+     "raw": "3. three\n",
+     "text": "three",
+     "task": false,
+     "loose": false
+    },
+    {
+     "type": "text",
+     "raw": "three",
+     "text": "three"
+    },
+    {
+     "type": "text",
+     "raw": "three",
+     "text": "three"
+    },
+    {
+     "type": "list_item",
+     "raw": "4. four",
+     "text": "four",
+     "task": false,
+     "loose": false
+    },
+    {
+     "type": "text",
+     "raw": "four",
+     "text": "four"
+    },
+    {
+     "type": "text",
+     "raw": "four",
+     "text": "four"
+    }
+   ]
+  },
+  "probe-nested-list": {
+   "types": [
+    "list",
+    "list_item",
+    "text",
+    "text",
+    "list",
+    "list_item",
+    "text",
+    "text",
+    "list_item",
+    "text",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "list",
+     "raw": "- a\n  - b\n- c",
+     "ordered": false,
+     "start": "",
+     "loose": false
+    },
+    {
+     "type": "list_item",
+     "raw": "- a\n  - b\n",
+     "text": "a\n- b",
+     "task": false,
+     "loose": false
+    },
+    {
+     "type": "text",
+     "raw": "a\n",
+     "text": "a"
+    },
+    {
+     "type": "text",
+     "raw": "a",
+     "text": "a"
+    },
+    {
+     "type": "list",
+     "raw": "- b",
+     "ordered": false,
+     "start": "",
+     "loose": false
+    },
+    {
+     "type": "list_item",
+     "raw": "- b",
+     "text": "b",
+     "task": false,
+     "loose": false
+    },
+    {
+     "type": "text",
+     "raw": "b",
+     "text": "b"
+    },
+    {
+     "type": "text",
+     "raw": "b",
+     "text": "b"
+    },
+    {
+     "type": "list_item",
+     "raw": "- c",
+     "text": "c",
+     "task": false,
+     "loose": false
+    },
+    {
+     "type": "text",
+     "raw": "c",
+     "text": "c"
+    },
+    {
+     "type": "text",
+     "raw": "c",
+     "text": "c"
+    }
+   ]
+  },
+  "probe-codespan": {
+   "types": [
+    "paragraph",
+    "text",
+    "codespan",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "use `x  y` here",
+     "text": "use `x  y` here"
+    },
+    {
+     "type": "text",
+     "raw": "use ",
+     "text": "use "
+    },
+    {
+     "type": "codespan",
+     "raw": "`x  y`",
+     "text": "x  y"
+    },
+    {
+     "type": "text",
+     "raw": " here",
+     "text": " here"
+    }
+   ]
+  },
+  "probe-fenced": {
+   "types": [
+    "code"
+   ],
+   "nodes": [
+    {
+     "type": "code",
+     "raw": "```js\nlet a=1;\n```",
+     "text": "let a=1;",
+     "lang": "js"
+    }
+   ]
+  },
+  "probe-link": {
+   "types": [
+    "paragraph",
+    "link",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "[t](http://e.com \"ti\")",
+     "text": "[t](http://e.com \"ti\")"
+    },
+    {
+     "type": "link",
+     "raw": "[t](http://e.com \"ti\")",
+     "text": "t",
+     "href": "http://e.com",
+     "title": "ti"
+    },
+    {
+     "type": "text",
+     "raw": "t",
+     "text": "t"
+    }
+   ]
+  },
+  "probe-html-block": {
+   "types": [
+    "html"
+   ],
+   "nodes": [
+    {
+     "type": "html",
+     "raw": "<div>\nraw\n</div>",
+     "text": "<div>\nraw\n</div>",
+     "pre": false
+    }
+   ]
+  },
+  "probe-setext": {
+   "types": [
+    "heading",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "heading",
+     "raw": "Title\n=====",
+     "text": "Title",
+     "depth": 1
+    },
+    {
+     "type": "text",
+     "raw": "Title",
+     "text": "Title"
+    }
+   ]
+  },
+  "probe-hr": {
+   "types": [
+    "hr"
+   ],
+   "nodes": [
+    {
+     "type": "hr",
+     "raw": "***"
+    }
+   ]
+  },
+  "probe-blockquote": {
+   "types": [
+    "blockquote",
+    "paragraph",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "blockquote",
+     "raw": "> q1\n> q2",
+     "text": "q1\nq2"
+    },
+    {
+     "type": "paragraph",
+     "raw": "q1\nq2",
+     "text": "q1\nq2"
+    },
+    {
+     "type": "text",
+     "raw": "q1\nq2",
+     "text": "q1\nq2"
+    }
+   ]
+  },
+  "probe-escape": {
+   "types": [
+    "paragraph",
+    "escape",
+    "text",
+    "escape"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "\\*not em\\*",
+     "text": "\\*not em\\*"
+    },
+    {
+     "type": "escape",
+     "raw": "\\*",
+     "text": "*"
+    },
+    {
+     "type": "text",
+     "raw": "not em",
+     "text": "not em"
+    },
+    {
+     "type": "escape",
+     "raw": "\\*",
+     "text": "*"
+    }
+   ]
+  },
+  "probe-autolink": {
+   "types": [
+    "paragraph",
+    "link",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "<http://e.com>",
+     "text": "<http://e.com>"
+    },
+    {
+     "type": "link",
+     "raw": "<http://e.com>",
+     "text": "http://e.com",
+     "href": "http://e.com"
+    },
+    {
+     "type": "text",
+     "raw": "http://e.com",
+     "text": "http://e.com"
+    }
+   ]
+  },
+  "probe-hardbreak": {
+   "types": [
+    "paragraph",
+    "text",
+    "br",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "a  \nb",
+     "text": "a  \nb"
+    },
+    {
+     "type": "text",
+     "raw": "a",
+     "text": "a"
+    },
+    {
+     "type": "br",
+     "raw": "  \n"
+    },
+    {
+     "type": "text",
+     "raw": "b",
+     "text": "b"
+    }
+   ]
+  }
+ }
 }

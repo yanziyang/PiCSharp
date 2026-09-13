@@ -1,17 +1,878 @@
 {
- "strikethrough-strict": "~~gone~~ and ~single~",
- "strikethrough-spaced": "~~ padded ~~",
- "table": "| a | b |\n|---|---|\n| 1 | 2 |",
- "list-start": "3. three\n4. four",
- "nested-list": "- a\n  - b\n- c",
- "codespan": "use `x  y` here",
- "fenced": "```js\nlet a=1;\n```",
- "link": "[t](http://e.com \"ti\")",
- "html-block": "<div>\nraw\n</div>",
- "setext": "Title\n=====",
- "hr": "***",
- "blockquote": "> q1\n> q2",
- "escape": "\\*not em\\*",
- "autolink": "<http://e.com>",
- "hardbreak": "a  \nb"
+ "metadata": {
+  "source": "reference/pi/packages/tui/test/markdown.test.ts",
+  "upstreamTestCount": 81,
+  "upstreamInputCount": 94,
+  "retainedProbeCount": 15,
+  "caseCount": 109,
+  "parserInputsOnly": true
+ },
+ "cases": [
+  {
+   "id": "test-01-01",
+   "testIndex": 1,
+   "test": "caches transformed Markdown by source and available width",
+   "source": "source",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-01-02",
+   "testIndex": 1,
+   "test": "caches transformed Markdown by source and available width",
+   "source": "updated",
+   "kind": "upstream",
+   "operation": "setText"
+  },
+  {
+   "id": "test-02-01",
+   "testIndex": 2,
+   "test": "should render simple nested list",
+   "source": "- Item 1\n  - Nested 1.1\n  - Nested 1.2\n- Item 2",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-03-01",
+   "testIndex": 3,
+   "test": "should render deeply nested list",
+   "source": "- Level 1\n  - Level 2\n    - Level 3\n      - Level 4",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-04-01",
+   "testIndex": 4,
+   "test": "should render ordered nested list",
+   "source": "1. First\n   1. Nested first\n   2. Nested second\n2. Second",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-05-01",
+   "testIndex": 5,
+   "test": "should normalize ordered list markers by default",
+   "source": "1. alpha\n1. beta\n1. gamma",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-06-01",
+   "testIndex": 6,
+   "test": "should preserve source list markers when configured",
+   "source": "  4. forth\n  3. third\n\n10) ten\n7) seven\n\n+ plus\n* star\n- minus\n+",
+   "kind": "upstream",
+   "operation": "constructor",
+   "options": {
+    "preserveOrderedListMarkers": true
+   }
+  },
+  {
+   "id": "test-07-01",
+   "testIndex": 7,
+   "test": "should render mixed ordered and unordered nested lists",
+   "source": "1. Ordered item\n   - Unordered nested\n   - Another nested\n2. Second ordered\n   - More nested",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-08-01",
+   "testIndex": 8,
+   "test": "should render blank lines between loose list items",
+   "source": "1. Lorem ipsum dolor sit amet.\n\n   Ut enim ad minim veniam.\n\n2. Duis aute irure dolor.\n\n   Excepteur sint occaecat cupidatat.\n\n3. Beep boop",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-09-01",
+   "testIndex": 9,
+   "test": "should render task list markers",
+   "source": "- [ ] beep\n- [x] boop",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-10-01",
+   "testIndex": 10,
+   "test": "should maintain numbering when code blocks are not indented (LLM output)",
+   "source": "1. First item\n\n```typescript\n// code block\n```\n\n2. Second item\n\n```typescript\n// another code block\n```\n\n3. Third item",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-11-01",
+   "testIndex": 11,
+   "test": "should indent wrapped unordered list lines",
+   "source": "- alpha beta gamma delta epsilon",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-12-01",
+   "testIndex": 12,
+   "test": "should indent wrapped ordered list lines",
+   "source": "1. alpha beta gamma delta epsilon",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-13-01",
+   "testIndex": 13,
+   "test": "should indent wrapped ordered list lines with multi-digit markers",
+   "source": "10. alpha beta gamma delta epsilon",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-14-01",
+   "testIndex": 14,
+   "test": "should indent wrapped nested list lines",
+   "source": "- parent\n  - alpha beta gamma delta epsilon",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-15-01",
+   "testIndex": 15,
+   "test": "should indent wrapped nested list lines under ordered parents",
+   "source": "1. parent\n   - alpha beta gamma delta epsilon",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-16-01",
+   "testIndex": 16,
+   "test": "should render and wrap blockquotes inside list items",
+   "source": "- > alpha beta gamma delta epsilon zeta",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-17-01",
+   "testIndex": 17,
+   "test": "should render and wrap code blocks inside list items",
+   "source": "- ```ts\n  alpha beta gamma delta epsilon zeta\n  ```",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-18-01",
+   "testIndex": 18,
+   "test": "should render simple table",
+   "source": "| Name | Age |\n| --- | --- |\n| Alice | 30 |\n| Bob | 25 |",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-19-01",
+   "testIndex": 19,
+   "test": "should render row dividers between data rows",
+   "source": "| Name | Age |\n| --- | --- |\n| Alice | 30 |\n| Bob | 25 |",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-20-01",
+   "testIndex": 20,
+   "test": "should keep column width at least the longest word",
+   "source": "| Column One | Column Two |\n| --- | --- |\n| superlongword short | otherword |\n| small | tiny |",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-21-01",
+   "testIndex": 21,
+   "test": "should render table with alignment",
+   "source": "| Left | Center | Right |\n| :--- | :---: | ---: |\n| A | B | C |\n| Long text | Middle | End |",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-22-01",
+   "testIndex": 22,
+   "test": "should handle tables with varying column widths",
+   "source": "| Short | Very long column header |\n| --- | --- |\n| A | This is a much longer cell content |\n| B | Short |",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-23-01",
+   "testIndex": 23,
+   "test": "should wrap table cells when table exceeds available width",
+   "source": "| Command | Description | Example |\n| --- | --- | --- |\n| npm install | Install all dependencies | npm install |\n| npm run build | Build the project | npm run build |",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-24-01",
+   "testIndex": 24,
+   "test": "should not leak wrapped link styles into table borders or plain cells",
+   "source": "| Link | Plain |\n| --- | --- |\n| [**one two three four five six**](https://example.com) | normal text |",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-25-01",
+   "testIndex": 25,
+   "test": "should restore the enclosing style after a wrapped table link",
+   "source": "> | Link | Plain |\n> | --- | --- |\n> | [one two three four five six](https://example.com) | normal text |",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-26-01",
+   "testIndex": 26,
+   "test": "should wrap long cell content to multiple lines",
+   "source": "| Header |\n| --- |\n| This is a very long cell content that should wrap |",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-27-01",
+   "testIndex": 27,
+   "test": "should wrap long unbroken tokens inside table cells (not only at line start)",
+   "source": "| Value |\n| --- |\n| prefix https://example.com/this/is/a/very/long/url/that/should/wrap |",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-28-01",
+   "testIndex": 28,
+   "test": "should wrap styled inline code inside table cells without breaking borders",
+   "source": "| Code |\n| --- |\n| `averyveryveryverylongidentifier` |",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-29-01",
+   "testIndex": 29,
+   "test": "should handle extremely narrow width gracefully",
+   "source": "| A | B | C |\n| --- | --- | --- |\n| 1 | 2 | 3 |",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-30-01",
+   "testIndex": 30,
+   "test": "should render table correctly when it fits naturally",
+   "source": "| A | B |\n| --- | --- |\n| 1 | 2 |",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-31-01",
+   "testIndex": 31,
+   "test": "should respect paddingX when calculating table width",
+   "source": "| Column One | Column Two |\n| --- | --- |\n| Data 1 | Data 2 |",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-32-01",
+   "testIndex": 32,
+   "test": "should not add a trailing blank line when table is the last rendered block",
+   "source": "| Name |\n| --- |\n| Alice |",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-33-01",
+   "testIndex": 33,
+   "test": "should render lists and tables together",
+   "source": "# Test Document\n\n- Item 1\n  - Nested item\n- Item 2\n\n| Col1 | Col2 |\n| --- | --- |\n| A | B |",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-34-01",
+   "testIndex": 34,
+   "test": "renders inline dollar and parenthesis delimiters",
+   "source": "A map $\\mathbb{C}^3 \\to \\mathbb{C}^3$, $xy$, $x-y$, $-x$, $\\frac{1}{2}$, and \\(s \\to \\infty\\).",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-35-01",
+   "testIndex": 35,
+   "test": "renders display dollar delimiters without Markdown escape corruption",
+   "source": "Before\n\n$$\\{3x+2y,\\; x \\in \\{0, \\pm 1\\}\\}$$\n\nafter",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-36-01",
+   "testIndex": 36,
+   "test": "renders display bracket delimiters",
+   "source": "Before\n\n\\[\nE \\approx \\frac{0.1\\ \\text{lux}}{100\\ \\text{lm/W}}\n\\]\n\nafter",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-37-01",
+   "testIndex": 37,
+   "test": "aligns matrix rows with the opening delimiter",
+   "source": "Consider the matrix\n\n\\[\nA=\n\\begin{pmatrix}\n\\pi & 0\\\\\n0 & \\frac{1}{\\pi}\n\\end{pmatrix}.\n\\]",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-38-01",
+   "testIndex": 38,
+   "test": "renders lower limits beneath display operators",
+   "source": "\\[\n\\lim_{x\\to 0}\\frac{\\frac{\\sin x}{x}-1}{\\frac{e^x-1}{x}-1}=0\n\\]",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-39-01",
+   "testIndex": 39,
+   "test": "renders math inside lists and tables",
+   "source": "- Formula: $F_1 = u^2$\n\n| Value |\n| --- |\n| $\\mathbb{C}^3$ |",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-40-01",
+   "testIndex": 40,
+   "test": "does not treat currency, shell variables, or code spans as math",
+   "source": "Costs $5 and $10 or $8k–$12k; use `$x$`, $HOME, and ${PATH}.",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-40-02",
+   "testIndex": 40,
+   "test": "does not treat currency, shell variables, or code spans as math",
+   "source": "Paths: $HOME/$USER and $XDG_CONFIG_HOME/$APP_CONFIG",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-41-01",
+   "testIndex": 41,
+   "test": "preserves unsupported and incomplete LaTeX exactly",
+   "source": "Unknown $x + \\unknown{y}$ after",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-41-02",
+   "testIndex": 41,
+   "test": "preserves unsupported and incomplete LaTeX exactly",
+   "source": "Streaming $\\mathbb{C}^3",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-42-01",
+   "testIndex": 42,
+   "test": "preserves incomplete backslash delimiters while streaming",
+   "source": "Map \\(\\mathbb{C}^3",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-42-02",
+   "testIndex": 42,
+   "test": "preserves incomplete backslash delimiters while streaming",
+   "source": "\\[\nx^2",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-43-01",
+   "testIndex": 43,
+   "test": "does not render LaTeX inside escaped delimiters or code fences",
+   "source": "Escaped \\$x-y\\$.\n\n```text\n$\\mathbb{C}^3$\n```",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-44-01",
+   "testIndex": 44,
+   "test": "allows LaTeX rendering to be disabled",
+   "source": "Map $\\mathbb{C}^3 \\to \\mathbb{C}^3$",
+   "kind": "upstream",
+   "operation": "constructor",
+   "options": {
+    "renderLatex": false
+   }
+  },
+  {
+   "id": "test-45-01",
+   "testIndex": 45,
+   "test": "switches from raw to rendered math when a streamed delimiter closes",
+   "source": "Map $\\mathbb{C}^3",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-45-02",
+   "testIndex": 45,
+   "test": "switches from raw to rendered math when a streamed delimiter closes",
+   "source": "Map $\\mathbb{C}^3$",
+   "kind": "upstream",
+   "operation": "setText"
+  },
+  {
+   "id": "test-46-01",
+   "testIndex": 46,
+   "test": "should normalize escaped punctuation by default",
+   "source": "\"\\\"",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-47-01",
+   "testIndex": 47,
+   "test": "should preserve source backslash escapes when configured",
+   "source": "\"\\\"",
+   "kind": "upstream",
+   "operation": "constructor",
+   "options": {
+    "preserveBackslashEscapes": true
+   }
+  },
+  {
+   "id": "test-48-01",
+   "testIndex": 48,
+   "test": "should preserve gray italic styling after inline code",
+   "source": "This is thinking with `inline code` and more text after",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-49-01",
+   "testIndex": 49,
+   "test": "should preserve gray italic styling after bold text",
+   "source": "This is thinking with **bold text** and more after",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-50-01",
+   "testIndex": 50,
+   "test": "should not leak styles into following lines when rendered in TUI",
+   "source": "This is thinking with `inline code`",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-51-01",
+   "testIndex": 51,
+   "test": "should have only one blank line between code block and following paragraph",
+   "source": "hello world\n\n```js\nconst hello = \"world\";\n```\n\nagain, hello world",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-52-01",
+   "testIndex": 52,
+   "test": "should normalize paragraph and code block spacing to one blank line",
+   "source": "hello this is text\n```\ncode block\n```\nmore text",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-52-02",
+   "testIndex": 52,
+   "test": "should normalize paragraph and code block spacing to one blank line",
+   "source": "hello this is text\n\n```\ncode block\n```\n\nmore text",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-53-01",
+   "testIndex": 53,
+   "test": "should not add a trailing blank line when code block is the last rendered block",
+   "source": "```js\nconst hello = 'world';\n```",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-53-02",
+   "testIndex": 53,
+   "test": "should not add a trailing blank line when code block is the last rendered block",
+   "source": "hello world\n\n```js\nconst hello = 'world';\n```",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-54-01",
+   "testIndex": 54,
+   "test": "should have only one blank line between divider and following paragraph",
+   "source": "hello world\n\n---\n\nagain, hello world",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-55-01",
+   "testIndex": 55,
+   "test": "should not add a trailing blank line when divider is the last rendered block",
+   "source": "---",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-56-01",
+   "testIndex": 56,
+   "test": "should have only one blank line between heading and following paragraph",
+   "source": "# Hello\n\nThis is a paragraph",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-57-01",
+   "testIndex": 57,
+   "test": "should not add a trailing blank line when heading is the last rendered block",
+   "source": "# Hello",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-58-01",
+   "testIndex": 58,
+   "test": "should have only one blank line between blockquote and following paragraph",
+   "source": "hello world\n\n> This is a quote\n\nagain, hello world",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-59-01",
+   "testIndex": 59,
+   "test": "should not add a trailing blank line when blockquote is the last rendered block",
+   "source": "> This is a quote",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-60-01",
+   "testIndex": 60,
+   "test": "should apply consistent styling to all lines in lazy continuation blockquote",
+   "source": ">Foo\nbar",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-61-01",
+   "testIndex": 61,
+   "test": "should apply consistent styling to explicit multiline blockquote",
+   "source": ">Foo\n>bar",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-62-01",
+   "testIndex": 62,
+   "test": "should render list content inside blockquotes",
+   "source": "> 1. bla bla\n> - nested bullet",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-63-01",
+   "testIndex": 63,
+   "test": "should wrap long blockquote lines and add border to each wrapped line",
+   "source": "> This is a very long blockquote line that should wrap to multiple lines when rendered",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-64-01",
+   "testIndex": 64,
+   "test": "should properly indent wrapped blockquote lines with styling",
+   "source": "> This is styled text that is long enough to wrap",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-65-01",
+   "testIndex": 65,
+   "test": "should render inline formatting inside blockquotes and reapply quote styling after",
+   "source": "> Quote with **bold** and `code`",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-66-01",
+   "testIndex": 66,
+   "test": "should preserve heading styling after inline code",
+   "source": "### Why `sourceInfo` should not be optional",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-67-01",
+   "testIndex": 67,
+   "test": "should preserve heading styling after inline code for h1",
+   "source": "# Title with `code` inside",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-68-01",
+   "testIndex": 68,
+   "test": "should not leak h1 underline into padding when inline code is the last token",
+   "source": "# Important distinction from `open()`",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-69-01",
+   "testIndex": 69,
+   "test": "should preserve heading styling after bold text",
+   "source": "## Heading with **bold** and more",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-70-01",
+   "testIndex": 70,
+   "test": "should render ~~text~~ as strikethrough",
+   "source": "Use ~~strikethrough~~ here",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-71-01",
+   "testIndex": 71,
+   "test": "should keep ~text~ as plain text",
+   "source": "Use ~strikethrough~ literally",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-72-01",
+   "testIndex": 72,
+   "test": "should not duplicate URL for autolinked emails",
+   "source": "Contact user@example.com for help",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-73-01",
+   "testIndex": 73,
+   "test": "should not duplicate URL for bare URLs",
+   "source": "Visit https://example.com for more",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-74-01",
+   "testIndex": 74,
+   "test": "should show URL in parentheses when hyperlinks are not supported",
+   "source": "[click here](https://example.com)",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-75-01",
+   "testIndex": 75,
+   "test": "should show mailto URL in parentheses when hyperlinks are not supported",
+   "source": "[Email me](mailto:test@example.com)",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-76-01",
+   "testIndex": 76,
+   "test": "should emit OSC 8 hyperlink sequence when terminal supports hyperlinks",
+   "source": "[click here](https://example.com)",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-77-01",
+   "testIndex": 77,
+   "test": "should use OSC 8 for mailto links when terminal supports hyperlinks",
+   "source": "[Email me](mailto:test@example.com)",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-78-01",
+   "testIndex": 78,
+   "test": "should use OSC 8 for bare URLs when terminal supports hyperlinks",
+   "source": "Visit https://example.com for more",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-79-01",
+   "testIndex": 79,
+   "test": "should render content with HTML-like tags as text",
+   "source": "This is text with <thinking>hidden content</thinking> that should be visible",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-80-01",
+   "testIndex": 80,
+   "test": "should render HTML tags in code blocks correctly",
+   "source": "```html\n<div>Some HTML</div>\n```",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-81-01",
+   "testIndex": 81,
+   "test": "stabilizes partial closing fence rendering",
+   "source": "```ts\nconst x = 1;\n``",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-81-02",
+   "testIndex": 81,
+   "test": "stabilizes partial closing fence rendering",
+   "source": "```md\nnot a closing fence:\n``\n```",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-81-03",
+   "testIndex": 81,
+   "test": "stabilizes partial closing fence rendering",
+   "source": "```ts\n``",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-81-04",
+   "testIndex": 81,
+   "test": "stabilizes partial closing fence rendering",
+   "source": "````\n```",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-81-05",
+   "testIndex": 81,
+   "test": "stabilizes partial closing fence rendering",
+   "source": "~~~~~\n~~~~",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-81-06",
+   "testIndex": 81,
+   "test": "stabilizes partial closing fence rendering",
+   "source": "```md\nnot a closing fence:\n``\n```\n\nafter",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "test-81-07",
+   "testIndex": 81,
+   "test": "stabilizes partial closing fence rendering",
+   "source": "```ts\nconst x = 1;\n```",
+   "kind": "upstream",
+   "operation": "constructor"
+  },
+  {
+   "id": "probe-strikethrough-strict",
+   "testIndex": 0,
+   "test": "preliminary probe: strikethrough-strict",
+   "source": "~~gone~~ and ~single~",
+   "kind": "probe"
+  },
+  {
+   "id": "probe-strikethrough-spaced",
+   "testIndex": 0,
+   "test": "preliminary probe: strikethrough-spaced",
+   "source": "~~ padded ~~",
+   "kind": "probe"
+  },
+  {
+   "id": "probe-table",
+   "testIndex": 0,
+   "test": "preliminary probe: table",
+   "source": "| a | b |\n|---|---|\n| 1 | 2 |",
+   "kind": "probe"
+  },
+  {
+   "id": "probe-list-start",
+   "testIndex": 0,
+   "test": "preliminary probe: list-start",
+   "source": "3. three\n4. four",
+   "kind": "probe"
+  },
+  {
+   "id": "probe-nested-list",
+   "testIndex": 0,
+   "test": "preliminary probe: nested-list",
+   "source": "- a\n  - b\n- c",
+   "kind": "probe"
+  },
+  {
+   "id": "probe-codespan",
+   "testIndex": 0,
+   "test": "preliminary probe: codespan",
+   "source": "use `x  y` here",
+   "kind": "probe"
+  },
+  {
+   "id": "probe-fenced",
+   "testIndex": 0,
+   "test": "preliminary probe: fenced",
+   "source": "```js\nlet a=1;\n```",
+   "kind": "probe"
+  },
+  {
+   "id": "probe-link",
+   "testIndex": 0,
+   "test": "preliminary probe: link",
+   "source": "[t](http://e.com \"ti\")",
+   "kind": "probe"
+  },
+  {
+   "id": "probe-html-block",
+   "testIndex": 0,
+   "test": "preliminary probe: html-block",
+   "source": "<div>\nraw\n</div>",
+   "kind": "probe"
+  },
+  {
+   "id": "probe-setext",
+   "testIndex": 0,
+   "test": "preliminary probe: setext",
+   "source": "Title\n=====",
+   "kind": "probe"
+  },
+  {
+   "id": "probe-hr",
+   "testIndex": 0,
+   "test": "preliminary probe: hr",
+   "source": "***",
+   "kind": "probe"
+  },
+  {
+   "id": "probe-blockquote",
+   "testIndex": 0,
+   "test": "preliminary probe: blockquote",
+   "source": "> q1\n> q2",
+   "kind": "probe"
+  },
+  {
+   "id": "probe-escape",
+   "testIndex": 0,
+   "test": "preliminary probe: escape",
+   "source": "\\*not em\\*",
+   "kind": "probe"
+  },
+  {
+   "id": "probe-autolink",
+   "testIndex": 0,
+   "test": "preliminary probe: autolink",
+   "source": "<http://e.com>",
+   "kind": "probe"
+  },
+  {
+   "id": "probe-hardbreak",
+   "testIndex": 0,
+   "test": "preliminary probe: hardbreak",
+   "source": "a  \nb",
+   "kind": "probe"
+  }
+ ]
 }
