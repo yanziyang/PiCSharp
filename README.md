@@ -133,4 +133,6 @@ and describe any upstream behavior that remains intentionally deferred.
 
 ## License
 
-See [`LICENSE`](LICENSE).
+See [`LICENSE`](LICENSE) for PiCSharp's MIT licence. See
+[`THIRD-PARTY-NOTICES.md`](THIRD-PARTY-NOTICES.md) for the upstream Pi, marked, and other ported-code
+notices that accompany the project.
