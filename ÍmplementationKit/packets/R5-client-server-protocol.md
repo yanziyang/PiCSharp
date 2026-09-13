@@ -3,6 +3,27 @@
 **Wave:** remediation  **Delegation fit:** A
 **Depends on:** `Pi.Client` and `Pi.Server` implementations (wave 1, already shipped)
 **Plan reference:** remediation, and the boundary wave 6 sits on.
+**Status:** ✅ Delivered in `c3cf33f`, with a small follow-up in `bebd460`. Client parity 19% → **86%
+of portable** (7 → 31 cases), server 18% → **36%** (9 → 18 cases). Full suite 1,505 tests, 0 failed,
+0 skipped, three runs. `.test-parity` floors raised in the delivery commit itself.
+
+All 42 upstream case names ported — 31 client, 11 server — with **zero missing**, verified by diffing
+against `connection.test.ts`, `sessions.test.ts`, `state.test.ts`, `requests.test.ts`,
+`disposal.test.ts`, `protocol.test.ts` and `listener.test.ts` directly. `src/` was untouched, as the
+freeze required, and **no divergence was found this time** — the opposite of `R4`'s result, and
+`R5Findings.md` says so plainly rather than manufacturing a finding to match the pattern.
+
+Hazard 1 was respected precisely: 8 pre-existing bare `[Fact]` cases in `ClientTests.cs` and
+`ServerTests.cs` were given upstream `DisplayName`s rather than left duplicated alongside new copies —
+confirmed by diffing the delivery commit, not just by reading the findings. Hazard 2 held: no case
+needed the Unix transport or `TestServerService`; the findings say so and R5b remains unbuilt. Hazard 3
+held: zero fixed delays anywhere in the new test files.
+
+Three translation findings worth keeping in view for later packets: JavaScript `undefined`/sparse-array
+holes/object cycles have no direct `JsonNode` representation and were mapped to null/dense-array/a
+sanitized marker; `MaxFrameLength` is `uint` in C# so the type system itself rejects upstream's
+above-`uint32` probe, with the port testing the representable boundary instead; and upstream's `NaN`
+invalid-timestamp case became C#'s representable invalid value, `-1`.
 
 ---
 
