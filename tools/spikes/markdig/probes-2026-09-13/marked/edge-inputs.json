@@ -1,0 +1,87 @@
+{
+ "metadata": {
+  "purpose": "autolink/table/strikethrough edge probe"
+ },
+ "cases": [
+  {
+   "id": "al-www",
+   "source": "see www.example.com now"
+  },
+  {
+   "id": "al-ftp",
+   "source": "ftp://example.com/file"
+  },
+  {
+   "id": "al-mailto-scheme",
+   "source": "write mailto:a@b.com today"
+  },
+  {
+   "id": "al-tel",
+   "source": "call tel:+15551234"
+  },
+  {
+   "id": "al-email",
+   "source": "mail user@example.com please"
+  },
+  {
+   "id": "al-trailing-dot",
+   "source": "go to https://example.com."
+  },
+  {
+   "id": "al-parens",
+   "source": "(https://example.com)"
+  },
+  {
+   "id": "al-balanced-parens",
+   "source": "https://en.wikipedia.org/wiki/Foo_(bar)"
+  },
+  {
+   "id": "tb-no-delim",
+   "source": "| a | b |\n| 1 | 2 |"
+  },
+  {
+   "id": "tb-no-outer-pipes",
+   "source": "a | b\n--- | ---\n1 | 2"
+  },
+  {
+   "id": "tb-escaped-pipe",
+   "source": "| a |\n|---|\n| x \\| y |"
+  },
+  {
+   "id": "tb-code-pipe",
+   "source": "| a |\n|---|\n| `x|y` |"
+  },
+  {
+   "id": "tb-align",
+   "source": "| l | c | r |\n|:--|:-:|--:|\n| 1 | 2 | 3 |"
+  },
+  {
+   "id": "st-padded",
+   "source": "~~ padded ~~"
+  },
+  {
+   "id": "st-tilde-after",
+   "source": "~~a~~~"
+  },
+  {
+   "id": "st-triple",
+   "source": "~~~triple~~~"
+  },
+  {
+   "id": "st-space-before-close",
+   "source": "~~a ~~"
+  },
+  {
+   "id": "st-letter-after",
+   "source": "~~a~~b"
+  },
+  {
+   "id": "st-intraword",
+   "source": "a~~b~~c"
+  },
+  {
+   "id": "st-escaped",
+   "source": "~~a\\~~~"
+  }
+ ]
+}

@@ -44,7 +44,7 @@
 | `AWSSDK.BedrockRuntime` | `@aws-sdk/client-bedrock-runtime`, `@smithy/node-http-handler` | `Pi.Ai` (T2.7) | Apache-2.0 | Adopted specifically for SigV4 signing and credential resolution. Hand-rolling SigV4 is a defect factory. |
 | `YamlDotNet` | `yaml` | `Pi.AgentCore`, `Pi.CodingAgent` | MIT | Verify round-trip fidelity against upstream for frontmatter in skills and prompt templates. |
 | `DiffPlex` | `diff` | `Pi.AgentCore`, `Pi.CodingAgent` (edit tool) | Apache-2.0 | **Must produce upstream-identical hunks** — the edit tool's behaviour depends on it. Verify early; if it diverges, port `diff` instead. |
-| `Markdig` | `marked` | `Pi.Tui`, `Pi.CodingAgent` | BSD-2-Clause | Must support the transformer hook `registerMarkdownTransformer` needs. |
+| `Markdig` | `marked` | — | BSD-2-Clause | **Not adopted (2026-09-13).** Measured against marked 18.0.5, its GFM extensions diverge in renderer-visible ways that no upstream test catches, and a faithful adapter would re-implement marked rules inside it. The marked lexer is ported instead: see §4 and `docs/spikes/markdig-divergence.md`. |
 | `NuGet.Versioning` | `semver` | `Pi.CodingAgent` (package manager) | Apache-2.0 | npm and SemVer 2.0 range syntax differ. Verify against upstream's range tests, or port `semver`. |
 | `SkiaSharp` | `@silvia-odwyer/photon-node` | `Pi.CodingAgent` (image handling) | MIT | See §5 — deliberately chosen over ImageSharp. **Not needed for T5.5**: terminal images shipped in `f2a045f` with no dependency at all, since Kitty/iTerm2 encoding is escape-sequence building and dimension probing is magic-byte header reading. Wave 6 image handling only. |
 | `TextMateSharp` | `highlight.js` | `Pi.CodingAgent` (code rendering) | MIT | Grammar-based; output will not match `highlight.js` token-for-token. Golden tests must be regenerated, not ported. |
@@ -63,6 +63,7 @@ Small, behaviour-critical, or without a faithful .NET equivalent. Each becomes a
 | `get-east-asian-width` | data table | `Pi.Tui/Text/EastAsianWidth.cs` | Pure Unicode data. Port the table; correctness is testable against the same data. |
 | `proper-lockfile` | small | `Pi.CodingAgent/Core/SessionLock.cs` | Must match the **on-disk protocol**, not just the intent — upstream Pi and PiCSharp may share a session directory. See `session-format.md`. |
 | `hosted-git-info` | small | `Pi.CodingAgent/Packages/GitUrlParser.cs` | Narrow, well-specified parsing. |
+| `marked` 18.0.5, lexer only | ~2,100 | `Pi.Tui/Marked/` | pi-tui renders from marked tokens directly, so the token stream is the contract. Markdig was measured against it and diverged in renderer-visible ways that no upstream test catches (`docs/spikes/markdig-divergence.md`). A port is checked against the real marked on any input. Specification vendored in `reference/marked/`. |
 | typebox JSON Schema emission | — | `Pi.Ai/Schema/` | Tool parameter schemas go to providers on the wire. The emitted JSON must be byte-identical to typebox's output for the same shape, or provider behaviour changes. Highest-risk item in this table. |
 
 ---

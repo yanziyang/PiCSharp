@@ -91,8 +91,9 @@ than quietly dropped.
 `dependencies.md`, `differential-testing.md`, `session-format.md`, `solution-layout.md` and
 `translation-patterns.md` are also still Proposed. Three of them have been in continuous use for
 eight packets — `translation-patterns.md` is cited in every one, `solution-layout.md` describes the
-solution as built, and `dependencies.md` has been correct enough that its Markdig entry pre-answered a
-question I had wrongly reopened.
+solution as built, and `dependencies.md` has settled dependency questions as they arose. Its Markdig
+entry, which once pre-answered a question I had wrongly reopened, was itself reversed on 2026-09-13
+once the divergence from marked was measured.
 
 They are working documents that have proven themselves in use. Marking them Accepted is
 record-keeping rather than a decision, and can be done in one commit whenever you want it.

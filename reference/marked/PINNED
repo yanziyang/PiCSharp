@@ -1,0 +1,12 @@
+# marked reference pin.
+#
+# reference/marked/ is the specification for src/Pi.Tui/Marked/, which ports
+# the marked lexer that pi-tui depends on. It is read-only, exactly like
+# reference/pi (AGENTS.md, "The prime rule").
+#
+# It must be the version reference/pi resolves. Bumping it is a deliberate,
+# separate decision: re-extract src/, re-dump composed-rules.gfm.json,
+# re-record tests/fixtures/marked/, and update this file in the same commit.
+#
+# Format: <package> <version> <npm-integrity>
+marked 18.0.5 sha512-S6GcvALHg6K4ohtu4E7x0a1AqhAjp6cV8KhLSyN9qVapnzJkusVBxZRcIU9AeYsbe6P1hKDusSbEOzGyyuce6w==

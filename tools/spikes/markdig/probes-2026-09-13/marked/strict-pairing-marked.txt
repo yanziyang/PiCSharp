@@ -1,0 +1,6 @@
+st-lazy-pairing               DEL[a ~~b]
+st-two-pairs                  DEL[a] DEL[b]
+st-three-openers              DEL[a ~~b ~~c]
+st-tilde-after                ~~a~~~
+st-nested-strong-tilde-after  ~~STRONG[a]~~~
+st-nested-strong              DEL[STRONG[a]]

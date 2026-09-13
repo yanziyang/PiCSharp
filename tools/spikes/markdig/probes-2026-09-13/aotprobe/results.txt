@@ -1,0 +1,13 @@
+Markdig 0.44.0 trim and Native AOT analysis, 2026-09-13 (SDK 10.0.303)
+
+Trimmed publish (ILLink, TrimmerSingleWarn=false):
+  IL warnings: 0  build errors: 0
+  binary output: parsed 4 samples, 59 nodes, kinds: autolink,CodeInline,emph,FencedCodeBlock,HeadingBlock,LineBreakInline,link,ListBlock,ListItemBlock,lit,math,ParagraphBlock,QuoteBlock,Table,TableCell,TableRow,TaskList
+
+Native AOT publish, first attempt:
+  Platform linker not found
+
+Native AOT publish with -p:IlcUseEnvironmentalTools=true (lets ILC run without MSVC):
+  ILC produced native object: yes
+  IL warnings: 0
+  then failed only at the native link step (no link.exe): 2 MSB3073 line(s)

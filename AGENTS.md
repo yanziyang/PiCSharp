@@ -6,6 +6,8 @@ PiCSharp is a C# / .NET 10 port of the Pi coding agent (`earendil-works/pi`), pi
 
 **The TypeScript source in `reference/pi/` is the specification.** It is read-only.
 
+`reference/marked/` is the same kind of specification for one port: marked 18.0.5, the Markdown lexer pi-tui depends on, vendored because `src/Pi.Tui/Marked/` ports it instead of adopting a .NET parser. It must stay the version `reference/pi` resolves; see `reference/marked/PINNED`.
+
 - Never modify anything under `reference/`.
 - Never invent an API shape, an error message, or a default value. Read the TS source.
 - If this document and the TS source disagree, the TS source wins — and say so in the PR.

@@ -3,6 +3,39 @@
 **Status:** complete, 2026-09-13
 **Recommendation:** **GO, with an explicit adapter and five small compatibility pieces.**
 
+> **Superseded 2026-09-13 — not acted on.** Scoping the port, a follow-up measurement against marked
+> 18.0.5 found further renderer-visible divergences that the 109-case sweep below did not reach. None
+> of them occurs in any of the 81 upstream cases, so a Markdig port built to this report would pass
+> every upstream test and still mangle ordinary output. The project decided to **port marked's lexer
+> instead** — specification in `reference/marked/`, port in `src/Pi.Tui/Marked/`, packet `T5.9`.
+> Evidence, reproducible: `tools/spikes/markdig/probes-2026-09-13/`.
+>
+> Measured with Markdig 0.44.0 against marked 18.0.5, using the production strict-strikethrough
+> tokenizer where it applies:
+>
+> - **Default emphasis extras corrupt plain text.** The pipeline in this report called
+>   `UseEmphasisExtras()` with default options, which also enables superscript, subscript, inserted and
+>   marked. `x^2 + y^2` becomes a superscript, `a==b==c` a highlight, `++i++` an insertion, `H~2~O` a
+>   subscript; marked keeps all of them as text. None of the 109 inputs contained `==` or `++`, and the
+>   only carets outside math sat in LaTeX rows set aside as the extension boundary.
+> - **Autolinks.** Markdig autolinks `tel:+15551234`; marked leaves it as text. In
+>   `write mailto:a@b.com`, Markdig swallows `mailto:` into the link, while marked leaves it visible and
+>   links only the address. `AutoLinkOptions` has no scheme control.
+> - **Strikethrough pairing.** marked's strict rule pairs from the first opener, so `~~a ~~b~~` strikes
+>   `a ~~b`; Markdig strikes only `b`. marked rejects `~~a~~~` and `~~**a**~~~`, and Markdig strikes
+>   both. Four of six pairing probes differ, and no post-parse check can repair a pairing already chosen.
+> - **Tables.** marked splits the raw row before inline parsing, so a pipe inside a code span splits the
+>   cell; Markdig keeps the code span whole. Markdig also reports a trailing column definition that is
+>   not a column, keeps overflow cells unless `UseHeaderForColumnCount` is set, and leaves
+>   `PipeTableDelimiterInline` nodes in paragraphs that do not become tables.
+>
+> Markdig passes trim and Native AOT analysis cleanly; that was never the problem. The problem is that a
+> faithful adapter would re-implement marked's `url`, `del`, `table` and `splitCells` rules, plus
+> upstream's LaTeX tokenizers, inside Markdig's extension model — at which point most GFM parsing is
+> ported marked code anyway, without marked's verification path. Porting marked's lexer (~2,100
+> TypeScript lines on pi's option path, MIT) makes every token difference a defect against a real
+> oracle. The report below is kept as the record of what the first sweep found.
+
 This spike answers whether the existing `markdown.ts` renderer can be fed by Markdig. It does not
 port `markdown.ts`, and it does not add Markdig to Pi.Tui. The next packet should implement the
 adapter only after carrying forward the required behaviors below.

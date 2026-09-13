@@ -1,0 +1,126 @@
+{
+ "metadata": {
+  "parser": "Marked",
+  "version": "18.0.5",
+  "strictStrikethrough": true,
+  "latexExtensions": "not loaded; the production tokenizer is the extension under test",
+  "caseCount": 6,
+  "source": "C:/Users/admin/AppData/Local/Temp/claude/C--MyProjects-PiCSharp/b7f0cb05-b9fe-4e50-93d5-78581f5483ff/scratchpad/markedprobe/inputs.json"
+ },
+ "cases": {
+  "caret-math": {
+   "types": [
+    "paragraph",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "x^2 + y^2",
+     "text": "x^2 + y^2"
+    },
+    {
+     "type": "text",
+     "raw": "x^2 + y^2",
+     "text": "x^2 + y^2"
+    }
+   ]
+  },
+  "caret-pair": {
+   "types": [
+    "paragraph",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "2^10^ bytes",
+     "text": "2^10^ bytes"
+    },
+    {
+     "type": "text",
+     "raw": "2^10^ bytes",
+     "text": "2^10^ bytes"
+    }
+   ]
+  },
+  "double-equals": {
+   "types": [
+    "paragraph",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "a==b==c and ==highlight==",
+     "text": "a==b==c and ==highlight=="
+    },
+    {
+     "type": "text",
+     "raw": "a==b==c and ==highlight==",
+     "text": "a==b==c and ==highlight=="
+    }
+   ]
+  },
+  "double-plus": {
+   "types": [
+    "paragraph",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "++i++ and ++j++",
+     "text": "++i++ and ++j++"
+    },
+    {
+     "type": "text",
+     "raw": "++i++ and ++j++",
+     "text": "++i++ and ++j++"
+    }
+   ]
+  },
+  "single-tilde": {
+   "types": [
+    "paragraph",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "H~2~O and ~/foo and ~/bar",
+     "text": "H~2~O and ~/foo and ~/bar"
+    },
+    {
+     "type": "text",
+     "raw": "H~2~O and ~/foo and ~/bar",
+     "text": "H~2~O and ~/foo and ~/bar"
+    }
+   ]
+  },
+  "double-tilde": {
+   "types": [
+    "paragraph",
+    "del",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "~~ok~~",
+     "text": "~~ok~~"
+    },
+    {
+     "type": "del",
+     "raw": "~~ok~~",
+     "text": "ok"
+    },
+    {
+     "type": "text",
+     "raw": "ok",
+     "text": "ok"
+    }
+   ]
+  }
+ }
+}

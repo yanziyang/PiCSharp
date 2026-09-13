@@ -21,7 +21,6 @@
          AWSSDK.BedrockRuntime   (T3.7; referenced above)
          YamlDotNet              (wave 3 / 6)
          DiffPlex                (wave 3 / 6)
-         Markdig                 (wave 5 / 6)
          NuGet.Versioning        (wave 6)
          SkiaSharp               (wave 6 image handling; NOT needed for T5.5 - see dependencies.md)
          TextMateSharp           (wave 6)

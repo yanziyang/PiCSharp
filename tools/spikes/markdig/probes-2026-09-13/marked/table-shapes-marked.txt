@@ -1,0 +1,6 @@
+tb-escaped-pipe   align=[null] header=["a"] rows=[["x | y"]]
+tb-align          align=["left","center","right"] header=["l","c","r"] rows=[["1","2","3"]]
+tb-overflow       align=[null] header=["a"] rows=[["x"]]
+tb-underflow      align=[null,null] header=["a","b"] rows=[["x",""]]
+tb-header-only    align=[null,null] header=["a","b"] rows=[]
+tb-code-pipe      align=[null] header=["a"] rows=[["`x"]]

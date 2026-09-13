@@ -113,6 +113,7 @@ No other package may be split without amending this document.
 | `packages/ai/src/providers/*.ts` | `src/Pi.Ai/Providers/*.cs` |
 | `packages/agent/src/**` | `src/Pi.AgentCore/**` |
 | `packages/tui/src/**` | `src/Pi.Tui/**` |
+| `reference/marked/src/**` (marked 18.0.5 lexer, see `reference/marked/README.md`) | `src/Pi.Tui/Marked/**` (namespace `Pi.Tui`, as pi-tui re-exports `Marked`, `Token`, `Tokens`) |
 | `packages/coding-agent/src/core/tools/*.ts` | `src/Pi.CodingAgent/Tools/*.cs` |
 | `packages/coding-agent/src/core/extensions/**` | `src/Pi.CodingAgent/Extensions/**` (redesign — see `extension-api.md`) |
 | `packages/coding-agent/src/core/*.ts` | `src/Pi.CodingAgent/Core/*.cs` |

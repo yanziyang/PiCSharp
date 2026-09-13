@@ -1,0 +1,18 @@
+INPUT: x^2 + y^2
+  default extras : P lit'x' EMPH(^x1) lit'2 + y' lit'2'
+  strikethrough  : P lit'x^2 + y^2'
+INPUT: 2^10^ bytes
+  default extras : P lit'2' EMPH(^x1) lit'10' lit' bytes'
+  strikethrough  : P lit'2^10^ bytes'
+INPUT: a==b==c and ==highlight==
+  default extras : P lit'a' EMPH(=x2) lit'b' lit'c and ' EMPH(=x2) lit'highlight'
+  strikethrough  : P lit'a==b==c and ==highlight=='
+INPUT: ++i++ and ++j++
+  default extras : P EMPH(+x2) lit'i' lit' and ' EMPH(+x2) lit'j'
+  strikethrough  : P lit'++i++ and ++j++'
+INPUT: H~2~O and ~/foo and ~/bar
+  default extras : P lit'H' EMPH(~x1) lit'2' lit'O and ' lit'~' lit'/foo and ' lit'~' lit'/bar'
+  strikethrough  : P lit'H~2~O and ~/foo and ~/bar'
+INPUT: ~~ok~~
+  default extras : P EMPH(~x2) lit'ok'
+  strikethrough  : P EMPH(~x2) lit'ok'

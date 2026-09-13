@@ -1,0 +1,15 @@
+AutoLinkOptions:
+  String ValidPreviousCharacters = "*_~("
+  Boolean UseHttpsForWWWLinks = False
+  Boolean AllowDomainWithoutPeriod = False
+  Boolean OpenInNewWindow = False
+PipeTableOptions:
+  Boolean RequireHeaderSeparator = True
+  Boolean UseHeaderForColumnCount = False
+  Boolean InferColumnWidthsFromSeparator = False
+EmphasisExtraOptions: Strikethrough, Subscript, Superscript, Inserted, Marked, Default | Default = Default
+AutoLinkParser fields:
+  AutoLinkOptions Options = (instance)
+  SearchValues`1 _validPreviousCharacters = (instance)
+AutoLinkParser constructors:
+  (AutoLinkOptions options)

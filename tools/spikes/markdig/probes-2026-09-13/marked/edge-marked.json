@@ -1,0 +1,505 @@
+{
+ "metadata": {
+  "parser": "Marked",
+  "version": "18.0.5",
+  "strictStrikethrough": true,
+  "latexExtensions": "not loaded; the production tokenizer is the extension under test",
+  "caseCount": 20,
+  "source": "C:/Users/admin/AppData/Local/Temp/claude/C--MyProjects-PiCSharp/b7f0cb05-b9fe-4e50-93d5-78581f5483ff/scratchpad/markedprobe/inputs2.json"
+ },
+ "cases": {
+  "al-www": {
+   "types": [
+    "paragraph",
+    "text",
+    "link",
+    "text",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "see www.example.com now",
+     "text": "see www.example.com now"
+    },
+    {
+     "type": "text",
+     "raw": "see ",
+     "text": "see "
+    },
+    {
+     "type": "link",
+     "raw": "www.example.com",
+     "text": "www.example.com",
+     "href": "http://www.example.com"
+    },
+    {
+     "type": "text",
+     "raw": "www.example.com",
+     "text": "www.example.com"
+    },
+    {
+     "type": "text",
+     "raw": " now",
+     "text": " now"
+    }
+   ]
+  },
+  "al-ftp": {
+   "types": [
+    "paragraph",
+    "link",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "ftp://example.com/file",
+     "text": "ftp://example.com/file"
+    },
+    {
+     "type": "link",
+     "raw": "ftp://example.com/file",
+     "text": "ftp://example.com/file",
+     "href": "ftp://example.com/file"
+    },
+    {
+     "type": "text",
+     "raw": "ftp://example.com/file",
+     "text": "ftp://example.com/file"
+    }
+   ]
+  },
+  "al-mailto-scheme": {
+   "types": [
+    "paragraph",
+    "text",
+    "link",
+    "text",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "write mailto:a@b.com today",
+     "text": "write mailto:a@b.com today"
+    },
+    {
+     "type": "text",
+     "raw": "write mailto:",
+     "text": "write mailto:"
+    },
+    {
+     "type": "link",
+     "raw": "a@b.com",
+     "text": "a@b.com",
+     "href": "mailto:a@b.com"
+    },
+    {
+     "type": "text",
+     "raw": "a@b.com",
+     "text": "a@b.com"
+    },
+    {
+     "type": "text",
+     "raw": " today",
+     "text": " today"
+    }
+   ]
+  },
+  "al-tel": {
+   "types": [
+    "paragraph",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "call tel:+15551234",
+     "text": "call tel:+15551234"
+    },
+    {
+     "type": "text",
+     "raw": "call tel:+15551234",
+     "text": "call tel:+15551234"
+    }
+   ]
+  },
+  "al-email": {
+   "types": [
+    "paragraph",
+    "text",
+    "link",
+    "text",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "mail user@example.com please",
+     "text": "mail user@example.com please"
+    },
+    {
+     "type": "text",
+     "raw": "mail ",
+     "text": "mail "
+    },
+    {
+     "type": "link",
+     "raw": "user@example.com",
+     "text": "user@example.com",
+     "href": "mailto:user@example.com"
+    },
+    {
+     "type": "text",
+     "raw": "user@example.com",
+     "text": "user@example.com"
+    },
+    {
+     "type": "text",
+     "raw": " please",
+     "text": " please"
+    }
+   ]
+  },
+  "al-trailing-dot": {
+   "types": [
+    "paragraph",
+    "text",
+    "link",
+    "text",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "go to https://example.com.",
+     "text": "go to https://example.com."
+    },
+    {
+     "type": "text",
+     "raw": "go to ",
+     "text": "go to "
+    },
+    {
+     "type": "link",
+     "raw": "https://example.com",
+     "text": "https://example.com",
+     "href": "https://example.com"
+    },
+    {
+     "type": "text",
+     "raw": "https://example.com",
+     "text": "https://example.com"
+    },
+    {
+     "type": "text",
+     "raw": ".",
+     "text": "."
+    }
+   ]
+  },
+  "al-parens": {
+   "types": [
+    "paragraph",
+    "text",
+    "link",
+    "text",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "(https://example.com)",
+     "text": "(https://example.com)"
+    },
+    {
+     "type": "text",
+     "raw": "(",
+     "text": "("
+    },
+    {
+     "type": "link",
+     "raw": "https://example.com",
+     "text": "https://example.com",
+     "href": "https://example.com"
+    },
+    {
+     "type": "text",
+     "raw": "https://example.com",
+     "text": "https://example.com"
+    },
+    {
+     "type": "text",
+     "raw": ")",
+     "text": ")"
+    }
+   ]
+  },
+  "al-balanced-parens": {
+   "types": [
+    "paragraph",
+    "link",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "https://en.wikipedia.org/wiki/Foo_(bar)",
+     "text": "https://en.wikipedia.org/wiki/Foo_(bar)"
+    },
+    {
+     "type": "link",
+     "raw": "https://en.wikipedia.org/wiki/Foo_(bar)",
+     "text": "https://en.wikipedia.org/wiki/Foo_(bar)",
+     "href": "https://en.wikipedia.org/wiki/Foo_(bar)"
+    },
+    {
+     "type": "text",
+     "raw": "https://en.wikipedia.org/wiki/Foo_(bar)",
+     "text": "https://en.wikipedia.org/wiki/Foo_(bar)"
+    }
+   ]
+  },
+  "tb-no-delim": {
+   "types": [
+    "paragraph",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "| a | b |\n| 1 | 2 |",
+     "text": "| a | b |\n| 1 | 2 |"
+    },
+    {
+     "type": "text",
+     "raw": "| a | b |\n| 1 | 2 |",
+     "text": "| a | b |\n| 1 | 2 |"
+    }
+   ]
+  },
+  "tb-no-outer-pipes": {
+   "types": [
+    "table"
+   ],
+   "nodes": [
+    {
+     "type": "table",
+     "raw": "a | b\n--- | ---\n1 | 2",
+     "align": [
+      null,
+      null
+     ]
+    }
+   ]
+  },
+  "tb-escaped-pipe": {
+   "types": [
+    "table"
+   ],
+   "nodes": [
+    {
+     "type": "table",
+     "raw": "| a |\n|---|\n| x \\| y |",
+     "align": [
+      null
+     ]
+    }
+   ]
+  },
+  "tb-code-pipe": {
+   "types": [
+    "table"
+   ],
+   "nodes": [
+    {
+     "type": "table",
+     "raw": "| a |\n|---|\n| `x|y` |",
+     "align": [
+      null
+     ]
+    }
+   ]
+  },
+  "tb-align": {
+   "types": [
+    "table"
+   ],
+   "nodes": [
+    {
+     "type": "table",
+     "raw": "| l | c | r |\n|:--|:-:|--:|\n| 1 | 2 | 3 |",
+     "align": [
+      "left",
+      "center",
+      "right"
+     ]
+    }
+   ]
+  },
+  "st-padded": {
+   "types": [
+    "paragraph",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "~~ padded ~~",
+     "text": "~~ padded ~~"
+    },
+    {
+     "type": "text",
+     "raw": "~~ padded ~~",
+     "text": "~~ padded ~~"
+    }
+   ]
+  },
+  "st-tilde-after": {
+   "types": [
+    "paragraph",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "~~a~~~",
+     "text": "~~a~~~"
+    },
+    {
+     "type": "text",
+     "raw": "~~a~~~",
+     "text": "~~a~~~"
+    }
+   ]
+  },
+  "st-triple": {
+   "types": [
+    "code"
+   ],
+   "nodes": [
+    {
+     "type": "code",
+     "raw": "~~~triple~~~",
+     "text": "",
+     "lang": "triple~~~"
+    }
+   ]
+  },
+  "st-space-before-close": {
+   "types": [
+    "paragraph",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "~~a ~~",
+     "text": "~~a ~~"
+    },
+    {
+     "type": "text",
+     "raw": "~~a ~~",
+     "text": "~~a ~~"
+    }
+   ]
+  },
+  "st-letter-after": {
+   "types": [
+    "paragraph",
+    "del",
+    "text",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "~~a~~b",
+     "text": "~~a~~b"
+    },
+    {
+     "type": "del",
+     "raw": "~~a~~",
+     "text": "a"
+    },
+    {
+     "type": "text",
+     "raw": "a",
+     "text": "a"
+    },
+    {
+     "type": "text",
+     "raw": "b",
+     "text": "b"
+    }
+   ]
+  },
+  "st-intraword": {
+   "types": [
+    "paragraph",
+    "text",
+    "del",
+    "text",
+    "text"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "a~~b~~c",
+     "text": "a~~b~~c"
+    },
+    {
+     "type": "text",
+     "raw": "a",
+     "text": "a"
+    },
+    {
+     "type": "del",
+     "raw": "~~b~~",
+     "text": "b"
+    },
+    {
+     "type": "text",
+     "raw": "b",
+     "text": "b"
+    },
+    {
+     "type": "text",
+     "raw": "c",
+     "text": "c"
+    }
+   ]
+  },
+  "st-escaped": {
+   "types": [
+    "paragraph",
+    "del",
+    "text",
+    "escape"
+   ],
+   "nodes": [
+    {
+     "type": "paragraph",
+     "raw": "~~a\\~~~",
+     "text": "~~a\\~~~"
+    },
+    {
+     "type": "del",
+     "raw": "~~a\\~~~",
+     "text": "a\\~"
+    },
+    {
+     "type": "text",
+     "raw": "a",
+     "text": "a"
+    },
+    {
+     "type": "escape",
+     "raw": "\\~",
+     "text": "~"
+    }
+   ]
+  }
+ }
+}

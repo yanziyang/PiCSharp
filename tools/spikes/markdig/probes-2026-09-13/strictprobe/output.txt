@@ -1,0 +1,7 @@
+=== Markdig 0.44.0, strikethrough-only extras (nesting shown) ===
+  st-lazy-pairing               ~~a DEL[b]
+  st-two-pairs                  DEL[a] DEL[b]
+  st-three-openers              ~~a ~~b DEL[c]
+  st-tilde-after                DEL[a]~
+  st-nested-strong-tilde-after  DEL[STRONG[a]]~
+  st-nested-strong              DEL[STRONG[a]]

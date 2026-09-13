@@ -1,0 +1,14 @@
+=== UseHeaderForColumnCount = False ===
+  tb-escaped-pipe   TABLE(defs=2,align=-/-) H[a] R[x | y]
+  tb-align          TABLE(defs=4,align=Left/Center/Right/-) H[l|c|r] R[1|2|3]
+  tb-overflow       TABLE(defs=2,align=-/-) H[a|] R[x|y]
+  tb-underflow      TABLE(defs=3,align=-/-/-) H[a|b] R[x|]
+  tb-header-only    TABLE(defs=2,align=-/-) H[a|b]
+  al-angle-email    ParagraphBlock: 
+=== UseHeaderForColumnCount = True ===
+  tb-escaped-pipe   TABLE(defs=2,align=-/-) H[a] R[x | y]
+  tb-align          TABLE(defs=4,align=Left/Center/Right/-) H[l|c|r] R[1|2|3]
+  tb-overflow       TABLE(defs=2,align=-/-) H[a] R[x]
+  tb-underflow      TABLE(defs=3,align=-/-/-) H[a|b] R[x|]
+  tb-header-only    TABLE(defs=2,align=-/-) H[a|b]
+  al-angle-email    ParagraphBlock: 

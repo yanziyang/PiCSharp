@@ -81,8 +81,9 @@ loc_ported() {
     [ -d "$d" ] && dirs="$dirs $d"
   done
   [ -n "$dirs" ] || { echo 0; return; }
+  # src/Pi.Tui/Marked/ ports marked (reference/marked), not pi-tui, so it is not pi-tui LOC.
   # shellcheck disable=SC2086
-  find $dirs -name '*.cs' ! -path '*/obj/*' ! -path '*/bin/*' -exec cat {} + 2>/dev/null | wc -l | tr -d ' '
+  find $dirs -name '*.cs' ! -path '*/obj/*' ! -path '*/bin/*' ! -path '*/Marked/*' -exec cat {} + 2>/dev/null | wc -l | tr -d ' '
 }
 
 count_ported() {
@@ -90,15 +91,16 @@ count_ported() {
   local dir="tests/${proj}.Tests"
   [ -d "$dir" ] || { echo 0; return; }
   # ProjectReferenceTests.cs is scaffold wiring, not a ported upstream test.
+  # tests/Pi.Tui.Tests/Marked/ checks that port against a recorded marked oracle, not pi-tui upstream cases.
   local attrs skips
-  attrs=$(find "$dir" -name '*.cs' ! -name 'ProjectReferenceTests.cs' \
+  attrs=$(find "$dir" -name '*.cs' ! -name 'ProjectReferenceTests.cs' ! -path '*/Marked/*' \
     -exec grep -hoE '\[(Fact|Theory)[]( ]' {} + 2>/dev/null | wc -l | tr -d ' ')
   # Skipped tests do not count as ported coverage. Without this the two gates
   # contradict each other: the skip audit penalises a skip while parity rewards
   # it, so a packet could raise its parity score by adding empty skipped stubs.
   # A Skip= can sit on a later line of a multi-line attribute, so match the
   # Skip= line itself, exactly as .github/workflows/ci.yml does.
-  skips=$(find "$dir" -name '*.cs' ! -name 'ProjectReferenceTests.cs' \
+  skips=$(find "$dir" -name '*.cs' ! -name 'ProjectReferenceTests.cs' ! -path '*/Marked/*' \
     -exec grep -hcE 'Skip[[:space:]]*=' {} + 2>/dev/null | awk '{s+=$1} END {print s+0}')
   echo $(( attrs - skips ))
 }

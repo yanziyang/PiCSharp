@@ -1,0 +1,8 @@
+{"metadata":{"purpose":"emphasis-extras divergence probe"},"cases":[
+ {"id":"caret-math","source":"x^2 + y^2"},
+ {"id":"caret-pair","source":"2^10^ bytes"},
+ {"id":"double-equals","source":"a==b==c and ==highlight=="},
+ {"id":"double-plus","source":"++i++ and ++j++"},
+ {"id":"single-tilde","source":"H~2~O and ~/foo and ~/bar"},
+ {"id":"double-tilde","source":"~~ok~~"}
+]}
