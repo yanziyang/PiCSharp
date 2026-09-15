@@ -125,6 +125,7 @@
 {"id":"seed-latex-pending","source":"streaming $\\mathbb{C}^3 and \\[x^2","kind":"generated"}
 {"id":"seed-unclosed-fences","source":"```typescript\nline\n``\n\n~~~~\npartial","kind":"generated"}
 {"id":"seed-nested-structure","source":"> - one\n>   1. nested\n>      ```\n>      code\n>      ```\n> - two","kind":"generated"}
+{"id":"seed-probe-extensions","source":"before\n\n@@B:[[inside]]@@\n\ntext [[inline]] and # heading","kind":"generated"}
 {"id":"generated-delimiter-*-1","source":"*alpha* * punctuation! * CJK文字 * 😀 *","kind":"generated"}
 {"id":"generated-delimiter-*-2","source":"**alpha** ** punctuation! ** CJK文字 ** 😀 **","kind":"generated"}
 {"id":"generated-delimiter-*-3","source":"***alpha*** *** punctuation! *** CJK文字 *** 😀 ***","kind":"generated"}

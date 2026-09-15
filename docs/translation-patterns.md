@@ -336,6 +336,11 @@ depends on, so **a pattern copied verbatim is a defect until shown otherwise.**
   C#. Measured on 2026-09-13 in Release with 100-character tokens, the copies alone cost 46 ms at
   100 KB and 8,081 ms at 1 MB, including 418 gen-2 collections: ten times the input, 175 times the time.
   Track an offset instead.
+- The marked port names that offset-bearing input `SourceView`: a `readonly struct` containing the
+  original immutable `string`, a UTF-16 `Offset`, and a UTF-16 `Length`. It provides relative indexing,
+  `StartsWith`, `IndexOf`, zero-copy `Slice`, and bounded `Regex.Match(input, beginning, length)`; token
+  fields call `Materialize()` only when a string is required. Tokenizer methods and extension delegates
+  therefore receive `SourceView`, never a copied remainder string.
 - `Regex.Match(input, beginning, length)` matches a range as if it were its own string: `^` matches at
   `beginning`, lookbehind cannot see before it, and `$` and `\z` match at the end of the range.
   `Match.Index` stays relative to the whole input. `Regex.Match(input, startat)` is **not** equivalent:

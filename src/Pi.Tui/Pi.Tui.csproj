@@ -1,3 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="Pi.Tui.Tests" />
+  </ItemGroup>
+
 </Project>

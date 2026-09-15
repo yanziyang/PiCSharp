@@ -45,6 +45,7 @@ const seeds = [
   ["latex-pending", "streaming $\\mathbb{C}^3 and \\[x^2"],
   ["unclosed-fences", "```typescript\nline\n``\n\n~~~~\npartial"],
   ["nested-structure", "> - one\n>   1. nested\n>      ```\n>      code\n>      ```\n> - two"],
+  ["probe-extensions", "before\n\n@@B:[[inside]]@@\n\ntext [[inline]] and # heading"],
 ];
 for (const [id, source] of seeds) add(`seed-${id}`, source);
 
