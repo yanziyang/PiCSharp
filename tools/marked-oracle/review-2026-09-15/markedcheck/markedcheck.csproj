@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- AssemblyName matches the port's InternalsVisibleTo entry, so this harness can reach MarkdownParser. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>Pi.Tui.Tests</AssemblyName>
+    <RootNamespace>MarkedCheck</RootNamespace>
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- The Release build of the port under review: build PiCSharp.slnx -c Release first. -->
+    <Reference Include="Pi.Tui">
+      <HintPath>$(MSBuildThisFileDirectory)../../../../src/Pi.Tui/bin/Release/net10.0/Pi.Tui.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>

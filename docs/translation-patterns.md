@@ -256,6 +256,19 @@ But:
 - `String.Length` in TS and `string.Length` in C# agree; `[...str].length` in TS is a **code point**
   count and maps to `Rune` enumeration, not `Length`.
 - Timestamps are round-tripped as **strings**, never reformatted (`session-format.md`).
+- JavaScript `substring` and `slice` clamp out-of-range indices; C# `Substring`, ranges and
+  `Span.Slice` throw. Upstream code can rely on the clamp: marked's blockquote tokenizer may return a
+  `raw` one `
+` longer than the remaining source, and `src.substring(token.raw.length)` quietly
+  yields `""`. Port the clamp at such sites instead of letting it become an exception. The T5.9 review
+  (2026-09-15) found `> - a` followed by a lazy `b` line crashed the port this way.
+- `trim()`, `trimStart()` and `trimEnd()` use JavaScript whitespace, which differs from
+  `char.IsWhiteSpace` exactly as `s` does (§15): U+FEFF is trimmed only in JavaScript, U+0085 only in
+  .NET. The same holds for `string.IsNullOrWhiteSpace` standing in for `!s.trim()`.
+- `toLowerCase()` and `toUpperCase()` apply Unicode's full, context-sensitive mappings: U+0130
+  lowercases to two code units, and a final capital sigma becomes U+03C2. `ToLowerInvariant` maps one
+  code unit to one. Where the result is compared or stored, as marked's link-reference labels are, port
+  the full mapping.
 
 ---
 
@@ -310,6 +323,7 @@ depends on, so **a pattern copied verbatim is a defect until shown otherwise.**
   code units, so a property class never matches an astral character — and most emoji are `\p{So}`.
   Where a pattern classifies the character beside a delimiter, classify the code point in code
   (`Rune.GetUnicodeCategory`) or match surrogate pairs explicitly, and test it with emoji.
+  The T5.9 review found an emoji between two asterisks became emphasis in C# and stayed text in marked.
 - V8 and .NET can ship different Unicode data. Recorded fixtures catch the difference; do not paper
   over it.
 
@@ -328,6 +342,10 @@ depends on, so **a pattern copied verbatim is a defect until shown otherwise.**
 
 - Prefer `[GeneratedRegex]` for fixed patterns: it is source-generated, fast, and safe under Native
   AOT. `RegexOptions.Compiled` needs dynamic code and runs interpreted under Native AOT.
+- Construct each `Regex` once. `new Regex` parses its pattern every time: the T5.9 port rebuilt its
+  rule set for every `Lexer`, costing 2.7 to 6.7 ms and about 0.9 MB for `Lexer("a")` before a
+  character was lexed (measured 2026-09-15). Fixed patterns belong in static `[GeneratedRegex]`
+  members, and parameterised ones in a static, thread-safe cache.
 - Do not use `RegexOptions.NonBacktracking` to defend against slow patterns. On .NET 10 it throws
   `NotSupportedException` for lookahead, lookbehind and backreferences, which JavaScript patterns use
   freely.

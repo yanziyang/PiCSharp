@@ -1,0 +1,115 @@
+// Targeted inputs for every JavaScript-versus-.NET difference in docs/translation-patterns.md section 15,
+// plus ordinary constructs. ASCII-only source: special characters are written as escapes.
+export const LS = "\u2028", PS = "\u2029", NEL = "\u0085", NBSP = "\u00A0", BOM = "\uFEFF";
+export const EMOJI = "\u{1F600}", MATHA = "\u{1D400}", CJK = "\u6587", FW3 = "\uFF13", AR3 = "\u0663";
+export const KELVIN = "\u212A", IDOT = "\u0130", E_ACUTE = "\u00E9", EXTB = "\u{20000}";
+
+export const targeted = {
+  eol: [
+    "# heading\n", "heading\n===\n", "text\n", "~~a~~\n", "| a |\n| - |\n", "***\n", "```\ncode\n```\n", "- item\n",
+    "> quote\n", "[a]: /url\n", "<div>\n", "a  \n", "a\\\n", "    code\n", "$$\nx\n$$\n", "*a*\n", "`a`\n",
+    "<http://a.b>\n", "https://a.b\n", "a@b.co\n", "[a](b)\n", "![a](b)\n", "1. a\n", "- [ ] a\n", "#\n", "# \n",
+    "-\n", ">\n", "```\n", "$x$\n", "\\(x\\)\n", "# a #\n", "[a]: <b>\n\n[a]\n", "[a](<b>)\n", "<a>\n",
+  ],
+  "line-separators": [
+    "[a](b" + LS + "c)", "`a" + LS + "b`", "<a" + LS + "b>", "# a" + LS + "b", "***a" + LS + "b***", "~~a\\" + LS + "b~~",
+    "a" + PS + "b", "- a" + LS + "b", "<!--" + LS + "-->", "![a](<b" + LS + "c>)", "[a](b \"t" + LS + "u\")",
+    "<http://a" + LS + "b>", "www.a" + LS + "b.com", "**a" + PS + "b**", "> a" + LS + "b", "| a" + LS + " | b |\n| - | - |",
+    "[a" + LS + "b]: /u\n\n[a" + LS + "b]", "$a" + LS + "b$", "$$a" + PS + "b$$", "\\(a" + LS + "b\\)", "<div" + LS + ">\n",
+    "<a href=\"x" + LS + "y\">b</a>", "a" + LS + "\nb", LS + "# heading", PS + "- item", "~~" + LS + "~~", "_a" + LS + "_",
+    "[a](b\\" + LS + ")", "a\\" + LS + "b", "*a\\" + PS + "*", "https://a.com/" + LS + "x", "[a]: /u \"t" + LS + "\"\n\n[a]",
+    "# a" + LS, "```" + LS + "\nx\n```", "Setext" + LS + "\n===", "a\n" + LS + "===", "| a |\n| - |\n| b" + LS + " |",
+  ],
+  whitespace: [
+    "~~" + BOM + "a~~", "~~a" + BOM + "~~", "~~a" + NEL + "~~", "~~" + NEL + "a~~", "*" + BOM + "a*", "**a" + NEL + "**",
+    "_" + BOM + "a_", "__a" + NEL + "__", "# " + BOM + "heading", "#" + BOM + "heading", "#" + NEL + "heading",
+    "-" + BOM + "item", "- " + NEL + "item", "1." + BOM + "item", ">" + BOM + "q", "[a]:" + BOM + "/url\n\n[a]",
+    "[a](" + BOM + "/url)", "[a](/url" + NEL + "\"t\")", "`" + BOM + "a" + BOM + "`", "| a" + BOM + " | b |\n|---|---|",
+    "a" + NEL + "\nb", "a" + BOM + "  \nb", "***" + BOM, "-" + NEL + "-" + NEL + "-", BOM + "    code", "$a" + BOM + "$",
+    "$a" + NEL + "$", "$" + BOM + "a$", "~~" + NBSP + "a~~", "*a" + NBSP + "*", "www.a.com" + BOM + "x",
+    "https://a.com" + NEL + "x", "a@b.com" + BOM, "<a" + BOM + "b>", "<div" + NEL + ">\n", "[a]: /u" + BOM + "\"t\"\n\n[a]",
+    "```" + BOM + "js\nx\n```", "~~~" + NEL + "\nx\n~~~", "a" + BOM + "\n===", "a\n" + BOM + "===", "- a\n" + BOM + "\n- b",
+    "a\n" + BOM + "\nb", "> a\n" + BOM + "\nb", "*a*" + BOM + "b", "a" + BOM + "*b*", "_a_" + NEL + "b", "a" + NEL + "_b_",
+    "~~a~~" + BOM, BOM + "~~a~~", NEL + "~~a~~" + NEL, "$$" + BOM + "\nx\n$$", "\\(" + NEL + "a\\)", "# a " + BOM + "#",
+    "# a" + NEL + "#", "- " + BOM, "- a\n" + NEL, "| a |\n| - |\n" + BOM, "[ a" + NEL + "b ]: /u\n\n[a b]",
+  ],
+  "digits-words": [
+    FW3 + ". item", AR3 + ". item", "1. a\n" + AR3 + ". b", FW3 + ") item", "$a$" + FW3, "$a$" + AR3, "$A$" + E_ACUTE,
+    "user@ex" + E_ACUTE + "mple.com", E_ACUTE + "ser@example.com", "www.ex" + E_ACUTE + "mple.com",
+    "http://ex" + E_ACUTE + "mple.com", "a_" + E_ACUTE + "_b", E_ACUTE + "_a_" + E_ACUTE, E_ACUTE + "*a*" + E_ACUTE,
+    "<d" + E_ACUTE + "v>\n", "<a" + E_ACUTE + ">", "[" + FW3 + "]: /u\n\n[" + FW3 + "]", CJK + "_a_" + CJK, "a_" + CJK + "_b",
+    "1" + FW3 + ". item", "- a\n" + AR3 + ". b", "$" + FW3 + "$", "www.a" + E_ACUTE + ".com", "a@" + E_ACUTE + ".com",
+    "https://a.b/" + E_ACUTE, "x_" + E_ACUTE, "_" + E_ACUTE + "_", "<a h" + E_ACUTE + "ref='x'>b</a>", "<x-" + E_ACUTE + ">",
+  ],
+  astral: [
+    EMOJI + "*a*" + EMOJI, "*a*" + EMOJI, EMOJI + "**a**", "a*" + EMOJI + "*", "**" + EMOJI + "**b", "_" + EMOJI + "_",
+    EMOJI + "_a_", "~~" + EMOJI + "~~", MATHA + "_a_" + MATHA, "a_" + MATHA + "_b", EMOJI + "~~a~~" + EMOJI,
+    MATHA + "*a*" + MATHA, "*" + MATHA + "*", "**a**" + MATHA, MATHA + "**a**", "_a_" + MATHA, MATHA + "_a_",
+    "__" + EMOJI + "__", EMOJI + "__a__" + EMOJI, "***" + EMOJI + "***", EMOJI + "~a~" + EMOJI, "a" + EMOJI + "_b_",
+    "[" + EMOJI + "](u)", "`" + EMOJI + "`", "# " + EMOJI, "| " + EMOJI + " |\n| - |", "*" + EMOJI + "a*", "*a" + EMOJI + "*",
+    "**" + EMOJI + "a" + EMOJI + "**", "_" + MATHA + "a_", "_a" + MATHA + "_", "a_b_" + MATHA, MATHA + "__b__c",
+    "~~a~~" + MATHA, MATHA + "~~a~~", EXTB + "_a_" + EXTB, "a_" + EXTB + "_b", "\\" + EMOJI, "*a\\" + EMOJI + "*",
+    "[a](\\" + EMOJI + ")", "```\\" + EMOJI + "\nx\n```", "**a\\" + EMOJI + "**b", "_a_\\" + EMOJI + "_b_", "~~" + EMOJI + "a~~",
+  ],
+  case: [
+    "<DIV>\nx\n</DIV>", "<SCRIPT>\nx\n</SCRIPT>", "<Pre>\nx\n</Pre>", "HTTP://EXAMPLE.COM", "WWW.EXAMPLE.COM", "<HTTPS://a.b>",
+    "[A]: /x\n\n[a]", "[" + IDOT + "]: /x\n\n[i\u0307]", "[" + IDOT + "]: /x\n\n[" + IDOT + "]", "[i]: /x\n\n[" + IDOT + "]",
+    "[\u03A3\u03A3]: /x\n\n[\u03C3\u03C2]", "[A\u03A3]: /x\n\n[a\u03C2]", "[A\u03A3]: /x\n\n[a\u03C3]",
+    "<lin" + KELVIN + ">\nx", "<" + KELVIN + "bd>x</" + KELVIN + "bd>", "<A HREF='x'>b</A>", "[" + KELVIN + "]: /x\n\n[k]",
+    "[\u1E9E]: /x\n\n[\u00DF]", "[\u00DF]: /x\n\n[SS]", "<PRE>*a*</PRE> *b*", "<A HREF=\"x\">*b*</a> *c*",
+    "[\u212B]: /x\n\n[\u00E5]", "[\uFB00]: /x\n\n[FF]", "<\u017Fcript>\nx", "[\u017F]: /x\n\n[s]",
+  ],
+  "line-endings": ["a\r\nb", "a\rb", "# h\r\n\r\ntext", "```\r\ncode\r\n```", "| a |\r\n| - |\r\n| b |", "- a\r- b", "> a\r\n> b", "a  \r\nb", "~~a\r\nb~~", "$$\r\nx\r\n$$"],
+  tabs: ["-\titem", "1.\titem", ">\tquote", "\tcode", "- a\n\t- b", "#\theading", "- a\n\n\tb", "*\t*\t*", "|\ta\t|\n|\t-\t|", "  \t- a", "- \tcode", "a\t\nb", "[a]:\t/u\n\n[a]"],
+  entities: ["&amp; &#123; &#x1F600; &copy; &notanentity; &#;", "[a](&quot;b&quot;)", "`&amp;`", "&nbsp;*a*&nbsp;", "https://a.com&amp;b", "www.a.com&quot;"],
+  links: [
+    "[a](<b c>)", "[a](b\"c\")", "[a](b 'c')", "[a](b (c))", "[a]( b )", "[a](\\(b)", "[a](b)c)", "[![img](src)](href)",
+    "[a [b] c](d)", "[a](b\n\"c\")", "[a]", "[a][]", "[a][b]\n\n[b]: /u", "![a][b]\n\n[b]: /u 'title'", "[a]: /u\n'title'\n\n[a]",
+    "[a](b 'c\" d')", "[a](<>)", "[a]()", "[](b)", "[a](b#c)", "[a](\\<b)", "[a]: <b c>\n\n[a]", "[a]: b \"c\"\n[a]: d\n\n[a]",
+    "[ A  B ]: /x\n\n[a b]", "[a]:\n/b\n'c'\n\n[a]", "[a\\]]: /x\n\n[a\\]]", "[a](b \"c\"d)", "https://a.com.", "https://a.com)",
+    "(https://a.com)", "https://a.com/?q=1&x=2.", "www.a.com,", "a@b.com.", "a.b-c_d@e.f.", "mailto:a@b.com", "xmpp:a@b.com",
+    "tel:+123", "https://a.com/x_(y)", "https://a.com/x_(y)z)", "www.commonmark.org/a.b.", "http://a.com'", "https://a.com*",
+    "https://a.com_", "https://a.com~", "~~https://a.com~~", "**https://a.com**", "_www.a.com_", "<https://a.com>.", "<a@b.com>",
+    "<mailto:a@b.com>", "<a+b@c.d>", "a_b@c.d", "a@b_c.d", "www.a.com/a<b", "http://a", "ftp://a.b", "https://", "www.", "a@b",
+  ],
+  delimiters: [
+    "*a*.", ".*a*", "**a**b", "a**b**", "_a_b", "a_b_", "__a__b", "*(a)*", "**(a)**", "*a **b** c*", "***a* b**", "**a *b***",
+    "_*a*_", "~a~", "~~a~~b", "a~~b~~", "~~~a~~~", "~~a~", "~~ a~~", "~~a ~~", "~~a ~~b~~", "~~a~~~", "~~**a**~~~", "~~a\\~~b~~",
+    "~~a\\\\~~", "*a", "a*", "**", "****", "*_a_*", "_a*b_c*", "**a**__b__", "*a*b*c*", "**a*", "*a**", "_a __b__ c_",
+    "a*\"b\"*c", "*\"a\"*", "__\"a\"__", "\\*a*", "*a\\*", "**a\\**", "~~a~~~~b~~", "x~~~~y", "*a\nb*", "**a\n\nb**",
+    "_a_\n_b_", "~~a\nb~~", "* * *", "_ _ _", "*a* *b* *c*", "x^2 + y^2", "a==b==c", "++i++", "H~2~O", "~~a ~~b ~~c",
+  ],
+  code: ["`` a ` b ``", "` a `", "`  `", "``` a```", "`a\nb`", "``a``b``", "`a\\`b`", "\\`a`", "````\na\n```\n````", "```js title\nx\n```", "~~~ ~\nx\n~~~", "``` `\nx\n```", "   ```\n   a\n  b\n   ```", "```\n```", "```"],
+  headings: ["#a", "# a #", "# a \\#", "####### a", "# a ###  ", "Setext\n===", "Setext\n---", "a\n= =", "  # a", "    # a", "# #", "#", "a\n    ===", "> a\n===", "- a\n---", "a\n---\nb", "# a\n=="],
+  html: [
+    "<div>\na\n</div>", "<!-- a -->", "<?php a ?>", "<!DOCTYPE html>", "<![CDATA[a]]>", "<pre>\na\n</pre>", "<a href='x'>b</a>",
+    "</div>", "<custom-tag>\nx", "<div\n>", "a <span>b</span> c", "<del>*a*</del>", "<pre><code>x</code></pre> *y*",
+    "<script>a</script> *b*", "<!-- *a* --> *b*", "<textarea>\n*a*\n</textarea>", "<style>\na\n</style>\nb", "  <div>", "    <div>",
+    "<div>*a*</div>", "<br>", "<br/>", "<x y=\"a\nb\">",
+  ],
+  lists: [
+    "-\n- a", "- \n  a", "- a\n\n- b", "- a\n- b\n\n- c", "1. a\n1. b", "0. a", "123456789. a", "1234567890. a", "- a\n * b",
+    "* a\n+ b\n- c", "1. a\n2) b", "- [ ] a", "- [x] a", "- [X] a", "- [ ]a", "* [ ]", "1. [x] a", "- [ ] ", "- a\n  - [x] b",
+    "- a\n\n  b", "- a\n\n\n  b", "10) a\n    b", "- ```\n  a\n  ```", "- # h", "- > q", "- a\n---", "- a\n***\n- b",
+    "  - a\n - b\n- c", "-   a\n    b", "-     code", "1.  a\n\n    b",
+  ],
+  quotes: ["> a\nb", "> - a\nb", "> ```\na", "> a\n> > b\nc", ">a", ">> a", "> # h\nb", "> a\n---", "> - a\n> - b\n\nc", "> | a |\n> | - |\n> | b |", ">\n> a\n>"],
+  tables: [
+    "|a|\n|-|", "a|b\n-|-", "| a | b |\n| - |", "| a |\n| :-: |\n| b | c | d |", "| `a|b` |\n| - |", "| a \\| b |\n|-|",
+    "| a |\n|-|\n| b\\\\| c |", "a | b\n--- | ---\nc", "| a |\n|---|\n| b |\n\nc", "| a |\n|---|\nb\n\nc", "| a |\n| --- |\n| b |\n- c",
+    "|a|b|\n|:-|-:|\n|c|d|", "| a |\n| - |\n|", "|\n|-|", "| a |\n| - |\n| [b](c) |", "| a | b |\n| --- | --- |\n| c |",
+  ],
+  breaks: ["a  \nb", "a\\\nb", "a \nb", "a     \nb", "*a*  \nb", "a  ", "a\\", "`a`  \nb"],
+  defs: ["[a]: <b c>", "[a]: b \"c\"\n[a]: d", "para\n[a]: /u\n\n[a]", "[a]: /u\npara\n\n[a]", "[a]: /u 'c'd", "[a]: /u\n  \"t\"", "[a]:/u", "[]: /u", "[a]: ", "[a]: <>"],
+  latex: [
+    "$a$", "$ a$", "$a $", "$$a$$", "\\(a\\)", "\\[a\\]", "$a$1", "$A$B", "$HOME$USER", "$a`b$", "cost $5 and $10", "$\\alpha",
+    "$x^2", "\\(x", "$$\nx\n$$", "$$x", "$$\n\\frac{a}{b}", "\\[\na", "  $$x$$", "    $$x$$", "a $$b$$ c", "$a\\$b$", "\\$a$",
+    "$$\n\n$$", "$a\nb$", "*$a$*", "**$a$**", "[$a$](b)", "`$a$`", "~~$a$~~", "| $a|b$ |\n| - |", "> $$\n> x\n> $$", "- $$x$$",
+    "$$$", "$ $", "$\\$", "\\\\(a\\)", "\\(a\\\\)", "$x_1$ and $y_2$", "$A$" + FW3, "$A_B$c",
+  ],
+};
+
+export const streamingDocs = [
+  "# Title\n\nSome **bold** and *em* text with `code` and $x^2$.\n\n- item one\n- item [two](https://a.com)\n  - nested ~~strike~~\n\n> quote with \\(a\\)\n\n| a | b |\n|:-|-:|\n| 1 | 2 |\n\n```ts\nconst x = 1;\n```\n\n$$\ny = mx + b\n$$\n\n1. last\n2) item",
+  "Text with <span>html</span> and www.example.com, email a@b.com.\n\n***\n\n[ref]: https://a.com \"t\"\n\nUse [ref] and ![img][ref].\n\n    indented\n\n~~~\nfence\n~~~",
+];
