@@ -52,8 +52,8 @@
 <p class="eyebrow">Claude Code · Session Transcript</p>
 <h1>PiCSharp — Pi to .NET 10 feasibility, port scaffold and review</h1>
 <div class="stat-bar">
-  <div>Exchanges<b>68</b></div>
-  <div>Responses<b>102</b></div>
+  <div>Exchanges<b>75</b></div>
+  <div>Responses<b>114</b></div>
 </div>
 </div></header>
 <div class="shell">
@@ -126,6 +126,13 @@
 <a href="#p66"><span class="n">66</span>Yes, write R5</a>
 <a href="#p67"><span class="n">67</span>I did not work on this project for two weeks. Do a summary for current s…</a>
 <a href="#p68"><span class="n">68</span>Update ClaudeSession.html and push</a>
+<a href="#p69"><span class="n">69</span>Yes, commit a copy into the repo</a>
+<a href="#p70"><span class="n">70</span>My plan is verify R5 properly, then finish T5.8 (unblocks markdown, the …</a>
+<a href="#p71"><span class="n">71</span>Completed with a GO recommendation.</a>
+<a href="#p72"><span class="n">72</span>yes, please write that packet</a>
+<a href="#p73"><span class="n">73</span>done</a>
+<a href="#p74"><span class="n">74</span>fix the issue.</a>
+<a href="#p75"><span class="n">75</span>commit and push all outstanding items</a>
 </nav>
 <main>
 <section class="turn user" id="p1">
@@ -1641,12 +1648,210 @@ class StrictStrikethroughTokenizer extends Tokenizer { ... }</code></pre>
 <p>One thing worth deciding: this exporter has now been lost once and nearly caused a silent history-loss on reconstruction. Want me to commit a copy into the repo (e.g. under <code>ÁI/</code> or <code>tools/</code>) so it survives the next gap?</p></div>
 </section>
 
+<section class="turn user" id="p69">
+  <div class="who"><span class="badge u">Exchange 69</span><time>2026-09-13 02:13:44</time></div>
+  <div class="bubble"><p>Yes, commit a copy into the repo</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span><time>2026-09-13 02:15:51</time></div>
+  <div class="bubble"><p>Pushed as <code>9b2580d</code> — HEAD and <code>origin/main</code> in sync.</p>
+<p><code>tools/export-session.mjs</code> is now in the repo, alongside <code>test-parity.sh</code> in the same "maintenance scripts" home. Two things I fixed before committing it, since a tool going into shared history that only runs on the machine that wrote it defeats the purpose:</p>
+<ul><li><strong>The Claude Code project directory was hardcoded</strong> to <code>C:/Users/admin/...</code>. It now derives that path by mangling the repo's own resolved location the same way Claude Code does (drive colon and separators → <code>-</code>), combined with <code>os.homedir()</code> — so it works under any account.</li><li><strong>The output path was hardcoded</strong> to this exact drive and folder. It's now resolved relative to the script's own location, so it works from any checkout path.</li></ul>
+<p>Verified both changes work by actually running it from <code>tools/export-session.mjs</code> rather than just reading the code — it correctly found the transcript directory, spliced on the one genuinely new exchange (this recovery turn), and produced a clean 68-exchange, 102-response file with no duplicate sections.</p>
+<p>Going forward: <code>node tools/export-session.mjs</code> from anywhere in the repo regenerates the export, and it can't be lost to a temp-directory cleanup again.</p></div>
+</section>
+<section class="turn user" id="p70">
+  <div class="who"><span class="badge u">Exchange 70</span><time>2026-09-13 02:19:28</time></div>
+  <div class="bubble"><p>My plan is verify R5 properly, then finish T5.8 (unblocks markdown, the largest remaining TUI file). The task will delegate to Codex. Create prompt for me.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span><time>2026-09-13 02:37:44</time></div>
+  <div class="bubble"><p>R5 is verified. Here's the Codex prompt for T5.8:</p>
+<pre class="code" data-lang="bash"><code>codex "Read ÍmplementationKit/packets/T5.8-markdig-spike.md and complete the spike. Do NOT port markdown.ts - the deliverable is findings and a go/no-go recommendation, written into docs/spikes/markdig-divergence.md. A preliminary run over 15 hand-picked constructs is already there and the harness (tools/spikes/markdig/) already works; extend both rather than starting over.
+
+Objectives: (1) harvest the actual markdown inputs the 81 cases in reference/pi/packages/tui/test/markdown.test.ts use, and run those through both parsers instead of my 15 guesses - that's where the real long tail is. (2) For every divergence found, record the input, both type streams, and whether it actually changes what the renderer would emit - a structural difference the renderer never observes isn't a finding. (3) Close two open questions: what does markdown.ts's case \"escape\" branch actually do with an escape token, and which blockquote soft-break behavior do upstream's own tests require (marked joins the line, Markdig preserves it as a node, and the renderer wraps to a width, so this one has visible consequences). (4) Prove, by writing them in the spike project, that strict strikethrough and the inline/block LaTeX tokenizers are expressible in Markdig's extension model - not by argument. (5) Write the adapter mapping: for each of the 19 token types markdown.ts inspects, the corresponding Markdig node type and any property checks needed to distinguish it.
+
+src/ stays untouched, and PiCSharp.slnx / Directory.Packages.props must not change. Name anything not delivered or any instruction overridden in the PR."</code></pre>
+<p><strong>Why this order was right.</strong> T5.8 gates <code>markdown.ts</code> — 1,015 LOC and 81 cases, the largest remaining file in the TUI wave — and it's been sitting untouched since I ran the preliminary 15-construct probe myself on 2026-08-31.</p>
+<p><strong>What's already there, so Codex extends rather than restarts:</strong> the harness in <code>tools/spikes/markdig/</code> (a Node script dumping <code>marked</code>'s token types, a standalone C# project dumping Markdig's), and a preliminary verdict in <code>docs/spikes/markdig-divergence.md</code> — <strong>viable</strong>, four divergences found (<code>del</code>, <code>escape</code>, <code>autolink</code>, blockquote soft breaks), none fatal.</p>
+<p><strong>The one thing I'm most protective of in this prompt</strong>: my 15 constructs were chosen from <em>my</em> knowledge of where CommonMark implementations tend to disagree — a reasonable smoke test, but not a representative sample. The real long tail lives in whatever the 81 actual upstream cases exercise, and that's the very first objective for a reason: everything downstream (the divergence list, the escape/blockquote answers, the go/no-go call) is only as good as that input set.</p>
+<p><strong>And the standing trap for a spike specifically</strong>: the failure mode here is the <em>opposite</em> of a normal packet. Normally the risk is silently dropping scope; here the risk is silently <em>growing</em> it — starting to write the actual renderer because the spike is going well. I've told it explicitly not to, and to leave <code>Directory.Packages.props</code> and the <code>.slnx</code> alone, since adding Markdig for real is a decision this spike informs, not one it makes.</p></div>
+</section>
+<section class="turn user" id="p71">
+  <div class="who"><span class="badge u">Exchange 71</span><time>2026-09-13 05:53:10</time></div>
+  <div class="bubble"><p>Completed with a GO recommendation.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span><time>2026-09-13 05:54:22</time></div>
+  <div class="bubble"><p>Both questions genuinely closed, and the GO is qualified with five concrete gates rather than being a blanket approval. Now let me verify rather than trust — starting with the claim I care most about: that the proofs are executable, not prose.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span><time>2026-09-13 05:56:55</time></div>
+  <div class="bubble"><p>Confirmed a false negative in my own check — upstream builds that input via a template literal with a variable (`<code> </code>&gt; ${longText}<code> </code>`), so the string never appears contiguously in the source. The harvester resolved the interpolation correctly, which is stronger evidence than naive extraction would give.</p>
+<p>T5.8 verifies clean on every objective. Recording it.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span><time>2026-09-13 05:57:45</time></div>
+  <div class="bubble"><p>Both plan items are done and pushed (<code>60ee7be</code>, <code>86d5c3b</code>).</p>
+<h4>R5 — verified clean</h4>
+<p><strong>1,505 tests, 0 failed, 0 skipped</strong> across three runs; format clean. Client parity 19% → <strong>86% of portable</strong>, server 18% → <strong>36%</strong>. All 42 upstream case names diffed directly against the seven source files — <strong>zero missing</strong>. <code>src/</code> untouched as the freeze required.</p>
+<p>I checked hazard 1 by diffing the delivery commit rather than reading the findings file: 8 pre-existing bare <code>[Fact]</code> cases were given upstream <code>DisplayName</code>s rather than left duplicated beside new copies. Floors were already raised in the delivery itself. <strong>No divergence was found this time</strong>, and <code>R5Findings.md</code> says so plainly instead of manufacturing one to match R4's pattern — which is the right instinct.</p>
+<h4>T5.8 — GO, and it holds up</h4>
+<p>I verified each claim rather than accepting the report:</p>
+<div class="tw"><table><thead><tr><th>Claim</th><th>How I checked it</th></tr></thead><tbody><tr><td>Proofs are executable, not prose</td><td>Re-ran the harness myself — 109 cases, assertions passed; output byte-identical to committed</td></tr><tr><td>Ledger: 91 no / 16 yes / 1 conditional / 1 unmapped</td><td>Recomputed from <code>divergences.json</code> — exact match</td></tr><tr><td>Adapter table covers 19 types</td><td>Cross-checked against <code>markdown.ts</code>'s real <code>case</code> vocabulary — 19/19, no gaps, no invented rows</td></tr><tr><td>Inputs genuinely harvested</td><td>93/94 trace verbatim to <code>markdown.test.ts</code></td></tr></tbody></table></div>
+<p>That last one is worth a note: my first trace flagged one input as untraceable, and I nearly recorded it as a gap. It's built upstream as `<code> </code>&gt; ${longText}<code> </code>` — a template literal with a variable — so the harvester <strong>resolved an interpolation</strong>, which is better than the naive extraction I was implicitly testing for. My check was wrong, not the delivery.</p>
+<p>Scope held completely: <code>src/</code>, <code>tests/</code>, <code>PiCSharp.slnx</code> and <code>Directory.Packages.props</code> untouched, Markdig confined to the standalone spike project, <code>markdown.ts</code> not ported. The stated risk for a spike was silent scope <em>growth</em>, and it didn't happen. Two deliberate overrides were disclosed unprompted.</p>
+<p><strong>The GO is conditional on five gates</strong> — list-boundary gap synthesis and marker recovery, soft <code>LineBreakInline</code> → newline, source-span recovery for <code>preserveBackslashEscapes</code>, <code>AutolinkInline</code> normalization plus bare-email parsing, and Markdig math extension nodes. Omitting any one reproduces a renderer-visible finding, so these belong in the port packet's acceptance criteria, not its prose.</p>
+<p><code>markdown.ts</code> is now unblocked — 1,015 LOC, 81 cases, the largest remaining TUI file. Want me to write that packet? It's the first one that will actually add Markdig to <code>Directory.Packages.props</code> and the solution.</p></div>
+</section>
+<section class="turn user" id="p72">
+  <div class="who"><span class="badge u">Exchange 72</span><time>2026-09-13 06:41:18</time></div>
+  <div class="bubble"><p>yes, please write that packet</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span><time>2026-09-13 07:25:12</time></div>
+  <div class="bubble"><p>I've stopped before writing the packet, because what I found changes which packet is right — and that's your call, not mine.</p>
+<h4>What the investigation found</h4>
+<p><strong>Markdig itself is sound.</strong> Trim and Native AOT analysis are both clean (ILC ran to completion with zero IL warnings; only the native link failed, for lack of a C++ toolchain).</p>
+<p><strong>But the spike's GO was under-scoped.</strong> Measured on both parsers, beyond its five gates:</p>
+<div class="tw"><table><thead><tr><th>Input</th><th>marked 18.0.5</th><th>Markdig</th></tr></thead><tbody><tr><td><code>x^2 + y^2</code>, <code>a==b==c</code>, <code>++i++</code></td><td>plain text</td><td>superscript / highlight / inserted (default extras)</td></tr><tr><td><code>call tel:+15551234</code></td><td>plain</td><td>autolinked</td></tr><tr><td><code>write mailto:a@b.com</code></td><td><code>mailto:</code> stays visible</td><td><code>mailto:</code> swallowed</td></tr><tr><td><code>~~a ~~b~~</code></td><td>strikes <code>a ~~b</code></td><td>strikes only <code>b</code></td></tr><tr><td><code>~~a~~~</code></td><td>plain</td><td>struck</td></tr><tr><td>``</td><td>`x</td><td>y`</td><td>`` in a table</td><td>cell splits at the pipe</td><td>one code span</td></tr></tbody></table></div>
+<p><strong>None of the 81 upstream cases would catch any of these</strong>, and Markdig's options can't fix the autolink, pairing or table ones. Following the spike's pipeline would pass every test while mangling <code>O(n^2)</code> in real LLM output.</p>
+<p>To be faithful, the Markdig path would need custom parsers re-implementing marked's <code>url</code>, <code>del</code>, <code>table</code> + <code>splitCells</code>, and upstream's LaTeX rules inside Markdig's extension model, plus the adapter. At that point most GFM parsing is <strong>ported marked code anyway</strong>.</p>
+<h4>And the alternative measures cheaper than I claimed</h4>
+<p>I earlier rated "port marked" as very high cost, assuming "thousands of LOC." Measured: marked 18.0.5's lexer on upstream's default path is <strong>~2,100 TS lines</strong> (tokenizer methods ~890, <code>Lexer</code> 495, <code>rules</code> ~470, <code>helpers</code> 167), MIT-licensed. That's about the size of T5.3b's editor.</p>
+<div class="tw"><table><thead><tr><th></th><th>Markdig + adapter</th><th>Port marked's lexer</th></tr></thead><tbody><tr><td>Fidelity</td><td>~10+ rules to get right, unknowns remain</td><td>exact by construction</td></tr><tr><td>Upstream's strict tokenizer + LaTeX extensions</td><td>re-hosted in Markdig's model</td><td>plug into ported hooks unchanged</td></tr><tr><td>Oracle</td><td>needs "structural-only" judgment calls</td><td>real marked, any input — any difference is a bug</td></tr><tr><td>Dependency</td><td>Markdig in Pi.Tui</td><td>none (policy #5 in <code>dependencies.md</code> favours this)</td></tr><tr><td>Wave 6 <code>mermaid.ts</code></td><td>uses Markdig directly</td><td>reuses the lexer, as upstream does</td></tr><tr><td>Main risk</td><td>awkward pairing/table parsers</td><td>JS→.NET regex semantics: 17 `(?:\n</td><td>$)<code>, 16 </code>\p{}<code>, 9 </code>u<code> flags, 6 </code>\b`, 3 lookbehinds — no convention in this repo yet</td></tr></tbody></table></div>
+<p><strong>My recommendation is to port marked's lexer.</strong> The spike did its job: it found out cheaply that the approved approach costs more than it looked.</p>
+<p>Several findings apply either way and will go into the renderer work regardless: chalk 5.6.2 escape semantics (19 cases depend on them), <code>MemoryTerminal</code>'s SGR parser misreading <code>38;2;…</code>, <code>RenderLatex</code> defaulting to <code>true</code>, and capability injection.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span><time>2026-09-13 07:38:49</time></div>
+  <div class="bubble"><p>Decision taken. Now the facts the lexer packet rests on:</p>
+<ul><li><strong>Provenance is clean.</strong> pi pins marked exactly: <code>18.0.5</code> in pi-tui's <code>package.json</code>, resolved in pi's lockfile with integrity <code>sha512-S6Gcv…</code>. <code>reference/</code> so far holds only the <code>pi</code> submodule, with <code>PINNED</code> checked in CI by commit SHA, and <code>AGENTS.md</code> declares everything under <code>reference/</code> read-only.</li><li><strong>No name collisions.</strong> Nothing in Pi.Tui is called <code>Token</code>, <code>Lexer</code>, <code>Tokenizer</code> or <code>Marked</code>; T5.7's LaTeX parser is private and nested. Still, those names are generic for the single <code>Pi.Tui</code> namespace.</li><li><strong>Placement precedent.</strong> <code>dependencies.md §4</code> puts ported libraries <em>inside</em> the consuming project (<code>get-east-asian-width</code> → <code>Pi.Tui/Text/</code>), and <code>solution-layout.md §3</code> maps upstream paths to C# paths.</li><li><strong><code>translation-patterns.md</code> has no regex section.</strong> Fourteen sections plus an "Amending this document" process, so the port needs a new one.</li><li><strong>marked exposes its final composed regexes at runtime</strong> through <code>Lexer.rules</code>. On the GFM default path that's 32 regexes with flags none:22, <code>u</code>:3, <code>gu</code>:4, <code>g</code>:2, <code>i</code>:1. That is a ready-made translation reference: nobody has to re-derive <code>edit()</code> composition by hand.</li><li><strong>Lexer shape confirmed</strong>: <code>lex()</code> normalizes <code>\r\n</code> and <code>\r</code> to <code>\n</code> first, the tokenizer takes an override, extensions register by level with <code>start</code> functions, and <code>marked.d.ts</code> declares 22 token types plus <code>Tokens.Generic</code>.</li></ul>
+<p>What I need next:</p>
+<ol><li><strong>Provenance proof</strong>: the installed package's integrity must equal pi's lockfile before anything is vendored; plus the licence text</li><li><strong>The composed GFM regexes</strong>, dumped for vendoring</li><li><strong>Marked's JSON-visible token shape</strong> on a rich sample (which keys each token type emits, <code>links</code>, the <code>start</code> type), since the oracle compares serialized trees</li><li>The token type declarations in <code>marked.d.ts</code></li><li>The exact text of the doc sections I'll edit: <code>solution-layout.md §3</code> and <code>§6</code>, <code>translation-patterns.md §12</code> and the amending process, and <code>AGENTS.md</code>'s prime rule and "Do not" list</li><li><strong>Preserving today's probe evidence in the repo</strong> — it lives in a session scratchpad, the exact failure that lost the exporter</li></ol></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span><time>2026-09-13 11:54:01</time></div>
+  <div class="bubble"><p>I wrote the T5.9 packet and pushed it to main along with everything it depends on. HEAD matches origin/main at <code>b1b384c</code>, the tree is clean, and the test-parity tui row is unchanged (703/838).</p>
+<p><strong>What went out, in two commits:</strong></p>
+<ul><li><strong><code>21ed4fb</code> — the Markdig reversal.</strong></li><li>marked 18.0.5 is copied into <code>reference/marked/</code> as a read-only spec. I checked it matches pi's lockfile and the published sources exactly.</li><li>The evidence from today's probes is committed.</li><li><code>dependencies.md</code>, <code>AGENTS.md</code>, the parity script and the layout doc are updated.</li><li>T5.8's GO is marked superseded, and I corrected claims in T5.7 and the design sign-off that relied on it.</li><li><strong><code>b1b384c</code> — the packet itself.</strong></li><li><code>ÍmplementationKit/packets/T5.9-marked-lexer.md</code>, 387 lines, rated B.</li><li>A new regex translation guide, §15 in <code>translation-patterns.md</code>.</li><li>A new oracle section in <code>differential-testing.md</code>.</li></ul>
+<p><strong>Two changes from what I described before:</strong></p>
+<ol><li><strong>Pi's parser configuration moved into T5.9.</strong> That's the strict strikethrough override and the LaTeX extensions, lines 7–175 of <code>markdown.ts</code>. The 81 renderer tests only check rendered lines, so they would never catch a translation bug in that regex code; only comparing tokens against marked can. T5.10 is now just the renderer. The recorder reads that code straight out of <code>markdown.ts</code> and strips its TypeScript types, which I tested, so there's no hand copy to drift.</li><li><strong>The tokenizer hooks don't take a plain <code>string</code> in C#.</strong> Marked re-slices the remaining text after every token, which is cheap in JavaScript but a full copy in .NET. I measured the copying alone at 46 ms for 100 KB and 8,081 ms for 1 MB. So the packet requires a no-copy view of the source and a time limit: 1 MB may take at most 15× as long as 100 KB. This is a deliberate break from marked's API shape.</li></ol>
+<p>The packet also adds <code>InternalsVisibleTo</code> to Pi.Tui, which is new to this repo, because pi's configuration is private upstream and the tests need to reach it.</p>
+<p>I also noticed the repo's <code>LICENSE</code> doesn't include pi's MIT notice (© Mario Zechner), and marked's will be needed soon too. That's out of scope here, so I left a task chip for it.</p>
+<p><strong>Prompt for Codex:</strong></p>
+<pre class="code" data-lang="text"><code>Implement ÍmplementationKit/packets/T5.9-marked-lexer.md in C:\MyProjects\PiCSharp. Read AGENTS.md and the packet in full first.
+
+Goal: port the marked 18.0.5 lexer (spec: reference/marked/) to src/Pi.Tui/Marked/, and pi's parser configuration (reference/pi/packages/tui/src/components/markdown.ts lines 7-144 and 171-175) to src/Pi.Tui/Components/MarkdownParser.cs. Prove both token for token against the real marked.
+
+Order of work:
+1. Oracle first, in its own commit: the tools/marked-oracle/ recorder, plus the corpus and fixtures in tests/fixtures/marked/ for the plain, pi and probe configurations. After that commit the corpus may grow but never shrink.
+2. Then the port and tests/Pi.Tui.Tests/Marked/.
+
+Non-negotiables (details in the packet):
+- Write only the packet's target paths. reference/ is read-only.
+- Tokens and links identical for every case in all three configurations, with no exclusions. Report any mismatch you cannot fix; never hide one.
+- Tokenizer methods and extension functions take a no-copy source view, not a copied string (hazard 2). Name it, document it in translation-patterns §15, and state its shape.
+- Prove concurrent lexing with explicit threads. 10,000 levels of nesting must not crash the process. Lexing 1 MB may take at most 15x as long as 100 KB; report all timings.
+- No NuGet dependency, no Markdig, no Node at build or test time. .skip-budget stays 0. The tui row of tools/test-parity.sh must not move, except the permitted MarkdownParser.cs LOC adjustment.
+- dotnet build -c Release with zero warnings; dotnet format --verify-no-changes; dotnet test PiCSharp.slnx -c Release -- --filter-not-trait "Category=E2E", run three times.
+
+Commit directly to main and push, no pull request. Confirm you are on main before pushing, and that HEAD equals origin/main afterwards.
+
+Report: the commits; the coverage report (token types and all 24 tokenizer-method hit counts per configuration); fixture size; timings; the source view's shape; where the nesting limit falls; and everything not delivered or overridden, in a findings file next to the tests as in R4 and R5.</code></pre></div>
+</section>
+<section class="turn user" id="p73">
+  <div class="who"><span class="badge u">Exchange 73</span><time>2026-09-15 13:04:16</time></div>
+  <div class="bubble"><p>done</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span><time>2026-09-15 14:02:14</time></div>
+  <div class="bubble"><p>The concurrency check is still running. It is making progress (process 5472, 177 s of CPU) on only 4 logical processors, with 8 threads and about 0.9 MB allocated per lex.</p>
+<p>Everything left depends on its result. Once it reports I'll fill in that line of the verdict, commit the review to main, and send you the verdict with a remediation prompt for Codex.</p>
+<p>The verdict itself won't change. T5.9 goes back to Codex:</p>
+<ul><li>the port crashes on some ordinary Markdown;</li><li>it gives different tokens from marked even on plain-ASCII input;</li><li>it didn't apply most of the regex rules in <code>translation-patterns.md</code> §15;</li><li>it is several times slower than marked on large documents, and quadratic on lists.</li></ul></div>
+</section>
+<section class="turn user" id="p74">
+  <div class="who"><span class="badge u">Exchange 74</span><time>2026-09-15 15:08:38</time></div>
+  <div class="bubble"><p>fix the issue.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span><time>2026-09-15 15:11:04</time></div>
+  <div class="bubble"><p>Private list of what's next:</p>
+<ol><li>The rerun is working. Patch and build succeeded (0 warnings), and the <code>plain</code> baseline covered 1,721 cases in 5.8 s, about 3.4 ms per lex with Server GC. The threaded phases for <code>plain</code> and <code>pi</code> should take roughly 2–3 minutes in total, well inside the timeout.</li><li>When it completes, fill <code>PENDING-CONCURRENCY</code> with the result.</li><li>Grep for <code>PENDING</code> and re-run <code>git diff --check</code>, since the README changed.</li><li>Commit the review, push to main, and verify HEAD equals origin/main.</li><li>Report what the failure was and how it's fixed, the concurrency result and the verdict, and give Codex's remediation prompt.</li></ol>
+<p>Every remaining item depends on the run's result, so nothing else can start now. I'll continue when the background task reports.</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span><time>2026-09-15 15:13:18</time></div>
+  <div class="bubble"><p>I fixed it: the failed check was my own mistake, not a problem in Codex's port. I also should have dealt with that failure notification instead of replying "No response requested."</p>
+<p><strong>What went wrong.</strong> Exit code 4 meant my 10-minute tool timeout had killed the run. The check ran 8 threads over all 6,881 test inputs twice. That is 110,000 parses, each allocating about 0.9 MB, and this 4-core machine couldn't finish it in time.</p>
+<p><strong>The fix.</strong> The check now uses every fourth input (1,721), one pass, and a .NET setting that handles heavy allocation better. It finished in under a minute: 8 threads sharing one parser matched the single-threaded results with 0 mismatches, for both marked's default setup (<code>plain</code>) and pi's setup (<code>pi</code>). Thread safety holds.</p>
+<p><strong>Pushed as <code>6351804</code></strong> (HEAD matches origin/main):</p>
+<ul><li><strong>Verdict:</strong> T5.9 is returned to Codex. The reasons, with evidence, are in the Status section of the <code>ÍmplementationKit/packets/T5.9-marked-lexer.md</code>.</li><li><strong>Review harness:</strong> <code>tools/marked-oracle/review-2026-09-15/README.md</code> holds the scripts I used, so Codex can rerun the same comparison against real marked.</li><li><strong>Porting rules:</strong> <code>docs/translation-patterns.md</code> gains the rules this review showed were missing:</li><li>JavaScript <code>substring</code> doesn't throw on a bad index, but .NET does;</li><li><code>trim()</code> and <code>toLowerCase()</code> behave differently from their .NET counterparts;</li><li>building regexes on every call is expensive.</li></ul>
+<p><strong>What held.</strong></p>
+<ul><li>Build, tests (three runs), formatting and the parity check all pass.</li><li>Codex's recorded marked output is genuine: re-recording from real marked reproduced it byte for byte.</li><li>Streaming prefixes, the input pi lexes most, had zero differences.</li></ul>
+<p><strong>What failed</strong>, on 6,881 inputs Codex's tests never saw:</p>
+<ul><li><strong>Crashes:</strong> 47 inputs crash the port, the shortest being <code>&gt; - a</code> followed by a plain <code>b</code> line.</li><li><strong>Wrong output:</strong> tokens differ from marked on 346 inputs, some of them plain ASCII. Most of the §15 regex rules were never applied, and pi's own patterns were copied without translation.</li><li><strong>Speed:</strong> lists take quadratic time. A 300 KB list takes marked 502 ms but the port 8,123 ms, allocating 11.8 GB. On a 1 MB document, pi's parser takes 26.7 s against marked's 2.0 s.</li><li><strong>Why Codex's tests missed it:</strong> a loader bug meant 25 of the 26 edge-case inputs from the earlier Markdig probes never reached its test corpus.</li></ul>
+<p><strong>Prompt for Codex:</strong></p>
+<pre class="code" data-lang="text"><code>Remediate T5.9 in C:\MyProjects\PiCSharp. The delivery (e1f5048 oracle, ed89414 port) was returned. Read the Status section of ÍmplementationKit/packets/T5.9-marked-lexer.md in full, then tools/marked-oracle/review-2026-09-15/README.md. The packet's rules, target paths and acceptance criteria still apply. docs/translation-patterns.md §12 and §15 now record the rules this review proved missing. Do not modify tools/marked-oracle/review-2026-09-15/; it is the review's evidence.
+
+Fix, in this order:
+1. Corpus first, in its own commit. Grow tests/fixtures/marked/, never shrink it:
+   - Fix corpus.mjs so the probe files load; they are objects with a cases array.
+   - Add the strict-pairing and table probes from tools/spikes/markdig/probes-2026-09-13/.
+   - Add every input in review-2026-09-15/targeted.mjs.
+   - Build the seeded generator the packet specified: special spaces and emoji beside delimiters, \r\n, tabs, entities.
+   - Report coverage as tokens produced per tokenizer method, not calls.
+   Re-record with the pinned marked, and commit before touching src/.
+2. Make the recorder's integrity check real. It currently falls back to reference/pi/package-lock.json and compares the pin with itself.
+3. The crash. marked can return a raw longer than the remaining source (for "&gt; - a" then a lazy "b" line), and JavaScript substring clamps. Clamp where the lexer consumes a token.
+4. Translate every pattern per §15 instead of copying it: $ to \z, ., \s, astral \p{P}\p{S} (classify by code point), and trim()/IsNullOrWhiteSpace semantics. This includes pi's patterns in MarkdownParser.cs.
+5. Link-reference labels need toLowerCase's full mapping (U+0130, final sigma). IgnoreCase must not let the Kelvin sign match tag names.
+6. Two logic divergences on ASCII input: del with an escaped tilde (~~a\~~b~~), and Tokenizer.ts:438-453 (the checkbox text branch and paragraph wrapper).
+7. Performance:
+   - Build the rules once, as static [GeneratedRegex] members, with a static thread-safe cache for parameterised ones.
+   - Remove the per-line Materialize() in List.
+   - Remove every Materialize() of the remainder in the LaTeX extension.
+8. Smaller items: let Tokenizer subclasses reach the rules; validate extensions in Use(); move TokenJson into the tests.
+
+Acceptance:
+- The committed oracle passes with no exclusions.
+- The review harness (record-fuzz.mjs, markedcheck fuzz, compare.mjs) reports 0 differences and 0 exceptions for plain and pi. The only permitted exception is a difference traced to a Unicode data-version gap, named individually.
+- Harness bench, for both configurations:
+  - the 300 KB list is within 4x the 100 KB list;
+  - the 1 MB document is within 15x the 100 KB document;
+  - Lexer("a") takes under 0.1 ms;
+  - every row is reported against marked.
+- Harness concurrency mode reports 0 mismatches.
+- Build with zero warnings; format passes; tests pass three times.
+- The parity tui row is unchanged, apart from the permitted MarkdownParser.cs LOC.
+- .skip-budget stays 0.
+
+Commit directly to main and push, no pull request. Confirm you are on main, and that HEAD equals origin/main after pushing.
+
+Report in tests/Pi.Tui.Tests/Marked/T5.9-findings.md: what changed for each numbered finding, the new corpus size and coverage, the harness results and timings, and anything not delivered.</code></pre>
+<p>If you'd rather I fix the port myself than send it back to Codex, say so.</p></div>
+</section>
+<section class="turn user" id="p75">
+  <div class="who"><span class="badge u">Exchange 75</span><time>2026-09-15 15:14:02</time></div>
+  <div class="bubble"><p>commit and push all outstanding items</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span><time>2026-09-15 15:15:03</time></div>
+  <div class="bubble"><p>There was nothing left to commit or push. Everything is already on origin/main at <code>6351804</code>.</p>
+<ul><li><strong>Main repository:</strong> no uncommitted or untracked files, no stashes, and 0 commits ahead of or behind origin/main.</li><li><strong>Notices task worktree</strong> (<code>.claude/worktrees/inspiring-cori-fcfa1a</code>): also clean, and none of its commits are missing from main. Its work reached main as <code>09abc5e</code>.</li></ul>
+<p>This round's commits on main:</p>
+<div class="tw"><table><thead><tr><th>Commit</th><th>What</th></tr></thead><tbody><tr><td><code>21ed4fb</code></td><td>Port marked's lexer instead of adopting Markdig; marked vendored into <code>reference/marked/</code></td></tr><tr><td><code>b1b384c</code></td><td>T5.9 packet written</td></tr><tr><td><code>09abc5e</code></td><td>Third-party notices for pi and marked</td></tr><tr><td><code>e1f5048</code>, <code>ed89414</code></td><td>Codex's T5.9 delivery (recorded marked output, then the port)</td></tr><tr><td><code>6351804</code></td><td>T5.9 review: returned, with the review harness and new translation-pattern rules</td></tr></tbody></table></div>
+<p>Two things are still pending but aren't uncommitted changes, so I haven't touched them:</p>
+<ul><li><code>ÁI/ClaudeSession.html</code> doesn't cover this session yet. Say if you want it updated and pushed.</li><li>The finished notices task left a worktree and a local branch, <code>claude/inspiring-cori-fcfa1a</code>, with nothing unmerged in either. I can remove both if you like.</li></ul></div>
+</section>
+
 </main>
 </div>
 <footer><div class="wrap">
 <p style="margin:0 0 6px"><b>Session transcript exported from Claude Code.</b> Prompts and responses only — tool calls, tool results and internal reasoning are excluded as intermediate working detail.</p>
-<p style="margin:0 0 6px">This is a curated record, not a complete one. Bare continuations such as “proceed” are folded into the preceding exchange, keeping the work they triggered without the empty prompt. Short progress narration between tool calls is dropped. A further 10 exchanges were omitted as routine housekeeping.</p>
-<p style="margin:0">Generated 2026-09-13 · 170 entries from 7,356 transcript records.</p>
+<p style="margin:0 0 6px">This is a curated record, not a complete one. Bare continuations such as “proceed” are folded into the preceding exchange, keeping the work they triggered without the empty prompt. Short progress narration between tool calls is dropped. A further 11 exchanges were omitted as routine housekeeping.</p>
+<p style="margin:0">Generated 2026-09-15 · 189 entries from 10,492 transcript records.</p>
 </div></footer>
 </body>
 </html>

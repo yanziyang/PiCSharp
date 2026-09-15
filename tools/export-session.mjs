@@ -145,6 +145,10 @@ function md(src) {
 }
 
 // ---------------------------------------------------------------- parse
+const SYSTEM_REMINDER = new RegExp("<system-reminder>[^]*?</system-reminder>", "g");
+// The harness's placeholder reply when a background-task notice arrives with nothing to add.
+const NO_RESPONSE = new RegExp("^no response requested[.]?$", "i");
+
 const recs = fs.readFileSync(SRC, "utf8").split("\n").filter(Boolean)
   .map(l => { try { return JSON.parse(l); } catch { return null; } }).filter(Boolean);
 
@@ -162,14 +166,19 @@ for (const r of conv) {
       if (t) text = t;
     }
     if (!text) continue;
-    if (/^<(command-name|local-command|system-reminder)/.test(text.trim())) continue;
-    turns.push({ role: "user", text, ts: r.timestamp });
+    // Harness reminders can precede the user's own words in one record. Strip them rather than
+    // dropping the whole turn, which silently lost real prompts such as "done".
+    text = text.replace(SYSTEM_REMINDER, "").trim();
+    if (!text) continue;
+    if (/^<(command-name|local-command)/.test(text)) continue;
+    turns.push({ role: "user", text, ts: r.timestamp, meta: Boolean(r.isMeta) });
     continue;
   }
 
   if (!Array.isArray(c)) continue;
   for (const b of c) {
-    if (b.type === "text" && b.text.trim()) turns.push({ role: "assistant", text: b.text, ts: r.timestamp });
+    if (b.type === "text" && b.text.trim() && !NO_RESPONSE.test(b.text.trim())) turns.push({ role: "assistant", text: b.text, ts: r.timestamp });
+    if (b.type === "tool_use") turns.push({ role: "tool", ts: r.timestamp });
   }
 }
 
@@ -184,6 +193,9 @@ for (const r of conv) {
 //    summary and usage-limit resumption look like user prompts but are not user
 //    intent, and folding them the same way keeps the work they triggered from
 //    being filed under text the user never wrote.
+//    Background-task notices (<task-notification>) and the meta records the harness
+//    injects ("Output token limit hit", "Continue from where you left off") fold the
+//    same way: their replies belong to the exchange whose work they report on.
 //
 // B. Narration is dropped. Short, unstructured assistant blocks that sit between
 //    tool calls ("Building the scaffold now.") are process, not content. The
@@ -197,14 +209,14 @@ const CONTINUATION =
   /^(proceed|continue|go ahead|carry on|go on|next|ok|okay|yes|please proceed)[.!]?$/i;
 
 const HARNESS =
-  /^(this session is being continued from a previous conversation|i hit my usage limit|caveat: the messages below)/i;
+  /^(this session is being continued from a previous conversation|i hit my usage limit|caveat: the messages below|<task-notification>)/i;
 
 const exchanges = [];
 for (const t of turns) {
   if (t.role === "user") {
     const text = t.text.trim();
     if (CONTINUATION.test(text) && exchanges.length) continue;  // A
-    if (HARNESS.test(text)) {
+    if (HARNESS.test(text) || t.meta) {
       // Same harness text, two shapes. Mid-transcript it folds into the
       // preceding exchange like a bare continuation. At position zero there is
       // no preceding exchange to fold into, and dropping it outright would also
@@ -216,6 +228,8 @@ for (const t of turns) {
       continue;
     }
     exchanges.push({ prompt: t, replies: [] });
+  } else if (t.role === "tool") {
+    if (exchanges.length) exchanges[exchanges.length - 1].tools = (exchanges[exchanges.length - 1].tools || 0) + 1;
   } else if (exchanges.length) {
     exchanges[exchanges.length - 1].replies.push(t);
   }
@@ -241,12 +255,18 @@ const HOUSEKEEPING =
 
 const replyText = x => x.replies.map(r => r.text).join("\n");
 
+// Text written between tool calls is not always persisted in the transcript, so an exchange of
+// heavy tool work can look thin from its text alone. Enough tool activity counts as substance.
+const TOOL_WORK_MIN = 10;
+
 function isSubstantive(x, index) {
   if (index === 0) return true;                          // the original brief
+  // Requests about this transcript itself are never content, however long the reply.
+  if (/claudesession/i.test(x.prompt.text)) return false;
   const body = replyText(x);
   const structured = /^#{2,4}\s/m.test(body) || /\n\|.*\|/.test(body);
   if (HOUSEKEEPING.test(x.prompt.text.trim()) && !structured && body.length < 2500) return false;
-  return structured || body.length >= 900;
+  return structured || body.length >= 900 || (x.tools || 0) >= TOOL_WORK_MIN;
 }
 
 const allKept = exchanges.filter(isSubstantive);
