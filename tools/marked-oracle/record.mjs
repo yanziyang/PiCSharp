@@ -29,32 +29,27 @@ if (!pin) die(`cannot parse ${PINNED}`);
 const pinnedVersion = pin[1];
 const pinnedIntegrity = pin[2];
 
+// The integrity npm verified when it installed this copy, read from the lockfiles beside it. It is never taken
+// from reference/pi: that is the lockfile PINNED was copied from, so it would compare the pin with itself.
 function packageIntegrity(packageRoot) {
   const pkg = JSON.parse(fs.readFileSync(path.join(packageRoot, "package.json"), "utf8"));
-  const lockPath = path.join(packageRoot, "package-lock.json");
-  let integrity = pkg._integrity || "";
-  if (!integrity && fs.existsSync(lockPath)) {
-    const lock = JSON.parse(fs.readFileSync(lockPath, "utf8"));
-    integrity = lock.packages?.["node_modules/marked"]?.integrity || "";
+  const nodeModules = path.dirname(packageRoot);
+  for (const lockPath of [path.join(nodeModules, ".package-lock.json"), path.join(path.dirname(nodeModules), "package-lock.json")]) {
+    if (!fs.existsSync(lockPath)) continue;
+    const entry = JSON.parse(fs.readFileSync(lockPath, "utf8")).packages?.["node_modules/marked"];
+    if (entry?.integrity) return { version: pkg.version, integrity: entry.integrity };
   }
-  if (!integrity) {
-    const upstreamLock = path.join(ROOT, "reference/pi/package-lock.json");
-    if (fs.existsSync(upstreamLock)) {
-      const lock = JSON.parse(fs.readFileSync(upstreamLock, "utf8"));
-      integrity = lock.packages?.["node_modules/marked"]?.integrity || "";
-    }
-  }
-  return { version: pkg.version, integrity };
+  return { version: pkg.version, integrity: "" };
 }
 
 let moduleRoot;
 if (requestedModule) {
-  const resolved = path.resolve(requestedModule);
-  moduleRoot = fs.existsSync(path.join(resolved, "package.json")) ? resolved : path.dirname(require.resolve(requestedModule));
+  moduleRoot = path.resolve(requestedModule);
+  if (!fs.existsSync(path.join(moduleRoot, "package.json"))) die(`--marked-module must be an installed marked package directory: ${moduleRoot}`);
 } else {
   const prefix = path.join(scratch, "marked-install");
   fs.mkdirSync(prefix, { recursive: true });
-  execFileSync("npm", ["install", "--ignore-scripts", "--no-package-lock", "--prefix", prefix, `marked@${pinnedVersion}`], { stdio: "inherit" });
+  execFileSync("npm", ["install", "--ignore-scripts", "--prefix", prefix, `marked@${pinnedVersion}`], { stdio: "inherit", shell: process.platform === "win32" });
   moduleRoot = path.join(prefix, "node_modules", "marked");
 }
 const packageInfo = packageIntegrity(moduleRoot);

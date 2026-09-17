@@ -2,6 +2,7 @@ import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import * as T from "./review-2026-09-15/targeted.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const OUT = path.join(ROOT, "tests/fixtures/marked/corpus.jsonl");
@@ -21,11 +22,6 @@ function add(id, source, kind = "generated") {
 const spike = JSON.parse(fs.readFileSync(spikePath, "utf8"));
 for (const entry of spike.cases) add(entry.id, entry.source, entry.kind ?? "spike");
 
-for (const file of [edgePath, extrasPath]) {
-  const entries = JSON.parse(fs.readFileSync(file, "utf8"));
-  for (let i = 0; i < entries.length; i++) add(`probe-${path.basename(file, ".json")}-${String(i + 1).padStart(3, "0")}`, entries[i], "probe");
-}
-
 const seeds = [
   ["blocks-basic", "\n\n    indented\n    code\n\n~~~csharp\nclass C {}\n~~~\n\n# heading\n\n---\n\n> quote\n> continuation\n\n- one\n- two"],
   ["blocks-html", "<div>\ncontent\n</div>\n\n<!-- comment -->\n\n<script>\nalert(1)\n</script>"],
@@ -39,7 +35,7 @@ const seeds = [
   ["inline-escapes", "\\*not em\\* \\_not_ \\#hash \\| pipe \\~tilde"],
   ["inline-code", "`a  b` and `` `code` `` and ```not a fence```"],
   ["inline-breaks", "hard  \nbreak\nnext"],
-  ["special-chars", "CJK *文字* 😀 _emoji_\u2028line\u2029next\u0085 NBSP\u00a0 FEFF\ufeff"],
+  ["special-chars", "CJK *文字* 😀 _emoji_" + T.LS + "line" + T.PS + "next" + T.NEL + " NBSP" + T.NBSP + " FEFF" + T.BOM],
   ["latex-inline", "math $x^2 + y^2$ and \\(a \\to b\\) and \\[c\\]"],
   ["latex-block", "before\n\n$$\nx^2\n$$\n\nafter\n\n\\[\ny^2\n\\]"],
   ["latex-pending", "streaming $\\mathbb{C}^3 and \\[x^2"],
@@ -92,6 +88,78 @@ const repeated = [
 let large = "";
 while (large.length < 50_000) large += repeated[large.length % repeated.length];
 add("large-50kb", large.slice(0, 50_000), "large");
+
+// ---------------------------------------------------------------------------------------------------------
+// Added 2026-09-15 by the T5.9 review. Appended after the original cases, which keep their order and content.
+// The two probe files hold { metadata, cases }; the original loop read them as arrays and added nothing.
+for (const file of [edgePath, extrasPath]) {
+  const document = JSON.parse(fs.readFileSync(file, "utf8"));
+  for (const entry of document.cases) add(`probe-${path.basename(file, ".json")}-${entry.id}`, entry.source, "probe");
+}
+
+// Inputs of tools/spikes/markdig/probes-2026-09-13/strictprobe and tableprobe, which the original never read.
+const strictAndTableProbes = [
+  ["st-lazy-pairing", "~~a ~~b~~"],
+  ["st-two-pairs", "~~a~~ ~~b~~"],
+  ["st-three-openers", "~~a ~~b ~~c~~"],
+  ["st-tilde-after", "~~a~~~"],
+  ["st-nested-strong-tilde-after", "~~**a**~~~"],
+  ["st-nested-strong", "~~**a**~~"],
+  ["tb-escaped-pipe", "| a |\n|---|\n| x \\| y |"],
+  ["tb-align", "| l | c | r |\n|:--|:-:|--:|\n| 1 | 2 | 3 |"],
+  ["tb-overflow", "| a |\n|---|\n| x | y |"],
+  ["tb-underflow", "| a | b |\n|---|---|\n| x |"],
+  ["tb-header-only", "| a | b |\n|---|---|"],
+  ["tb-code-pipe", "| a |\n|---|\n| `x|y` |"],
+];
+for (const [id, source] of strictAndTableProbes) add(`probe-${id}`, source, "probe");
+
+// Inputs aimed at each JavaScript-versus-.NET difference in docs/translation-patterns.md section 15.
+for (const [group, sources] of Object.entries(T.targeted)) {
+  sources.forEach((source, i) => add(`review-${group}-${String(i).padStart(3, "0")}`, source, "review"));
+}
+
+// A seeded generated set: character-level and line-structured Markdown, including special spaces, emoji,
+// astral letters, Unicode digits and case-mapping characters beside delimiters, tabs and \r\n.
+function seeded(seed) {
+  let state = seed >>> 0;
+  return () => {
+    state = (state + 0x6d2b79f5) >>> 0;
+    let t = state;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+const random = seeded(591);
+const pick = (list) => list[Math.floor(random() * list.length)];
+const between = (lo, hi) => lo + Math.floor(random() * (hi - lo + 1));
+const atoms = [
+  "a", "b", "c", "x", "1", " ", " ", "  ", "\n", "\n", "\n\n", "\t",
+  "*", "*", "**", "_", "_", "__", "~", "~~", "`", "``", "```", "#", "# ", ">", "> ", "-", "- ", "+", "1. ", "2) ", "=", "---",
+  "|", "| ", ":", ":-", "[", "]", "(", ")", "![", "](", "]:", "<", ">", "\\", "$", "$$", "\\(", "\\)", "\\[", "\\]",
+  "&", "&amp;", "@", ".", "/", "\"", "'", "!", "?", ",", "^", "http://", "https://", "www.", "a@b.co", "<div>", "</div>",
+  "<span>", "<!--", "-->", "<a href=\"x\">", "</a>", "[x]: /u", "[x]", "[ ] ", "[x] ",
+  T.LS, T.PS, T.NEL, T.NBSP, T.BOM, T.EMOJI, T.MATHA, T.CJK, T.FW3, T.AR3, T.KELVIN, T.IDOT, T.E_ACUTE, "\r", "\r\n",
+];
+const inlineAtoms = atoms.filter((atom) => !atom.includes("\n") && !atom.includes("\r"));
+const prefixes = ["", "", "", "# ", "## ", "> ", "> > ", "- ", "* ", "1. ", "2) ", "    ", "\t", "  - ", "| ", "```", "~~~", "$$", "[a]: ", "- [ ] ", "---", "<div>"];
+const suffixes = ["", "", "", " |", "  ", "\\", "```", "$$", " #"];
+const line = () => {
+  let text = pick(prefixes);
+  for (let n = between(0, 8); n > 0; n--) text += pick(inlineAtoms);
+  return text + pick(suffixes);
+};
+for (let i = 0; i < 500; i++) {
+  let text = "";
+  for (let n = between(1, 30); n > 0; n--) text += pick(atoms);
+  add(`fuzz-char-${String(i).padStart(3, "0")}`, text, "fuzz");
+}
+for (let i = 0; i < 500; i++) {
+  let text = line();
+  for (let n = between(0, 6); n > 0; n--) text += pick(["\n", "\n", "\n\n", "\r\n", "\n  ", "\n> "]) + line();
+  add(`fuzz-line-${String(i).padStart(3, "0")}`, text, "fuzz");
+}
 
 const lines = cases.map(entry => JSON.stringify(entry)).join("\n") + "\n";
 fs.mkdirSync(path.dirname(OUT), { recursive: true });
