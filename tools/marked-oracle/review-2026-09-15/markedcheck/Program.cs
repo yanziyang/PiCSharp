@@ -1,6 +1,8 @@
 using System.Diagnostics;
 using System.Text;
+using System.Reflection;
 using System.Text.Json.Nodes;
+using System.Text.RegularExpressions;
 using Pi.Tui;
 
 // Independent verification harness for the T5.9 marked port, run against the built Pi.Tui.dll.
@@ -13,9 +15,11 @@ switch (mode)
     case "concurrency": return Concurrency(dir, args.Length > 2 ? int.Parse(args[2], System.Globalization.CultureInfo.InvariantCulture) : 1, args.Length > 3 ? int.Parse(args[3], System.Globalization.CultureInfo.InvariantCulture) : 2);
     case "coverage": return Coverage(args.Length > 1 ? args[1] : "");
     case "overhead": return Overhead();
+    case "regex": return RegexCheck(dir);
+    case "nesting": return Nesting();
     case "trace": return Trace(args.Skip(1).ToArray());
     default:
-        Console.Error.WriteLine("usage: fuzz|bench <dir> | concurrency <dir> [stride] [passes] | coverage <inputs.jsonl> | overhead");
+        Console.Error.WriteLine("usage: fuzz|bench|regex <dir> | concurrency <dir> [stride] [passes] | coverage <inputs.jsonl> | overhead | nesting");
         return 2;
 }
 
@@ -128,15 +132,17 @@ static int Concurrency(string dir, int stride, int passes)
 static int Coverage(string inputsFile)
 {
     var inputs = ReadInputs(inputsFile);
-    var tokenizer = new ProducedCounter();
-    var parser = new Marked();
-    parser.SetOptions(new MarkedOptions { Tokenizer = tokenizer });
-    foreach (var (_, source) in inputs)
-    {
-        try { _ = parser.Lexer(source); } catch (Exception) { }
-    }
     Console.WriteLine($"tokens produced (non-null returns) over {inputs.Length} cases of {Path.GetFileName(inputsFile)}:");
-    Console.WriteLine("  " + string.Join(", ", ProducedCounter.Names.Select(name => $"{name}={tokenizer.Produced.GetValueOrDefault(name)}")));
+    foreach (var configuration in new[] { "plain", "pi" })
+    {
+        var tokenizer = new ProducedCounter();
+        var parser = configuration == "plain" ? new Marked().SetOptions(new MarkedOptions { Tokenizer = tokenizer }) : MarkdownParser.CreateParserForTests(tokenizer);
+        foreach (var (_, source) in inputs)
+        {
+            try { _ = parser.Lexer(source); } catch (Exception) { }
+        }
+        Console.WriteLine($"  {configuration}: " + string.Join(", ", ProducedCounter.Names.Select(name => $"{name}={tokenizer.Produced.GetValueOrDefault(name)}")));
+    }
     return 0;
 }
 
@@ -156,6 +162,138 @@ static int Trace(string[] sources)
         }
     }
     return 0;
+}
+
+// Runs every generated regex over the inputs in <dir>/inputs.json and writes match and group offsets to
+// <dir>/cs.jsonl, for compare-regexes.mjs to check against record-regexes.mjs's JavaScript offsets.
+static int RegexCheck(string dir)
+{
+    var manifest = JsonNode.Parse(File.ReadAllText(Path.Combine(dir, "manifest.json")))!.AsArray();
+    var inputs = JsonNode.Parse(File.ReadAllText(Path.Combine(dir, "inputs.json")))!.AsArray().Select(node => node!.GetValue<string>()).ToArray();
+    var type = typeof(Marked).Assembly.GetType("Pi.Tui.MarkedRegexes", throwOnError: true)!;
+    using var writer = new StreamWriter(Path.Combine(dir, "cs.jsonl"), false, new UTF8Encoding(false)) { NewLine = ((char)10).ToString() };
+    var pairs = 0;
+    foreach (var entry in manifest)
+    {
+        var name = entry!["name"]!.GetValue<string>();
+        var flags = entry["flags"]!.GetValue<string>();
+        var global = flags.Contains('g');
+        var sticky = flags.Contains('y');
+        var regex = (Regex)type.GetMethod(name, BindingFlags.Static | BindingFlags.NonPublic)!.Invoke(null, null)!;
+        for (var n = 0; n < inputs.Length; n++)
+        {
+            var input = inputs[n];
+            var results = new JsonArray();
+            if (sticky)
+            {
+                // A sticky pattern is asked at every start that is not inside a surrogate pair.
+                for (var start = 0; start <= input.Length && results.Count < 100; start++)
+                {
+                    if (start > 0 && start < input.Length && char.IsLowSurrogate(input[start]) && char.IsHighSurrogate(input[start - 1])) continue;
+                    if (regex.Match(input, start) is { Success: true } match) results.Add(Offsets(match));
+                }
+            }
+            else
+            {
+                for (var match = regex.Match(input); match.Success; match = match.NextMatch())
+                {
+                    results.Add(Offsets(match));
+                    if (!global || results.Count >= 100) break;
+                }
+            }
+            if (results.Count == 0) continue;
+            pairs++;
+            writer.WriteLine(new JsonObject { ["p"] = name, ["n"] = n, ["r"] = results }.ToJsonString());
+        }
+    }
+    Console.WriteLine($"patterns {manifest.Count}, inputs {inputs.Length}, matching pairs {pairs}");
+    return 0;
+}
+
+static JsonArray Offsets(Match match)
+{
+    var row = new JsonArray();
+    foreach (Group group in match.Groups)
+    {
+        row.Add(group.Success ? new JsonArray(JsonValue.Create(group.Index), JsonValue.Create(group.Index + group.Length)) : null);
+    }
+    return row;
+}
+
+// Lexes nested blockquotes, lists and emphasis on threads with 256 KB and 1 MB stacks, which hold only a few hundred
+// levels, up to and past the port's 5,000-level limit.
+static int Nesting()
+{
+    foreach (var kilobytes in new[] { 256, 1024 })
+    {
+        foreach (var (name, parser) in Parsers())
+        {
+            foreach (var (shape, make) in NestingShapes())
+            {
+                foreach (var depth in new[] { 100, 1_000, 3_500, 5_000, 5_001, 10_000 })
+                {
+                    if (shape == "em" && depth > 5_001) continue;
+                    var source = make(depth);
+                    var outcome = "";
+                    var thread = new Thread(
+                        () =>
+                        {
+                            var stopwatch = Stopwatch.StartNew();
+                            try
+                            {
+                                outcome = $"ok, token tree depth {TreeDepth(parser.Lexer(source))}";
+                            }
+                            catch (InsufficientExecutionStackException exception)
+                            {
+                                outcome = $"{exception.GetType().Name}: {exception.Message}";
+                            }
+                            outcome = $"{stopwatch.Elapsed.TotalMilliseconds,9:F1} ms {outcome}";
+                        },
+                        kilobytes * 1024);
+                    thread.Start();
+                    thread.Join();
+                    Console.WriteLine($"stack={kilobytes,4} KB {name,-5} {shape,-5} depth={depth,6} {outcome}");
+                }
+            }
+        }
+    }
+    return 0;
+}
+
+// Emphasis alternates * and _ with spaces, which marked nests one level per delimiter.
+static (string Name, Func<int, string> Make)[] NestingShapes() =>
+[
+    ("quote", depth => string.Concat(Enumerable.Repeat("> ", depth)) + "leaf"),
+    ("list", depth => string.Concat(Enumerable.Repeat("- ", depth)) + "leaf"),
+    ("em", depth =>
+    {
+        var delimiters = Enumerable.Range(0, depth).Select(level => level % 2 == 0 ? "*" : "_").ToArray();
+        return string.Concat(delimiters.Select(delimiter => delimiter + "a ")) + "leaf" + string.Concat(delimiters.Reverse().Select(delimiter => " b" + delimiter));
+    }),
+];
+
+// Walks the token tree without recursion.
+static int TreeDepth(IEnumerable<Token> tokens)
+{
+    var pending = new Stack<(Token Token, int Depth)>(tokens.Select(token => (token, 1)));
+    var deepest = 0;
+    while (pending.TryPop(out var entry))
+    {
+        deepest = Math.Max(deepest, entry.Depth);
+        IEnumerable<Token>? children = entry.Token switch
+        {
+            Tokens.List list => list.Items,
+            Tokens.ListItem item => item.Children,
+            Tokens.Blockquote quote => quote.Children,
+            Tokens.Paragraph paragraph => paragraph.Children,
+            Tokens.Em em => em.Children,
+            Tokens.Strong strong => strong.Children,
+            Tokens.Text text => text.Children,
+            _ => null,
+        };
+        foreach (var child in children ?? []) pending.Push((child, entry.Depth + 1));
+    }
+    return deepest;
 }
 
 static int Overhead()

@@ -1,10 +1,10 @@
-// Ported from marked 18.0.5; see LICENSE in this directory.
+// Serialises the port's tokens into marked's JSON shape, so tests compare them with the recorded oracle.
 using System.Text.Json.Nodes;
 
-namespace Pi.Tui;
+namespace Pi.Tui.Tests;
 
 /// <summary>Serialises the mutable C# token model into marked's exact JSON shape.</summary>
-public static class TokenJson
+internal static class TokenJson
 {
     /// <summary>Creates a JSON node with the same keys marked emits for a token.</summary>
     public static JsonObject ToObject(Token token)

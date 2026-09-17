@@ -346,6 +346,22 @@ depends on, so **a pattern copied verbatim is a defect until shown otherwise.**
   rule set for every `Lexer`, costing 2.7 to 6.7 ms and about 0.9 MB for `Lexer("a")` before a
   character was lexed (measured 2026-09-15). Fixed patterns belong in static `[GeneratedRegex]`
   members, and parameterised ones in a static, thread-safe cache.
+- Watch for strings grown with `+=` or rebuilt for every match. marked appends to token text with `+=` when
+  it merges tokens, and rebuilds its masked copy of the inline source for each masked match. V8's rope
+  strings make both cheap; ported literally, both are quadratic. Before the fix, a 200 KB paragraph took 1.8 s
+  and 4.5 GB, and four times the snake_case text took 32 times as long (measured 2026-09-16). Edit a buffer
+  in place for per-match rewrites, and append to a builder that materialises once.
+- **Recursion needs a stack as deep as V8's.** marked recurses once per nesting level, and on Node 24 it lexes
+  2,000 to 3,500 levels of blockquotes, lists or emphasis before V8 throws a `RangeError`. A .NET thread with
+  1 MB of stack holds only a few hundred levels of the port. There, `RuntimeHelpers.EnsureSufficientExecutionStack()`
+  throws where marked still returns tokens (measured 2026-09-16). The marked port calls
+  `RuntimeHelpers.TryEnsureSufficientExecutionStack()` on every recursive entry. When the stack is nearly full,
+  the call continues on a new thread with 64 MB of stack. A fixed limit of 5,000 levels, above V8's, then
+  throws `InsufficientExecutionStackException`, so the calling thread's stack size no longer decides.
+- **Deep recursion makes garbage expensive:** every collection walks the whole stack. marked's emphasis scan
+  reads capture groups at every delimiter it passes. Ported with a `Match` per delimiter, 3,000 levels of nested
+  emphasis allocated 6.8 GB and spent 5.9 s in GC pauses, and the pauses grew with the cube of the depth.
+  `EnumerateMatches` and span `IsMatch` allocate nothing per match, which brought that down to 212 MB and 0.4 s.
 - Do not use `RegexOptions.NonBacktracking` to defend against slow patterns. On .NET 10 it throws
   `NotSupportedException` for lookahead, lookbehind and backreferences, which JavaScript patterns use
   freely.
@@ -364,6 +380,34 @@ depends on, so **a pattern copied verbatim is a defect until shown otherwise.**
   `Match.Index` stays relative to the whole input. `Regex.Match(input, startat)` is **not** equivalent:
   `^` does not match at `startat`, and lookbehind sees the text before it. That suits `lastIndex`
   iteration and is the wrong tool for substring semantics. Both verified on .NET 10, 2026-09-13.
+
+**Generated translation, checked against JavaScript.**
+
+marked's patterns are not translated by hand. `tools/marked-oracle/generate-regexes.mjs` reads the final
+patterns from `reference/marked/src/rules.ts` and pi's from `markdown.ts`, applies the rules above, and
+writes static `[GeneratedRegex]` members to `src/Pi.Tui/Marked/MarkedRegexes.g.cs`. It also enforces rules
+the list above does not spell out:
+
+- `\p{…}` classes become explicit BMP ranges plus surrogate-pair alternatives computed from V8's own Unicode
+  data, so the port classifies characters with the oracle's Unicode version. A negated class under `u`
+  matches a whole surrogate pair or a lone surrogate, never half of a pair.
+- The `i` flag becomes the exact case closure of each class and literal under ECMA-262 `Canonicalize`, which
+  never folds a non-ASCII character to an ASCII one. `RegexOptions.IgnoreCase` is not used: .NET matches the
+  Kelvin sign against `k`. A backreference under `i` becomes `(?i:\1)` only when the referenced group cannot
+  contain `k`.
+- Named groups become numbered groups in JavaScript's order. .NET numbers named groups after every unnamed
+  one, so `match[2]` would otherwise read a different group.
+- A class range never starts or ends with an escaped character. .NET reads `[\--9]` as three literals, not
+  as a range from `-` to `9`, so the generator writes such endpoints as hex escapes.
+- JavaScript clears the captures inside a repeated group on every iteration, while .NET keeps the last
+  capture. No pattern can translate this, so code must never read a group nested inside a repeated group.
+- Where a tokenizer only needs to know which capture group of a scan matched, the generator also emits sticky
+  patterns (`\G`) built from the same alternatives, so the scan can run without captures. The generator asserts
+  the pattern shape that makes this exact, and stops if a marked update changes that shape.
+
+The review harness in `tools/marked-oracle/review-2026-09-15/` checks every generated pattern against its
+JavaScript original over thousands of inputs, and each sticky pattern at every start position. Match and group
+offsets must agree, except for the capture-reset case above.
 
 The recorded oracle, not this list, is the arbiter. When a port proves a rule missing here, add it.
 

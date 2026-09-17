@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.ExceptionServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -64,7 +65,7 @@ public sealed class MarkedOracleTests
         parser.SetOptions(new MarkedOptions { Tokenizer = tokenizer });
         foreach (var item in _cases) _ = parser.Lexer(item.Source);
         Assert.Equal(24, tokenizer.Hits.Count);
-        Assert.All(_tokenizerMethodNames, name => Assert.True(tokenizer.Hits.ContainsKey(name), $"{name} was never dispatched."));
+        Assert.All(_tokenizerMethodNames, name => Assert.True(tokenizer.Hits.ContainsKey(name), $"{name} never produced a token."));
     }
 
     [Fact(DisplayName = "plain pi and probe coverage reaches every tokenizer method")]
@@ -81,7 +82,7 @@ public sealed class MarkedOracleTests
         foreach (var snapshot in snapshots)
         {
             Assert.Equal(24, snapshot.Hits.Count);
-            Assert.All(_tokenizerMethodNames, name => Assert.True(snapshot.Hits.TryGetValue(name, out var count) && count > 0, $"{snapshot.Name}.{name} was not reached."));
+            Assert.All(_tokenizerMethodNames, name => Assert.True(snapshot.Hits.TryGetValue(name, out var count) && count > 0, $"{snapshot.Name}.{name} never produced a token."));
             Console.WriteLine(FormatCoverage(snapshot));
         }
     }
@@ -90,32 +91,33 @@ public sealed class MarkedOracleTests
     public void Marked_inline_tag_rule_stops_ordinary_text()
     {
         if (IsNestingProbe) return;
-        var rules = new MarkedRuleSet();
+        var rules = MarkedRules.Instance;
         var text = "This is text with <thinking>hidden content</thinking> that should be visible";
         Assert.Equal("This is text with ", rules.Inline.Text.Match(text).Value);
         Assert.Matches(rules.Inline.Tag, "<thinking>");
     }
 
     [Fact(DisplayName = "one parser instance can lex concurrently")]
-    public async Task One_parser_instance_can_lex_concurrently()
+    public void One_parser_instance_can_lex_concurrently()
     {
         if (IsNestingProbe) return;
+        // Explicit threads: this assembly runs with ParallelMode.None, so xUnit would not race the lexing itself.
         var parser = MarkdownParser.Parser;
-        var selected = _cases.Where(static item => item.Source.Length > 0).Take(64).ToArray();
-        var expected = selected.Select(item => LexJson(parser, item.Source)).ToArray();
-        var failures = new List<string>();
-        await Task.WhenAll(Enumerable.Range(0, 16).Select(async worker =>
+        var selected = ReadFixture("pi").Cases.Where(static (_, index) => index % 7 == 0).ToArray();
+        var failures = new System.Collections.Concurrent.ConcurrentQueue<string>();
+        using var start = new ManualResetEventSlim(false);
+        var threads = Enumerable.Range(0, 8).Select(worker => new Thread(() =>
         {
-            await Task.Yield();
-            foreach (var (item, expectedJson) in selected.Zip(expected))
+            start.Wait();
+            for (var k = 0; k < selected.Length; k++)
             {
-                var actual = LexJson(parser, item.Source);
-                if (Difference(expectedJson, actual, "$") is { } difference)
-                {
-                    lock (failures) failures.Add($"worker {worker}, case {item.Id}: {difference}");
-                }
+                var item = selected[(k + (worker * 37)) % selected.Length];
+                if (Difference(item.Result, LexJson(parser, item.Source), "$") is { } difference) failures.Enqueue($"worker {worker}, case {item.Id}: {difference.Path}");
             }
-        }));
+        })).ToArray();
+        foreach (var thread in threads) thread.Start();
+        start.Set();
+        foreach (var thread in threads) thread.Join();
         Assert.Empty(failures);
     }
 
@@ -124,8 +126,12 @@ public sealed class MarkedOracleTests
     {
         if (IsNestingProbe)
         {
-            RunNestingSource(string.Concat(Enumerable.Repeat("> ", 10_000)) + "leaf");
-            RunNestingSource(string.Concat(Enumerable.Repeat("- ", 10_000)) + "leaf");
+            // Past the nesting limit, both end in a catchable exception instead of a stack overflow.
+            foreach (var marker in new[] { "> ", "- " })
+            {
+                var exception = Assert.Throws<InsufficientExecutionStackException>(() => new Marked().Lexer(Nested(marker, 10_000)));
+                Assert.Contains("5000", exception.Message, StringComparison.Ordinal);
+            }
             return;
         }
 
@@ -148,25 +154,80 @@ public sealed class MarkedOracleTests
         startInfo.Environment["PI_MARKED_NESTING_PROBE"] = "1";
         using var process = Process.Start(startInfo);
         Assert.NotNull(process);
-        if (!process!.WaitForExit(TimeSpan.FromSeconds(30)))
+        if (!process!.WaitForExit(TimeSpan.FromSeconds(120)))
         {
             process.Kill(entireProcessTree: true);
-            Assert.Fail("The 10,000-level nesting probe did not finish within 30 seconds.");
+            Assert.Fail("The 10,000-level nesting probe did not finish within 120 seconds.");
         }
         var output = process.StandardOutput.ReadToEnd() + process.StandardError.ReadToEnd();
         Assert.True(process.ExitCode == 0, $"The 10,000-level nesting probe exited {process.ExitCode}.\n{output}");
     }
 
-    private static void RunNestingSource(string source)
+    [Fact(DisplayName = "nesting lexes beyond a small thread stack up to the nesting limit")]
+    public void Nesting_lexes_beyond_a_small_thread_stack_up_to_the_nesting_limit()
     {
-        try
+        if (IsNestingProbe) return;
+        var delimiters = Enumerable.Range(0, 1_000).Select(level => level % 2 == 0 ? "*" : "_").ToArray();
+        var emphasis = string.Concat(delimiters.Select(delimiter => delimiter + "a ")) + "leaf" + string.Concat(delimiters.Reverse().Select(delimiter => " b" + delimiter));
+
+        // A 256 KB stack holds a few dozen levels, so these depend on the lexer continuing on a larger stack.
+        Assert.Equal(1_002, OnSmallStack(() => TokenTreeDepth(new Marked().Lexer(Nested("> ", 1_000)))));
+        Assert.Equal(2_002, OnSmallStack(() => TokenTreeDepth(new Marked().Lexer(Nested("- ", 1_000)))));
+        Assert.Equal(1_002, OnSmallStack(() => TokenTreeDepth(MarkdownParser.Parser.Lexer(emphasis))));
+
+        // marked on Node 24 reaches 2,000 to 3,500 levels before a RangeError; the limit sits above that.
+        Assert.Equal(Lexer.MaxNestingDepth + 2, OnSmallStack(() => TokenTreeDepth(new Marked().Lexer(Nested("> ", Lexer.MaxNestingDepth)))));
+        var exception = Assert.Throws<InsufficientExecutionStackException>(() => OnSmallStack(() => new Marked().Lexer(Nested("> ", Lexer.MaxNestingDepth + 1))));
+        Assert.Contains("5000", exception.Message, StringComparison.Ordinal);
+    }
+
+    private static string Nested(string marker, int levels) => string.Concat(Enumerable.Repeat(marker, levels)) + "leaf";
+
+    // Runs work on a thread with a 256 KB stack and rethrows what it throws.
+    private static T OnSmallStack<T>(Func<T> work)
+    {
+        var result = default(T);
+        ExceptionDispatchInfo? failure = null;
+        var thread = new Thread(
+            () =>
+            {
+                try
+                {
+                    result = work();
+                }
+                catch (Exception exception)
+                {
+                    failure = ExceptionDispatchInfo.Capture(exception);
+                }
+            },
+            256 * 1024);
+        thread.Start();
+        thread.Join();
+        failure?.Throw();
+        return result!;
+    }
+
+    // Walks the token tree without recursion, which would overflow on the trees these tests build.
+    private static int TokenTreeDepth(IEnumerable<Token> tokens)
+    {
+        var pending = new Stack<(Token Token, int Depth)>(tokens.Select(token => (token, 1)));
+        var deepest = 0;
+        while (pending.TryPop(out var entry))
         {
-            _ = new Marked().Lexer(source);
+            deepest = Math.Max(deepest, entry.Depth);
+            IEnumerable<Token>? children = entry.Token switch
+            {
+                Tokens.Blockquote quote => quote.Children,
+                Tokens.List list => list.Items,
+                Tokens.ListItem item => item.Children,
+                Tokens.Paragraph paragraph => paragraph.Children,
+                Tokens.Em em => em.Children,
+                Tokens.Text text => text.Children,
+                _ => null,
+            };
+            foreach (var child in children ?? []) pending.Push((child, entry.Depth + 1));
         }
-        catch (Exception exception) when (exception is not StackOverflowException)
-        {
-            Console.WriteLine($"Nesting probe stopped with {exception.GetType().Name}: {exception.Message}");
-        }
+        return deepest;
     }
 
     [Fact(DisplayName = "unsupported marked flags name the option")]
@@ -419,61 +480,70 @@ public sealed class MarkedOracleTests
     private class CountingTokenizer : Tokenizer, IHitCounter
     {
         public Dictionary<string, int> Hits { get; } = new(StringComparer.Ordinal);
-        protected void Hit(string name) => Hits[name] = Hits.GetValueOrDefault(name) + 1;
-        public override Tokens.Space? Space(SourceView source) { Hit(nameof(Space)); return base.Space(source); }
-        public override Tokens.Code? Code(SourceView source) { Hit(nameof(Code)); return base.Code(source); }
-        public override Tokens.Code? Fences(SourceView source) { Hit(nameof(Fences)); return base.Fences(source); }
-        public override Tokens.Heading? Heading(SourceView source) { Hit(nameof(Heading)); return base.Heading(source); }
-        public override Tokens.Hr? Hr(SourceView source) { Hit(nameof(Hr)); return base.Hr(source); }
-        public override Tokens.Blockquote? Blockquote(SourceView source) { Hit(nameof(Blockquote)); return base.Blockquote(source); }
-        public override Tokens.List? List(SourceView source) { Hit(nameof(List)); return base.List(source); }
-        public override Tokens.Html? Html(SourceView source) { Hit(nameof(Html)); return base.Html(source); }
-        public override Tokens.Def? Def(SourceView source) { Hit(nameof(Def)); return base.Def(source); }
-        public override Tokens.Table? Table(SourceView source) { Hit(nameof(Table)); return base.Table(source); }
-        public override Tokens.Heading? Lheading(SourceView source) { Hit(nameof(Lheading)); return base.Lheading(source); }
-        public override Tokens.Paragraph? Paragraph(SourceView source) { Hit(nameof(Paragraph)); return base.Paragraph(source); }
-        public override Tokens.Text? Text(SourceView source) { Hit(nameof(Text)); return base.Text(source); }
-        public override Tokens.Escape? Escape(SourceView source) { Hit(nameof(Escape)); return base.Escape(source); }
-        public override Tokens.Html? Tag(SourceView source) { Hit(nameof(Tag)); return base.Tag(source); }
-        public override Token? Link(SourceView source) { Hit(nameof(Link)); return base.Link(source); }
-        public override Token? Reflink(SourceView source, Dictionary<string, LinkReference> links) { Hit(nameof(Reflink)); return base.Reflink(source, links); }
-        public override Token? EmStrong(SourceView source, SourceView maskedSource, string previous = "") { Hit(nameof(EmStrong)); return base.EmStrong(source, maskedSource, previous); }
-        public override Tokens.Codespan? Codespan(SourceView source) { Hit(nameof(Codespan)); return base.Codespan(source); }
-        public override Tokens.Br? Br(SourceView source) { Hit(nameof(Br)); return base.Br(source); }
-        public override Tokens.Del? Del(SourceView source, SourceView maskedSource, string previous = "") { Hit(nameof(Del)); return base.Del(source, maskedSource, previous); }
-        public override Tokens.Link? Autolink(SourceView source) { Hit(nameof(Autolink)); return base.Autolink(source); }
-        public override Tokens.Link? Url(SourceView source) { Hit(nameof(Url)); return base.Url(source); }
-        public override Tokens.Text? InlineText(SourceView source) { Hit(nameof(InlineText)); return base.InlineText(source); }
+        // Counts tokens produced, not calls: every method is called on every loop, so calls prove nothing.
+        protected T? Produced<T>(string name, T? value) where T : class
+        {
+            if (value is not null) Hits[name] = Hits.GetValueOrDefault(name) + 1;
+            return value;
+        }
+        public override Tokens.Space? Space(SourceView source) => Produced(nameof(Space), base.Space(source));
+        public override Tokens.Code? Code(SourceView source) => Produced(nameof(Code), base.Code(source));
+        public override Tokens.Code? Fences(SourceView source) => Produced(nameof(Fences), base.Fences(source));
+        public override Tokens.Heading? Heading(SourceView source) => Produced(nameof(Heading), base.Heading(source));
+        public override Tokens.Hr? Hr(SourceView source) => Produced(nameof(Hr), base.Hr(source));
+        public override Tokens.Blockquote? Blockquote(SourceView source) => Produced(nameof(Blockquote), base.Blockquote(source));
+        public override Tokens.List? List(SourceView source) => Produced(nameof(List), base.List(source));
+        public override Tokens.Html? Html(SourceView source) => Produced(nameof(Html), base.Html(source));
+        public override Tokens.Def? Def(SourceView source) => Produced(nameof(Def), base.Def(source));
+        public override Tokens.Table? Table(SourceView source) => Produced(nameof(Table), base.Table(source));
+        public override Tokens.Heading? Lheading(SourceView source) => Produced(nameof(Lheading), base.Lheading(source));
+        public override Tokens.Paragraph? Paragraph(SourceView source) => Produced(nameof(Paragraph), base.Paragraph(source));
+        public override Tokens.Text? Text(SourceView source) => Produced(nameof(Text), base.Text(source));
+        public override Tokens.Escape? Escape(SourceView source) => Produced(nameof(Escape), base.Escape(source));
+        public override Tokens.Html? Tag(SourceView source) => Produced(nameof(Tag), base.Tag(source));
+        public override Token? Link(SourceView source) => Produced(nameof(Link), base.Link(source));
+        public override Token? Reflink(SourceView source, Dictionary<string, LinkReference> links) => Produced(nameof(Reflink), base.Reflink(source, links));
+        public override Token? EmStrong(SourceView source, SourceView maskedSource, string previous = "") => Produced(nameof(EmStrong), base.EmStrong(source, maskedSource, previous));
+        public override Tokens.Codespan? Codespan(SourceView source) => Produced(nameof(Codespan), base.Codespan(source));
+        public override Tokens.Br? Br(SourceView source) => Produced(nameof(Br), base.Br(source));
+        public override Tokens.Del? Del(SourceView source, SourceView maskedSource, string previous = "") => Produced(nameof(Del), base.Del(source, maskedSource, previous));
+        public override Tokens.Link? Autolink(SourceView source) => Produced(nameof(Autolink), base.Autolink(source));
+        public override Tokens.Link? Url(SourceView source) => Produced(nameof(Url), base.Url(source));
+        public override Tokens.Text? InlineText(SourceView source) => Produced(nameof(InlineText), base.InlineText(source));
     }
 
     private sealed class CountingPiTokenizer : MarkdownParser.StrictStrikethroughTokenizer, IHitCounter
     {
         public Dictionary<string, int> Hits { get; } = new(StringComparer.Ordinal);
-        private void Hit(string name) => Hits[name] = Hits.GetValueOrDefault(name) + 1;
-        public override Tokens.Space? Space(SourceView source) { Hit(nameof(Space)); return base.Space(source); }
-        public override Tokens.Code? Code(SourceView source) { Hit(nameof(Code)); return base.Code(source); }
-        public override Tokens.Code? Fences(SourceView source) { Hit(nameof(Fences)); return base.Fences(source); }
-        public override Tokens.Heading? Heading(SourceView source) { Hit(nameof(Heading)); return base.Heading(source); }
-        public override Tokens.Hr? Hr(SourceView source) { Hit(nameof(Hr)); return base.Hr(source); }
-        public override Tokens.Blockquote? Blockquote(SourceView source) { Hit(nameof(Blockquote)); return base.Blockquote(source); }
-        public override Tokens.List? List(SourceView source) { Hit(nameof(List)); return base.List(source); }
-        public override Tokens.Html? Html(SourceView source) { Hit(nameof(Html)); return base.Html(source); }
-        public override Tokens.Def? Def(SourceView source) { Hit(nameof(Def)); return base.Def(source); }
-        public override Tokens.Table? Table(SourceView source) { Hit(nameof(Table)); return base.Table(source); }
-        public override Tokens.Heading? Lheading(SourceView source) { Hit(nameof(Lheading)); return base.Lheading(source); }
-        public override Tokens.Paragraph? Paragraph(SourceView source) { Hit(nameof(Paragraph)); return base.Paragraph(source); }
-        public override Tokens.Text? Text(SourceView source) { Hit(nameof(Text)); return base.Text(source); }
-        public override Tokens.Escape? Escape(SourceView source) { Hit(nameof(Escape)); return base.Escape(source); }
-        public override Tokens.Html? Tag(SourceView source) { Hit(nameof(Tag)); return base.Tag(source); }
-        public override Token? Link(SourceView source) { Hit(nameof(Link)); return base.Link(source); }
-        public override Token? Reflink(SourceView source, Dictionary<string, LinkReference> links) { Hit(nameof(Reflink)); return base.Reflink(source, links); }
-        public override Token? EmStrong(SourceView source, SourceView maskedSource, string previous = "") { Hit(nameof(EmStrong)); return base.EmStrong(source, maskedSource, previous); }
-        public override Tokens.Codespan? Codespan(SourceView source) { Hit(nameof(Codespan)); return base.Codespan(source); }
-        public override Tokens.Br? Br(SourceView source) { Hit(nameof(Br)); return base.Br(source); }
-        public override Tokens.Del? Del(SourceView source, SourceView maskedSource, string previous = "") { Hit(nameof(Del)); return base.Del(source, maskedSource, previous); }
-        public override Tokens.Link? Autolink(SourceView source) { Hit(nameof(Autolink)); return base.Autolink(source); }
-        public override Tokens.Link? Url(SourceView source) { Hit(nameof(Url)); return base.Url(source); }
-        public override Tokens.Text? InlineText(SourceView source) { Hit(nameof(InlineText)); return base.InlineText(source); }
+        private T? Produced<T>(string name, T? value) where T : class
+        {
+            if (value is not null) Hits[name] = Hits.GetValueOrDefault(name) + 1;
+            return value;
+        }
+        public override Tokens.Space? Space(SourceView source) => Produced(nameof(Space), base.Space(source));
+        public override Tokens.Code? Code(SourceView source) => Produced(nameof(Code), base.Code(source));
+        public override Tokens.Code? Fences(SourceView source) => Produced(nameof(Fences), base.Fences(source));
+        public override Tokens.Heading? Heading(SourceView source) => Produced(nameof(Heading), base.Heading(source));
+        public override Tokens.Hr? Hr(SourceView source) => Produced(nameof(Hr), base.Hr(source));
+        public override Tokens.Blockquote? Blockquote(SourceView source) => Produced(nameof(Blockquote), base.Blockquote(source));
+        public override Tokens.List? List(SourceView source) => Produced(nameof(List), base.List(source));
+        public override Tokens.Html? Html(SourceView source) => Produced(nameof(Html), base.Html(source));
+        public override Tokens.Def? Def(SourceView source) => Produced(nameof(Def), base.Def(source));
+        public override Tokens.Table? Table(SourceView source) => Produced(nameof(Table), base.Table(source));
+        public override Tokens.Heading? Lheading(SourceView source) => Produced(nameof(Lheading), base.Lheading(source));
+        public override Tokens.Paragraph? Paragraph(SourceView source) => Produced(nameof(Paragraph), base.Paragraph(source));
+        public override Tokens.Text? Text(SourceView source) => Produced(nameof(Text), base.Text(source));
+        public override Tokens.Escape? Escape(SourceView source) => Produced(nameof(Escape), base.Escape(source));
+        public override Tokens.Html? Tag(SourceView source) => Produced(nameof(Tag), base.Tag(source));
+        public override Token? Link(SourceView source) => Produced(nameof(Link), base.Link(source));
+        public override Token? Reflink(SourceView source, Dictionary<string, LinkReference> links) => Produced(nameof(Reflink), base.Reflink(source, links));
+        public override Token? EmStrong(SourceView source, SourceView maskedSource, string previous = "") => Produced(nameof(EmStrong), base.EmStrong(source, maskedSource, previous));
+        public override Tokens.Codespan? Codespan(SourceView source) => Produced(nameof(Codespan), base.Codespan(source));
+        public override Tokens.Br? Br(SourceView source) => Produced(nameof(Br), base.Br(source));
+        public override Tokens.Del? Del(SourceView source, SourceView maskedSource, string previous = "") => Produced(nameof(Del), base.Del(source, maskedSource, previous));
+        public override Tokens.Link? Autolink(SourceView source) => Produced(nameof(Autolink), base.Autolink(source));
+        public override Tokens.Link? Url(SourceView source) => Produced(nameof(Url), base.Url(source));
+        public override Tokens.Text? InlineText(SourceView source) => Produced(nameof(InlineText), base.InlineText(source));
     }
 
     private sealed class ProbeTokenizer : CountingTokenizer

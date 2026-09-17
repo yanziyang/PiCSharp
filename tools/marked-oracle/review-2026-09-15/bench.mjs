@@ -20,8 +20,10 @@ const { Marked } = await import(pathToFileURL(path.join(markedRoot, "lib/marked.
 const { markdownParser: pi } = await import(pathToFileURL(path.join(DIR, "pi-parser.mjs")).href);
 const plain = new Marked();
 
+// The corpus documents concatenate the 358 cases the review timed. The corpus grew afterwards, and its generated
+// cases open fences that swallow much of a concatenated document: 3,632 top-level tokens in 1 MB instead of 31,921.
 const sources = fs.readFileSync(path.join(REPO, "tests/fixtures/marked/corpus.jsonl"), "utf8")
-  .split("\n").filter(Boolean).map((line) => JSON.parse(line).source);
+  .split("\n").filter(Boolean).map((line) => JSON.parse(line).source).slice(0, 358);
 function trimSurrogate(text) {
   const last = text.charCodeAt(text.length - 1);
   return last >= 0xd800 && last <= 0xdbff ? text.slice(0, -1) : text;
@@ -44,6 +46,19 @@ const docs = [
   ["list-100kb", repeated("- item #N with **bold** and `code`\n", 100_000)],
   ["list-300kb", repeated("- item #N with **bold** and `code`\n", 300_000)],
 ];
+// Scaling documents, added after the review: each shape at 25 KB and 100 KB, so linear work takes four times as
+// long. Each targets one path that grows strings or rescans text: _ runs in words, one long list item,
+// blockquote continuation, table rows, and backslash escapes.
+const shapes = [
+  ["snake", "use my_long_variable_name and other_value_#N here "],
+  ["item", "  continuation line #N of the same item\n", "- first line\n"],
+  ["quote", "> quoted line #N with **bold** text\n"],
+  ["table", "| cell `x` #N | cell y |\n", "| a | b |\n| - | - |\n"],
+  ["escapes", "\\* not em \\_ #N \\` "],
+];
+for (const [name, unit, head = ""] of shapes) {
+  for (const [label, size] of [["25kb", 25_000], ["100kb", 100_000]]) docs.push([`${name}-${label}`, (head + repeated(unit, size)).slice(0, size)]);
+}
 for (const [name, text] of docs) fs.writeFileSync(path.join(OUT, `${name}.md`), text);
 
 const lines = [];
