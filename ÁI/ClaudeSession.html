@@ -52,8 +52,8 @@
 <p class="eyebrow">Claude Code · Session Transcript</p>
 <h1>PiCSharp — Pi to .NET 10 feasibility, port scaffold and review</h1>
 <div class="stat-bar">
-  <div>Exchanges<b>75</b></div>
-  <div>Responses<b>114</b></div>
+  <div>Exchanges<b>76</b></div>
+  <div>Responses<b>116</b></div>
 </div>
 </div></header>
 <div class="shell">
@@ -133,6 +133,7 @@
 <a href="#p73"><span class="n">73</span>done</a>
 <a href="#p74"><span class="n">74</span>fix the issue.</a>
 <a href="#p75"><span class="n">75</span>commit and push all outstanding items</a>
+<a href="#p76"><span class="n">76</span>Fix all the issues detected so far</a>
 </nav>
 <main>
 <section class="turn user" id="p1">
@@ -1846,12 +1847,38 @@ Report in tests/Pi.Tui.Tests/Marked/T5.9-findings.md: what changed for each numb
 <ul><li><code>ÁI/ClaudeSession.html</code> doesn't cover this session yet. Say if you want it updated and pushed.</li><li>The finished notices task left a worktree and a local branch, <code>claude/inspiring-cori-fcfa1a</code>, with nothing unmerged in either. I can remove both if you like.</li></ul></div>
 </section>
 
+<section class="turn user" id="p76">
+  <div class="who"><span class="badge u">Exchange 76</span><time>2026-09-15 15:24:57</time></div>
+  <div class="bubble"><p>Fix all the issues detected so far</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span><time>2026-09-16 13:17:49</time></div>
+  <div class="bubble"><p>The regex translation check is nearly clean. Of 113 patterns over 5,391 probes (97,500 match pairs), only two differ from JavaScript:</p>
+<ul><li><strong><code>BlockBlockquote</code>, harmless.</strong> JavaScript clears captures inside a repeated group on each iteration, while .NET keeps the last one. Only <code>cap[0]</code> is used from this rule, so tokens are unaffected, but the rule belongs in §15.</li><li><strong><code>InlineText</code>, a real bug.</strong> For <code>a.b-c_d@e.f.</code> JavaScript matches 1 character and .NET matches 2. The email lookahead <code>[a-zA-Z0-9.!#$…]+@</code> seems to fail in .NET, as if a character were missing from the translated class.</li></ul>
+<p>Private list of what's next:</p>
+<ol><li>Pull the <code>InlineText</code> JavaScript source, the translated .NET pattern, and the three differing inputs, to find which part of the translation broke. The session's scratchpad directory changed, so new files go in the new one.</li><li>Fix the generator, regenerate, and rerun the differential until only the harmless capture-reset case remains.</li><li>Then the Tokenizer and Lexer re-port, pi's parser, tests, and verification.</li></ol>
+<p>Item 1 now:</p></div>
+</section>
+<section class="turn asst">
+  <div class="who"><span class="badge a">Claude</span><time>2026-09-17 15:03:24</time></div>
+  <div class="bubble"><p>All the T5.9 review findings are fixed and pushed to main in three commits; <code>HEAD</code> and <code>origin/main</code> are both at <code>0745b23</code>. Checked against real marked with the review's own harness, the port now differs on 0 of 6,881 fresh cases in both <code>plain</code> and <code>pi</code>, and throws on none. Before, it differed on 346 and 341 and threw on 47 and 43.</p>
+<p><strong>The three commits</strong></p>
+<ul><li><strong>Oracle</strong> (<code>8cb577d</code>), committed before the port changes. The recorded test corpus grows from 358 to 1,940 cases, recorded again from marked 18.0.5. The recorder's integrity check no longer compares the pinned version with itself.</li><li><strong>Port</strong> (<code>0ba45cc</code>):</li><li>All 119 regexes are generated from marked's and pi's sources, and every one was checked against JavaScript.</li><li>The tokenizer and lexer were ported again from marked's source.</li><li>Lexing no longer copies or rebuilds strings at each step. The 1 MB document went from 5,121 ms and 4.5 GB to 452 ms and 98 MB.</li><li><strong>Record</strong> (<code>0745b23</code>): the <code>ÍmplementationKit/packets/T5.9-marked-lexer.md</code>, <code>tests/Pi.Tui.Tests/Marked/T5.9-findings.md</code> and the <code>tools/marked-oracle/review-2026-09-15/README.md</code>. A new §15 note in <code>docs/translation-patterns.md</code> went in with the port commit.</li></ul>
+<p><strong>Two more problems turned up while fixing, and are fixed</strong></p>
+<ul><li><strong>Nesting limit.</strong> The delivered findings said the port survives 10,000 nesting levels, but its test only checked that the process exited. On an ordinary 1 MB thread stack it actually failed after about 300–400 levels, while marked handles 2,000–3,500. The lexer now moves to a larger stack when it runs low and stops at 5,000 levels with a catchable exception. The tests check that outcome.</li><li><strong>Deeply nested emphasis.</strong> Its cost grew with the cube of the depth: 3,000 levels allocated 6.8 GB, and every garbage collection had to walk the deep stack. The delimiter scans now allocate nothing per match, bringing that down to 212 MB.</li></ul>
+<p><strong>Things you should know</strong></p>
+<ul><li><strong>Speed:</strong> timed side by side, the port is 2–4× slower than marked on mixed documents and faster on long paragraphs and escapes. marked ran several times slower on the review day, so comparisons against those timings flattered the port. The packet only requires that 1 MB takes at most 15× as long as 100 KB; the port is at 4.9× (<code>plain</code>) and 9.2× (<code>pi</code>).</li><li><strong>The 5,000-level limit</strong> is my choice. marked has no limit of its own beyond Node's stack.</li><li><strong>Test suite time</strong> rose from 44–52 s to 56–94 s, mostly the test that lexes 10,000 nesting levels.</li><li><strong>Acceptance:</strong> I marked T5.9 accepted because every packet criterion now holds. Say if you'd rather make that call yourself.</li></ul>
+<p><strong>Checks</strong></p>
+<ul><li>The build has 0 warnings.</li><li>1,517 tests passed in each of four runs, with none failed or skipped.</li><li>Format, parity, the skip budget and the regex generator check all pass.</li><li>Concurrent lexing on eight threads matched single-threaded output exactly.</li></ul>
+<p>I didn't update <code>ÁI/ClaudeSession.html</code>. An export now would miss this report, and the exporter lists an interrupted request as if it were a prompt. Want me to fix the exporter and push an updated record?</p></div>
+</section>
+
 </main>
 </div>
 <footer><div class="wrap">
 <p style="margin:0 0 6px"><b>Session transcript exported from Claude Code.</b> Prompts and responses only — tool calls, tool results and internal reasoning are excluded as intermediate working detail.</p>
-<p style="margin:0 0 6px">This is a curated record, not a complete one. Bare continuations such as “proceed” are folded into the preceding exchange, keeping the work they triggered without the empty prompt. Short progress narration between tool calls is dropped. A further 11 exchanges were omitted as routine housekeeping.</p>
-<p style="margin:0">Generated 2026-09-15 · 189 entries from 10,492 transcript records.</p>
+<p style="margin:0 0 6px">This is a curated record, not a complete one. Bare continuations such as “proceed” are folded into the preceding exchange, keeping the work they triggered without the empty prompt. Short progress narration between tool calls is dropped. A further 13 exchanges were omitted as routine housekeeping.</p>
+<p style="margin:0">Generated 2026-09-17 · 192 entries from 12,858 transcript records.</p>
 </div></footer>
 </body>
 </html>

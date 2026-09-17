@@ -148,6 +148,8 @@ function md(src) {
 const SYSTEM_REMINDER = new RegExp("<system-reminder>[^]*?</system-reminder>", "g");
 // The harness's placeholder reply when a background-task notice arrives with nothing to add.
 const NO_RESPONSE = new RegExp("^no response requested[.]?$", "i");
+// Tools that write a file, recorded per exchange so filter C can tell what the work touched.
+const FILE_TOOLS = new Set(["Edit", "Write", "MultiEdit"]);
 
 const recs = fs.readFileSync(SRC, "utf8").split("\n").filter(Boolean)
   .map(l => { try { return JSON.parse(l); } catch { return null; } }).filter(Boolean);
@@ -178,7 +180,7 @@ for (const r of conv) {
   if (!Array.isArray(c)) continue;
   for (const b of c) {
     if (b.type === "text" && b.text.trim() && !NO_RESPONSE.test(b.text.trim())) turns.push({ role: "assistant", text: b.text, ts: r.timestamp });
-    if (b.type === "tool_use") turns.push({ role: "tool", ts: r.timestamp });
+    if (b.type === "tool_use") turns.push({ role: "tool", ts: r.timestamp, file: FILE_TOOLS.has(b.name) ? b.input?.file_path : undefined });
   }
 }
 
@@ -195,7 +197,9 @@ for (const r of conv) {
 //    being filed under text the user never wrote.
 //    Background-task notices (<task-notification>) and the meta records the harness
 //    injects ("Output token limit hit", "Continue from where you left off") fold the
-//    same way: their replies belong to the exchange whose work they report on.
+//    same way: their replies belong to the exchange whose work they report on. So
+//    does "[Request interrupted by user]", which the harness records when the user
+//    stops a turn and which carries no meta flag.
 //
 // B. Narration is dropped. Short, unstructured assistant blocks that sit between
 //    tool calls ("Building the scaffold now.") are process, not content. The
@@ -209,7 +213,14 @@ const CONTINUATION =
   /^(proceed|continue|go ahead|carry on|go on|next|ok|okay|yes|please proceed)[.!]?$/i;
 
 const HARNESS =
-  /^(this session is being continued from a previous conversation|i hit my usage limit|caveat: the messages below|<task-notification>)/i;
+  /^(this session is being continued from a previous conversation|i hit my usage limit|caveat: the messages below|<task-notification>|\[request interrupted by user)/i;
+
+// A written file's path relative to the repository, or null for files outside it, such as scratch files.
+const repoRelative = file => {
+  const root = REPO_ROOT.replace(/\\/g, "/").toLowerCase() + "/";
+  const full = path.resolve(file).replace(/\\/g, "/");
+  return full.toLowerCase().startsWith(root) ? full.slice(root.length).normalize("NFC").toLowerCase() : null;
+};
 
 const exchanges = [];
 for (const t of turns) {
@@ -229,7 +240,12 @@ for (const t of turns) {
     }
     exchanges.push({ prompt: t, replies: [] });
   } else if (t.role === "tool") {
-    if (exchanges.length) exchanges[exchanges.length - 1].tools = (exchanges[exchanges.length - 1].tools || 0) + 1;
+    if (exchanges.length) {
+      const x = exchanges[exchanges.length - 1];
+      x.tools = (x.tools || 0) + 1;
+      const file = t.file && repoRelative(t.file);
+      if (file) (x.edited ??= new Set()).add(file);
+    }
   } else if (exchanges.length) {
     exchanges[exchanges.length - 1].replies.push(t);
   }
@@ -259,10 +275,15 @@ const replyText = x => x.replies.map(r => r.text).join("\n");
 // heavy tool work can look thin from its text alone. Enough tool activity counts as substance.
 const TOOL_WORK_MIN = 10;
 
+// This record and its exporter. Work whose repository edits touch nothing else is about the transcript, however
+// the prompt is worded ("fix the exporter and push an updated record").
+const TRANSCRIPT_FILES = new Set(["ÁI/ClaudeSession.html", "tools/export-session.mjs"].map(file => file.normalize("NFC").toLowerCase()));
+const editsOnlyTranscript = x => x.edited?.size > 0 && [...x.edited].every(file => TRANSCRIPT_FILES.has(file));
+
 function isSubstantive(x, index) {
   if (index === 0) return true;                          // the original brief
   // Requests about this transcript itself are never content, however long the reply.
-  if (/claudesession/i.test(x.prompt.text)) return false;
+  if (/claudesession/i.test(x.prompt.text) || editsOnlyTranscript(x)) return false;
   const body = replyText(x);
   const structured = /^#{2,4}\s/m.test(body) || /\n\|.*\|/.test(body);
   if (HOUSEKEEPING.test(x.prompt.text.trim()) && !structured && body.length < 2500) return false;
