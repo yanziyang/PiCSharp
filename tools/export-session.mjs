@@ -317,6 +317,8 @@ if (fs.existsSync(OUT)) {
     const omittedMatch = oldHtml.match(/A further ([\d,]+) exchange/);
     const recordsMatch = oldHtml.match(/from ([\d,]+) transcript records/);
     const replyCount = (oldHtml.match(/<section class="turn asst">/g) || []).length;
+    const stateMatch = oldHtml.match(/<!-- export-state (\{.*?\}) -->/);
+    const state = stateMatch ? JSON.parse(stateMatch[1]) : {};
     if (navMatch && mainMatch && lastTs) {
       prefix = {
         count: userSections.length,
@@ -326,23 +328,40 @@ if (fs.existsSync(OUT)) {
         nav: navMatch[1],
         main: mainMatch[1],
         lastTs,
+        // Written by the previous export: the newest prompt it judged, kept or omitted, and how many records of each
+        // transcript it had counted. Files from before the state existed fall back to the last kept exchange.
+        judgedThrough: state.judgedThrough ? Date.parse(state.judgedThrough) : lastTs,
+        counted: state.records ?? {},
       };
     }
   }
 }
 
+// The cutoff is the newest prompt an earlier export judged, not the last one it kept. Omitted exchanges after the
+// last kept one would otherwise be judged, and counted as omitted, again at every export.
+//
 // The published file's <time> is truncated to the second (no milliseconds), so
 // a raw timestamp landing in the SAME second as the cutoff (e.g. ...11.080Z vs a
 // cutoff parsed as ...11.000Z) would compare as later and re-include the exchange
 // that produced the cutoff. Compare at second granularity to match what was
 // actually rendered.
-const afterCutoff = ts => !prefix || Math.floor(Date.parse(ts) / 1000) > Math.floor(prefix.lastTs / 1000);
+const cutoff = prefix ? Math.max(prefix.lastTs, prefix.judgedThrough) : 0;
+const afterCutoff = ts => !prefix || Math.floor(Date.parse(ts) / 1000) > Math.floor(cutoff / 1000);
 const kept = prefix ? allKept.filter(x => afterCutoff(x.prompt.ts)) : allKept;
 const consideredAfterSplice = prefix ? exchanges.filter(x => afterCutoff(x.prompt.ts)) : exchanges;
 const omitted = consideredAfterSplice.length - kept.length;
 
+// Re-exporting a transcript reads records an earlier export already counted, so only its growth since then counts.
+const source = path.basename(SRC);
+const countedBefore = prefix ? prefix.counted[source] ?? 0 : 0;
+const records = (prefix ? prefix.records : 0) + Math.max(0, recs.length - countedBefore);
+const exportState = {
+  judgedThrough: new Date(Math.max(cutoff, ...exchanges.map(x => Date.parse(x.prompt.ts)).filter(Number.isFinite))).toISOString().slice(0, 19) + "Z",
+  records: { ...(prefix ? prefix.counted : {}), [source]: Math.max(recs.length, countedBefore) },
+};
+
 if (prefix) {
-  console.log(`splicing onto existing export: ${prefix.count} prior exchanges kept as-is, appending from after ${new Date(prefix.lastTs).toISOString()}`);
+  console.log(`splicing onto existing export: ${prefix.count} prior exchanges kept as-is, appending from after ${new Date(cutoff).toISOString()}`);
 }
 
 const summarise = x => {
@@ -387,8 +406,9 @@ const stats = {
 
 const newToc = kept.map((x, n) =>
   `<a href="#p${baseIdx + n + 1}"><span class="n">${baseIdx + n + 1}</span>${esc(summarise(x))}</a>`).join("\n");
-const toc = prefix ? prefix.nav + "\n" + newToc : newToc;
-body = prefix ? prefix.main + "\n" + body : body;
+// An export with nothing new to append leaves the published contents and body exactly as they were.
+const toc = prefix && newToc ? prefix.nav + "\n" + newToc : prefix ? prefix.nav : newToc;
+body = prefix && body ? prefix.main + "\n" + body : prefix ? prefix.main : body;
 
 const html = `<!doctype html>
 <html lang="en">
@@ -459,8 +479,9 @@ ${body}
 <footer><div class="wrap">
 <p style="margin:0 0 6px"><b>Session transcript exported from Claude Code.</b> Prompts and responses only \u2014 tool calls, tool results and internal reasoning are excluded as intermediate working detail.</p>
 <p style="margin:0 0 6px">This is a curated record, not a complete one. Bare continuations such as \u201cproceed\u201d are folded into the preceding exchange, keeping the work they triggered without the empty prompt. Short progress narration between tool calls is dropped. A further ${stats.omitted} exchange${stats.omitted === 1 ? " was" : "s were"} omitted as routine housekeeping.</p>
-<p style="margin:0">Generated ${new Date().toISOString().slice(0, 10)} \u00b7 ${stats.prompts + stats.replies} entries from ${((prefix ? prefix.records : 0) + recs.length).toLocaleString()} transcript records.</p>
+<p style="margin:0">Generated ${new Date().toISOString().slice(0, 10)} \u00b7 ${stats.prompts + stats.replies} entries from ${records.toLocaleString()} transcript records.</p>
 </div></footer>
+<!-- export-state ${JSON.stringify(exportState)} -->
 </body>
 </html>`;
 
